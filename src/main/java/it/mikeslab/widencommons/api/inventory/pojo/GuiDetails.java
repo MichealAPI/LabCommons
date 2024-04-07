@@ -18,7 +18,7 @@ public class GuiDetails {
     // Optional
     private InventoryHolder holder;
     private Component inventoryName = Component.empty();
-    private int inventorySize; // Only 9, 27, 36, 54
+    private int inventorySize; // calculated or fixed, in case of a chest
 
     public GuiDetails(String[] inventoryLayout, GuiType guiType) {
 

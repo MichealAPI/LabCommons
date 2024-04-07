@@ -7,7 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+
+import java.util.Optional;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class GuiListener implements Listener {
@@ -29,7 +33,7 @@ public class GuiListener implements Listener {
 
             CustomGui customGui = guiFactoryImpl.getCachedGuis().get(id);
 
-            if(clickedInventory.getHolder() instanceof CustomGui) {
+            if(isCustomGui(clickedInventory)) {
 
                 event.setCancelled(true);
 
@@ -44,6 +48,18 @@ public class GuiListener implements Listener {
                 return;
 
             }
+        }
+
+    }
+
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+
+        Inventory draggedInventory = event.getView().getTopInventory();
+
+        if(isCustomGui(draggedInventory)) {
+            event.setCancelled(true);
         }
 
     }
@@ -67,14 +83,21 @@ public class GuiListener implements Listener {
 
         if(gui.getGuiDetails().getElements().containsKey(clickedChar)) {
 
-            gui.getGuiDetails().getElements()
-                    .get(clickedChar)
-                    .getOnClick()
-                    .accept(event);
+            Optional<Consumer<InventoryClickEvent>> consumer = Optional.ofNullable(
+                    gui.getGuiDetails().getElements()
+                            .get(clickedChar)
+                            .getOnClick()
+            );
+
+            consumer.ifPresent(lambdaConsumer -> lambdaConsumer.accept(event));
 
         }
 
+    }
 
+
+    private boolean isCustomGui(Inventory inventory) {
+        return inventory.getHolder() instanceof CustomGui;
     }
 
 
