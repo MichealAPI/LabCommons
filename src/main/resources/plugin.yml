@@ -1,0 +1,4 @@
+name: WidenCommons
+version: '${project.version}'
+main: it.mikeslab.widencommons.WidenCommons
+api-version: '1.20'

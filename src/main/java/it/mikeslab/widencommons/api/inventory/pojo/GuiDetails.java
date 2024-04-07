@@ -1,0 +1,48 @@
+package it.mikeslab.widencommons.api.inventory.pojo;
+
+import it.mikeslab.widencommons.api.inventory.GuiType;
+import lombok.Data;
+import net.kyori.adventure.text.Component;
+import org.bukkit.inventory.InventoryHolder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Data
+public class GuiDetails {
+
+    private final String[] inventoryLayout;
+    private final GuiType guiType;
+    private final Map<Character, GuiElement> elements;
+
+    // Optional
+    private InventoryHolder holder;
+    private Component inventoryName = Component.empty();
+    private int inventorySize; // Only 9, 27, 36, 54
+
+    public GuiDetails(String[] inventoryLayout, GuiType guiType) {
+
+        // default size
+        inventorySize = inventoryLayout.length * guiType.getRowLength();
+
+        this.guiType = guiType;
+        this.inventoryLayout = inventoryLayout;
+
+        this.elements = new HashMap<>();
+
+    }
+
+
+    // Simple methods to add and remove elements
+    // Avoiding exposing the map directly
+
+    public void addElement(Character key, GuiElement element) {
+        this.elements.put(key, element);
+    }
+
+    public void removeElement(Character key) {
+        this.elements.remove(key);
+    }
+
+
+}
