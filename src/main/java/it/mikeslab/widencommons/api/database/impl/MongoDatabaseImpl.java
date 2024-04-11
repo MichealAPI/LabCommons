@@ -7,6 +7,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import it.mikeslab.widencommons.api.database.Database;
+import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
 import it.mikeslab.widencommons.api.database.util.PojoMapper;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ public class MongoDatabaseImpl<T> implements Database<T> {
             Bson command = new BsonDocument("ping", new BsonInt64(1));
             Document commandResult = mongoDatabase.runCommand(command);
             return true;
-        } catch (MongoException me) {
+        } catch (Exception e) {
             return false;
         }
 
@@ -110,7 +111,7 @@ public class MongoDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public Map.Entry<Integer, T> find(Object pojoObject) {
+    public RetrievedEntry find(Object pojoObject) {
 
         Map<String, Object> values = PojoMapper.toMap(pojoObject);
 
@@ -128,7 +129,7 @@ public class MongoDatabaseImpl<T> implements Database<T> {
         resultDocument.remove("_id"); // MongoDB's internal id
         resultDocument.remove("id"); // The id is not needed in the POJO
 
-        return new AbstractMap.SimpleEntry<>(
+        return new RetrievedEntry(
                 id,
                 PojoMapper.fromMap(resultDocument, (Class<T>) pojoObject.getClass())
         );

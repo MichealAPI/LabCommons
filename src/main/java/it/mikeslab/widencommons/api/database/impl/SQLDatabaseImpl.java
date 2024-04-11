@@ -3,6 +3,7 @@ package it.mikeslab.widencommons.api.database.impl;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import it.mikeslab.widencommons.api.database.Database;
+import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
 import it.mikeslab.widencommons.api.database.util.PojoMapper;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
@@ -167,7 +168,7 @@ public class SQLDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public Map.Entry<Integer, T> find(Object pojoObject) {
+    public RetrievedEntry find(Object pojoObject) {
 
         Map<String, Object> values = PojoMapper.toMap(pojoObject);
 
@@ -196,7 +197,7 @@ public class SQLDatabaseImpl<T> implements Database<T> {
                 int id = (int) resultValues.get("id");
 
                 resultValues.remove("id");
-                return new AbstractMap.SimpleEntry<>(
+                return new RetrievedEntry(
                         id,
                         PojoMapper.fromMap(resultValues, (Class<T>) pojoObject.getClass())
                 );

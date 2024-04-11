@@ -1,5 +1,7 @@
 package it.mikeslab.widencommons.api.database;
 
+import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,6 +52,6 @@ public interface Database<T> {
      * Find a pojo object from the database
      * @param pojoObject similar to the object to find
      */
-    Map.Entry<Integer, T> find(Object pojoObject);
+    RetrievedEntry find(Object pojoObject);
 
 }
