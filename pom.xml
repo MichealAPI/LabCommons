@@ -16,9 +16,15 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <licenses>
+    <license>
+        <name>Gnu General Public License</name>
+        <url>https://www.gnu.org/licenses/gpl-3.0.html#license-text</url>
+    </license>
+  </licenses>
+
   <build>
     <plugins>
-
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
