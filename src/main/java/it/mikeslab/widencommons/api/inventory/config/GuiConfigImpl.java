@@ -1,5 +1,6 @@
 package it.mikeslab.widencommons.api.inventory.config;
 
+import it.mikeslab.widencommons.api.component.ComponentsUtil;
 import it.mikeslab.widencommons.api.inventory.GuiType;
 import it.mikeslab.widencommons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.widencommons.api.inventory.pojo.GuiElement;
@@ -88,7 +89,7 @@ public class GuiConfigImpl implements GuiConfig {
             return;
         }
 
-        Component guiTitle = getComponent(section, ConfigField.TITLE.getField());
+        Component guiTitle = ComponentsUtil.getComponent(section, ConfigField.TITLE.getField());
         String[] layout = section.getStringList(ConfigField.LAYOUT.getField())
                 .toArray(new String[0]);
 
@@ -130,8 +131,8 @@ public class GuiConfigImpl implements GuiConfig {
 
             ConfigurationSection element = elements.getConfigurationSection(charKey);
 
-            Component displayName = getComponent(element, ConfigField.DISPLAYNAME.getField());
-            List<Component> lore = getComponentList(element, ConfigField.LORE.getField());
+            Component displayName = ComponentsUtil.getComponent(element, ConfigField.DISPLAYNAME.getField());
+            List<Component> lore = ComponentsUtil.getComponentList(element, ConfigField.LORE.getField());
 
             Material material = Material.getMaterial(
                     element.getString(ConfigField.MATERIAL.getField(), "AIR")
@@ -169,8 +170,6 @@ public class GuiConfigImpl implements GuiConfig {
             String actionKey = entry.getKey();
             Consumer<InventoryClickEvent> actionConsumer = entry.getValue();
 
-            // todo lowercase parse
-
             if(action.equalsIgnoreCase(actionKey)) {
                 guiElement.setOnClick(actionConsumer);
             }
@@ -179,21 +178,6 @@ public class GuiConfigImpl implements GuiConfig {
 
     }
 
-
-
-    // todo move out of this class
-
-    private Component getComponent(ConfigurationSection section, String key) {
-        return MiniMessage.miniMessage().deserialize(
-                section.getString(key, "")
-        );
-    }
-
-    private List<Component> getComponentList(ConfigurationSection section, String key) {
-        return section.getStringList(key).stream()
-                .map(MiniMessage.miniMessage()::deserialize)
-                .collect(Collectors.toList());
-    }
 
 
 

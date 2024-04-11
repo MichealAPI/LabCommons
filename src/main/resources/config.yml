@@ -1,3 +1,11 @@
+settings:
+  type: MONGODB
+  uri: ""
+  password: ""
+  user: ""
+  table: ""
+  database: ""
+
 title: "<red>Test"
 layout:
   - "   "

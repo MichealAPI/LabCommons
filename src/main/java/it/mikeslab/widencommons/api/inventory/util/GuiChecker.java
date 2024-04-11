@@ -96,7 +96,7 @@ public class GuiChecker {
      */
     public boolean isLayoutValid(String[] layout) {
 
-        boolean areEntriesValid = layout.length > 2 && layout.length < 7;
+        boolean areEntriesValid = layout.length > 0 && layout.length < 7;
         boolean areRowsValid = true;
 
         for(String row : layout) {
