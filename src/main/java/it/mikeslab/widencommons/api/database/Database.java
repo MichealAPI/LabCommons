@@ -1,5 +1,6 @@
 package it.mikeslab.widencommons.api.database;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface Database<T> {
@@ -49,6 +50,6 @@ public interface Database<T> {
      * Find a pojo object from the database
      * @param pojoObject similar to the object to find
      */
-    T find(Object pojoObject);
+    Map.Entry<Integer, T> find(Object pojoObject);
 
 }

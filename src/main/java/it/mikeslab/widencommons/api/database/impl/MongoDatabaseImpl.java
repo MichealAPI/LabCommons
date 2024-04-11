@@ -15,6 +15,7 @@ import org.bson.BsonInt64;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -109,7 +110,7 @@ public class MongoDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public T find(Object pojoObject) {
+    public Map.Entry<Integer, T> find(Object pojoObject) {
 
         Map<String, Object> values = PojoMapper.toMap(pojoObject);
 
@@ -122,10 +123,15 @@ public class MongoDatabaseImpl<T> implements Database<T> {
 
         if(resultDocument == null) return null;
 
+        int id = resultDocument.getInteger("id");
+
         resultDocument.remove("_id"); // MongoDB's internal id
         resultDocument.remove("id"); // The id is not needed in the POJO
 
-        return PojoMapper.fromMap(resultDocument, (Class<T>) pojoObject.getClass());
+        return new AbstractMap.SimpleEntry<>(
+                id,
+                PojoMapper.fromMap(resultDocument, (Class<T>) pojoObject.getClass())
+        );
 
     }
 

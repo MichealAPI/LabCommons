@@ -167,7 +167,7 @@ public class SQLDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public T find(Object pojoObject) {
+    public Map.Entry<Integer, T> find(Object pojoObject) {
 
         Map<String, Object> values = PojoMapper.toMap(pojoObject);
 
@@ -193,8 +193,13 @@ public class SQLDatabaseImpl<T> implements Database<T> {
                     resultValues.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
                 }
 
+                int id = (int) resultValues.get("id");
+
                 resultValues.remove("id");
-                return PojoMapper.fromMap(resultValues, (Class<T>) pojoObject.getClass());
+                return new AbstractMap.SimpleEntry<>(
+                        id,
+                        PojoMapper.fromMap(resultValues, (Class<T>) pojoObject.getClass())
+                );
             }
 
         } catch (Exception e) {
