@@ -2,7 +2,6 @@ package it.mikeslab.widencommons.api.database;
 
 import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 
-import java.util.Map;
 import java.util.Optional;
 
 public interface Database<T> {

@@ -9,6 +9,9 @@ import java.util.Map;
 @UtilityClass
 public class PojoMapper {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+
     /**
      * Convert a POJO to a map
      * @param pojoClass the class of the POJO
@@ -16,13 +19,12 @@ public class PojoMapper {
      */
     public Map<String, Object> toMap(Object pojoClass) {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
         return objectMapper.convertValue(
                 pojoClass,
                 new TypeReference<>() {}
         );
     }
+
 
     /**
      * Convert a map to a POJO
@@ -31,8 +33,6 @@ public class PojoMapper {
      * @return the POJO
      */
     public <T> T fromMap(Map<String, Object> map, Class<T> pojoClass) {
-
-        ObjectMapper objectMapper = new ObjectMapper();
 
         return objectMapper.convertValue(
                 map,

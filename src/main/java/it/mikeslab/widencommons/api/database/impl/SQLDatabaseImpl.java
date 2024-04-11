@@ -1,5 +1,6 @@
 package it.mikeslab.widencommons.api.database.impl;
 
+import com.google.common.base.Stopwatch;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import it.mikeslab.widencommons.api.database.Database;
@@ -12,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class SQLDatabaseImpl<T> implements Database<T> {
@@ -175,11 +177,13 @@ public class SQLDatabaseImpl<T> implements Database<T> {
         // check if the entry exists
         // if it does, return the pojo object
 
+        Stopwatch findStopwatch = Stopwatch.createStarted();
+
         try {
             // Convert the map to a list of "key = value" format
             List<String> keyValuePairs = new ArrayList<>();
             for (Map.Entry<String, Object> entry : values.entrySet()) {
-                keyValuePairs.add(entry.getKey() + " = " + entry.getValue());
+                keyValuePairs.add(entry.getKey() + " = '" + entry.getValue() + "'");
             }
 
             // Join the list into a single string with an AND separation
@@ -197,6 +201,9 @@ public class SQLDatabaseImpl<T> implements Database<T> {
                 int id = (int) resultValues.get("id");
 
                 resultValues.remove("id");
+
+                findStopwatch.stop();
+
                 return new RetrievedEntry(
                         id,
                         PojoMapper.fromMap(resultValues, (Class<T>) pojoObject.getClass())
@@ -317,8 +324,16 @@ public class SQLDatabaseImpl<T> implements Database<T> {
 
     private boolean createTable(List<String> fields) {
         try {
+
             StringBuilder query = new StringBuilder("CREATE TABLE " + uriBuilder.getTable() + " (id INT PRIMARY KEY, ");
-            query.append(String.join(", ", fields));
+
+            for(int i = 0; i < fields.size(); i++) {
+                query.append(fields.get(i));
+                query.append(" TEXT");
+                if(i != fields.size() - 1) query.append(", ");
+            }
+
+
             query.append(")");
 
             PreparedStatement pst = connection.prepareStatement(query.toString());

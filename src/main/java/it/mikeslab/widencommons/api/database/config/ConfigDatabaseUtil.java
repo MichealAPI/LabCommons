@@ -16,6 +16,7 @@ public class ConfigDatabaseUtil<T> {
 
     private final ConfigurationSection section;
 
+
     public Database<T> getDatabaseInstance() {
 
         String typeAsString = section.getString("type");
