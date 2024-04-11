@@ -109,6 +109,24 @@ public class MongoDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
+    public T find(Class<T> pojoClass) {
+
+        Document resultDocument = mongoDatabase
+                .getCollection(uriBuilder.getTable())
+                .find()
+                .first();
+
+        if(resultDocument == null) return null;
+
+        resultDocument.remove("_id"); // MongoDB's internal id
+        resultDocument.remove("id"); // The id is not needed in the POJO
+
+        return PojoMapper.fromMap(resultDocument, pojoClass);
+        
+    }
+
+
+    @Override
     public boolean delete(int id) {
         Bson filter = Filters.eq("id", id);
 

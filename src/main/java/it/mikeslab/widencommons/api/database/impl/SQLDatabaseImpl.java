@@ -166,6 +166,40 @@ public class SQLDatabaseImpl<T> implements Database<T> {
         return false;
     }
 
+    @Override
+    public T find(Class<T> pojoClass) {
+
+
+        // Map that contains fields and their values of the pojo object
+        Map<String, Object> values = new HashMap<>();
+
+        // check if the entry exists
+        // if it does, return the pojo object
+
+        try {
+            PreparedStatement pst = connection.prepareStatement("SELECT * FROM " + uriBuilder.getTable());
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                    values.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
+                }
+            }
+
+        } catch (Exception e) {
+            LoggerUtil.log(
+                    Level.SEVERE,
+                    LoggerUtil.LogSource.DATABASE,
+                    e
+            );
+        }
+
+        values.remove("id");
+        return PojoMapper.fromMap(values, pojoClass);
+
+
+    }
+
     private int getNextId() {
 
         try {
