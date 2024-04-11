@@ -47,8 +47,8 @@ public interface Database<T> {
 
     /**
      * Find a pojo object from the database
-     * @param pojoClass similar to the object to find
+     * @param pojoObject similar to the object to find
      */
-    T find(Class<T> pojoClass);
+    T find(Object pojoObject);
 
 }

@@ -167,23 +167,34 @@ public class SQLDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public T find(Class<T> pojoClass) {
+    public T find(Object pojoObject) {
 
-
-        // Map that contains fields and their values of the pojo object
-        Map<String, Object> values = new HashMap<>();
+        Map<String, Object> values = PojoMapper.toMap(pojoObject);
 
         // check if the entry exists
         // if it does, return the pojo object
 
         try {
-            PreparedStatement pst = connection.prepareStatement("SELECT * FROM " + uriBuilder.getTable());
+            // Convert the map to a list of "key = value" format
+            List<String> keyValuePairs = new ArrayList<>();
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
+                keyValuePairs.add(entry.getKey() + " = " + entry.getValue());
+            }
+
+            // Join the list into a single string with an AND separation
+            String whereClause = String.join(" AND ", keyValuePairs);
+
+            PreparedStatement pst = connection.prepareStatement("SELECT * FROM " + uriBuilder.getTable() + " WHERE " + whereClause);
             ResultSet rs = pst.executeQuery();
 
             if (rs.next()) {
+                Map<String, Object> resultValues = new HashMap<>();
                 for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    values.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
+                    resultValues.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
                 }
+
+                resultValues.remove("id");
+                return PojoMapper.fromMap(resultValues, (Class<T>) pojoObject.getClass());
             }
 
         } catch (Exception e) {
@@ -194,9 +205,7 @@ public class SQLDatabaseImpl<T> implements Database<T> {
             );
         }
 
-        values.remove("id");
-        return PojoMapper.fromMap(values, pojoClass);
-
+        return null;
 
     }
 

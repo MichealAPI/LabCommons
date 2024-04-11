@@ -109,11 +109,15 @@ public class MongoDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public T find(Class<T> pojoClass) {
+    public T find(Object pojoObject) {
+
+        Map<String, Object> values = PojoMapper.toMap(pojoObject);
+
+        Document document = new Document(values);
 
         Document resultDocument = mongoDatabase
                 .getCollection(uriBuilder.getTable())
-                .find()
+                .find(document)
                 .first();
 
         if(resultDocument == null) return null;
@@ -121,8 +125,8 @@ public class MongoDatabaseImpl<T> implements Database<T> {
         resultDocument.remove("_id"); // MongoDB's internal id
         resultDocument.remove("id"); // The id is not needed in the POJO
 
-        return PojoMapper.fromMap(resultDocument, pojoClass);
-        
+        return PojoMapper.fromMap(resultDocument, (Class<T>) pojoObject.getClass());
+
     }
 
 
