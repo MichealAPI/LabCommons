@@ -1,10 +1,10 @@
 settings:
   type: MONGODB
-  uri: ""
+  uri: "mongodb://localhost:27017"
   password: ""
-  user: ""
-  table: ""
-  database: ""
+  username: ""
+  table: "testunit"
+  database: "widennetwork"
 
 title: "<red>Test"
 layout:
