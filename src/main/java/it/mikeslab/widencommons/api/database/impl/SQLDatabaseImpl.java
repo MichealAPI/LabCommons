@@ -177,8 +177,6 @@ public class SQLDatabaseImpl<T> implements Database<T> {
         // check if the entry exists
         // if it does, return the pojo object
 
-        Stopwatch findStopwatch = Stopwatch.createStarted();
-
         try {
             // Convert the map to a list of "key = value" format
             List<String> keyValuePairs = new ArrayList<>();
@@ -201,8 +199,6 @@ public class SQLDatabaseImpl<T> implements Database<T> {
                 int id = (int) resultValues.get("id");
 
                 resultValues.remove("id");
-
-                findStopwatch.stop();
 
                 return new RetrievedEntry(
                         id,
