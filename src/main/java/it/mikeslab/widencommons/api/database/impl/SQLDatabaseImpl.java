@@ -1,22 +1,20 @@
 package it.mikeslab.widencommons.api.database.impl;
 
-import com.google.common.base.Stopwatch;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import it.mikeslab.widencommons.api.database.Database;
+import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
-import it.mikeslab.widencommons.api.database.util.PojoMapper;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-public class SQLDatabaseImpl<T> implements Database<T> {
+public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {
 
     private final URIBuilder uriBuilder;
     private HikariConfig config = new HikariConfig();
@@ -39,11 +37,13 @@ public class SQLDatabaseImpl<T> implements Database<T> {
 
 
     @Override
-    public boolean connect(Class<?> pojoClass) {
+    public boolean connect(Class<T> pojoClass) {
         try {
             this.connection = dataSource.getConnection();
 
             if (!tableExists()) {
+
+                // todo Isn't working!
                 List<String> fields = Arrays.stream(pojoClass.getDeclaredFields())
                         .map(field -> field.getName())
                         .toList();
@@ -85,7 +85,7 @@ public class SQLDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public T get(int id, Class<T> pojoClass) {
+    public T get(int id, T pojoClass) {
 
         // Map that contains fields and their values of the pojo object
         Map<String, Object> values = new HashMap<>();
@@ -112,15 +112,15 @@ public class SQLDatabaseImpl<T> implements Database<T> {
         }
 
         values.remove("id");
-        return PojoMapper.fromMap(values, pojoClass);
+        return pojoClass.fromMap(values);
     }
 
 
 
     @Override
-    public int upsert(Optional<Integer> id, Object pojoObject) {
+    public int upsert(Optional<Integer> id, T pojoObject) {
 
-        Map<String, Object> values = PojoMapper.toMap(pojoObject);
+        Map<String, Object> values = pojoObject.toMap();
 
         // check if the entry exists
         // if it does, update the entry
@@ -170,9 +170,9 @@ public class SQLDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public RetrievedEntry find(Object pojoObject) {
+    public RetrievedEntry find(T pojoObject) {
 
-        Map<String, Object> values = PojoMapper.toMap(pojoObject);
+        Map<String, Object> values = pojoObject.toMap();
 
         // check if the entry exists
         // if it does, return the pojo object
@@ -202,7 +202,7 @@ public class SQLDatabaseImpl<T> implements Database<T> {
 
                 return new RetrievedEntry(
                         id,
-                        PojoMapper.fromMap(resultValues, (Class<T>) pojoObject.getClass())
+                        pojoObject.fromMap(resultValues)
                 );
             }
 

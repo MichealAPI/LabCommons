@@ -1,6 +1,7 @@
 package it.mikeslab.widencommons.api.database.async;
 
 import it.mikeslab.widencommons.api.database.Database;
+import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 import lombok.RequiredArgsConstructor;
 
@@ -8,12 +9,12 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
-public class AsyncDatabaseImpl<T> implements AsyncDatabase<T> {
+public class AsyncDatabaseImpl<T extends SerializableMapConvertible<T>> implements AsyncDatabase<T> {
 
     private final Database<T> syncDatabase;
 
     @Override
-    public CompletableFuture<Boolean> connect(Class<?> pojoClass) {
+    public CompletableFuture<Boolean> connect(Class<T> pojoClass) {
         return CompletableFuture.supplyAsync(() -> syncDatabase.connect(pojoClass));
     }
 
@@ -28,12 +29,12 @@ public class AsyncDatabaseImpl<T> implements AsyncDatabase<T> {
     }
 
     @Override
-    public CompletableFuture<T> get(int id, Class<T> pojoClass) {
+    public CompletableFuture<T> get(int id, T pojoClass) {
         return CompletableFuture.supplyAsync(() -> syncDatabase.get(id, pojoClass));
     }
 
     @Override
-    public CompletableFuture<Integer> upsert(Optional<Integer> id, Object pojoObject) {
+    public CompletableFuture<Integer> upsert(Optional<Integer> id, T pojoObject) {
         return CompletableFuture.supplyAsync(() -> syncDatabase.upsert(id, pojoObject));
     }
 
@@ -43,7 +44,7 @@ public class AsyncDatabaseImpl<T> implements AsyncDatabase<T> {
     }
 
     @Override
-    public CompletableFuture<RetrievedEntry> find(Object pojoObject) {
+    public CompletableFuture<RetrievedEntry> find(T pojoObject) {
         return CompletableFuture.supplyAsync(() -> syncDatabase.find(pojoObject));
     }
 }

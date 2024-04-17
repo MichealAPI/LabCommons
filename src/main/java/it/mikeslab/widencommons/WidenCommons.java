@@ -21,6 +21,4 @@ public final class WidenCommons extends JavaPlugin implements Listener {
 
     }
 
-
-
 }

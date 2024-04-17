@@ -1,6 +1,7 @@
 package it.mikeslab.widencommons.api.database.config;
 
 import it.mikeslab.widencommons.api.database.Database;
+import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.SupportedDatabase;
 import it.mikeslab.widencommons.api.database.impl.MongoDatabaseImpl;
 import it.mikeslab.widencommons.api.database.impl.SQLDatabaseImpl;
@@ -12,7 +13,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.util.logging.Level;
 
 @RequiredArgsConstructor
-public class ConfigDatabaseUtil<T> {
+public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
 
     private final ConfigurationSection section;
 

@@ -4,13 +4,13 @@ import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 
 import java.util.Optional;
 
-public interface Database<T> {
+public interface Database<T extends SerializableMapConvertible<T>> {
 
     /**
      * Connect to the database
      * @return true if the connection is successful, false otherwise
      */
-    boolean connect(Class<?> pojoClass);
+    boolean connect(Class<T> pojoClass);
 
     /**
      * Check if the connection is active
@@ -29,7 +29,7 @@ public interface Database<T> {
      * @param id the id of the object
      * @return the object if it exists, null otherwise
      */
-    T get(int id, Class<T> pojoClass);
+    T get(int id, T pojoClass);
 
     /**
      * Insert a pojo object into the database
@@ -37,7 +37,7 @@ public interface Database<T> {
      * @param pojoObject the object to insert
      * @return true if the insertion is successful, false otherwise
      */
-    int upsert(Optional<Integer> id, Object pojoObject);
+    int upsert(Optional<Integer> id, T pojoObject);
 
     /**
      * Delete a pojo object from the database
@@ -51,6 +51,6 @@ public interface Database<T> {
      * Find a pojo object from the database
      * @param pojoObject similar to the object to find
      */
-    RetrievedEntry find(Object pojoObject);
+    RetrievedEntry find(T pojoObject);
 
 }

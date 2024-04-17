@@ -1,13 +1,17 @@
 package it.mikeslab.widencommons.api.database.impl;
 
 import com.google.common.base.Stopwatch;
-import com.mongodb.*;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerApi;
+import com.mongodb.ServerApiVersion;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import it.mikeslab.widencommons.api.database.Database;
+import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
 import it.mikeslab.widencommons.api.database.util.PojoMapper;
@@ -17,14 +21,11 @@ import org.bson.BsonInt64;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
-public class MongoDatabaseImpl<T> implements Database<T> {
+public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {
 
     private final URIBuilder uriBuilder;
     private MongoClient mongoClient;
@@ -32,7 +33,7 @@ public class MongoDatabaseImpl<T> implements Database<T> {
 
 
     @Override
-    public boolean connect(Class<?> pojoClass) {
+    public boolean connect(Class<T> pojoClass) {
         // Construct a ServerApi instance using the ServerApi.builder() method
         ServerApi serverApi = ServerApi.builder()
                 .version(ServerApiVersion.V1)
@@ -73,7 +74,7 @@ public class MongoDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public T get(int id, Class<T> pojoClass) {
+    public T get(int id, T pojoClass) {
 
         Bson filter = Filters.eq("id", id);
 
@@ -84,18 +85,22 @@ public class MongoDatabaseImpl<T> implements Database<T> {
 
         if(resultDocument == null) return null;
 
+        // todo Remove? Does this still useful?
         resultDocument.remove("_id"); // MongoDB's internal id
         resultDocument.remove("id"); // The id is not needed in the POJO
 
-        return PojoMapper.fromMap(resultDocument, pojoClass);
+        return pojoClass.fromMap(resultDocument);
     }
 
 
 
     @Override
-    public int upsert(Optional<Integer> id, Object pojoObject) {
+    public int upsert(Optional<Integer> id, T pojoObject) {
 
-        Map<String, Object> values = PojoMapper.toMap(pojoObject);
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        Map<String, Object> values = pojoObject.toMap();
+        stopwatch.stop();
+        System.out.println("To map took " + stopwatch.elapsed().toMillis() + " milliseconds");
 
         Document document = new Document(values);
 
@@ -114,9 +119,9 @@ public class MongoDatabaseImpl<T> implements Database<T> {
     }
 
     @Override
-    public RetrievedEntry find(Object pojoObject) {
+    public RetrievedEntry find(T pojoObject) {
 
-        Map<String, Object> values = PojoMapper.toMap(pojoObject);
+        Map<String, Object> values = pojoObject.toMap();
 
         Document document = new Document(values);
 
@@ -134,7 +139,7 @@ public class MongoDatabaseImpl<T> implements Database<T> {
 
         return new RetrievedEntry(
                 id,
-                PojoMapper.fromMap(resultDocument, (Class<T>) pojoObject.getClass())
+                pojoObject.fromMap(resultDocument)
         );
 
     }
