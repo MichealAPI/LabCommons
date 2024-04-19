@@ -14,7 +14,7 @@ public interface AsyncDatabase<T extends SerializableMapConvertible<T>> {
      * Connect to the database
      * @return a {@link CompletableFuture} true if the connection is successful, false otherwise
      */
-    CompletableFuture<Boolean> connect(Class<T> pojoClass);
+    CompletableFuture<Boolean> connect(T pojoObject);
 
     /**
      * Check if the connection is active

@@ -31,7 +31,7 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
 
     @Override
-    public boolean connect(Class<T> pojoClass) {
+    public boolean connect(T pojoObject) {
         // Construct a ServerApi instance using the ServerApi.builder() method
         ServerApi serverApi = ServerApi.builder()
                 .version(ServerApiVersion.V1)

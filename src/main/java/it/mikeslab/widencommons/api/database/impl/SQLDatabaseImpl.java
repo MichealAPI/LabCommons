@@ -36,16 +36,21 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
 
     @Override
-    public boolean connect(Class<T> pojoClass) {
+    public boolean connect(T pojoObject) {
         try {
             this.connection = dataSource.getConnection();
+
+            Class<T> pojoClass = (Class<T>) pojoObject.getClass();
 
             if (!tableExists()) {
                 List<String> fields = Arrays.stream(pojoClass.getDeclaredFields())
                         .map(field -> field.getName())
                         .toList();
 
-                createTable(fields);
+                createTable(
+                        fields,
+                        pojoObject
+                );
             }
 
             return true;
@@ -270,27 +275,27 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         try {
             // Convert the map to a list of keys
             List<String> keys = new ArrayList<>(values.keySet());
-
             // Convert the map to a list of values
             List<Object> valuesList = new ArrayList<>(values.values());
 
             // Prepare the query
             StringBuilder query = new StringBuilder("INSERT INTO " + uriBuilder.getTable() + " (");
-            query.append(pojoObject.getIdentifierName());
-            query.append(", ");
             query.append(String.join(", ", keys));
             query.append(") VALUES (?");
-            query.append(", ?".repeat(valuesList.size()));
+            query.append(", ?".repeat(valuesList.size() - 1));
 
             query.append(")");
 
             // Prepared statement to insert the entry
+
+            System.out.println("DEBUG: '" + query.toString() + "'");
+
             PreparedStatement insertPst = connection.prepareStatement(query.toString());
             insertPst.setObject(1, pojoObject.getIdentifierValue());
-            for (int i = 0; i < valuesList.size(); i++) {
+            for (int i = 1; i < valuesList.size(); i++) {
 
                 // Skips the first value because it's the id
-                insertPst.setObject(i + 2, valuesList.get(i));
+                insertPst.setObject(i, valuesList.get(i));
 
             }
 
@@ -317,10 +322,13 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         }
     }
 
-    private boolean createTable(List<String> fields) {
+    private boolean createTable(List<String> fields, T pojoObject) {
         try {
 
-            StringBuilder query = new StringBuilder("CREATE TABLE " + uriBuilder.getTable() + " (id INT PRIMARY KEY, ");
+            StringBuilder query = new StringBuilder("CREATE TABLE " + uriBuilder.getTable() + " ("+ pojoObject.getIdentifierName() +" TEXT PRIMARY KEY, ");
+            fields.remove(pojoObject.getIdentifierName());
+
+            System.out.println("DEBUG: " + query.toString());
 
             for(int i = 0; i < fields.size(); i++) {
                 query.append(fields.get(i));

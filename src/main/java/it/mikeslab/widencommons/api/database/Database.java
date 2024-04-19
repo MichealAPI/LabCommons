@@ -6,7 +6,7 @@ public interface Database<T extends SerializableMapConvertible<T>> {
      * Connect to the database
      * @return true if the connection is successful, false otherwise
      */
-    boolean connect(Class<T> pojoClass);
+    boolean connect(T pojoClass);
 
     /**
      * Check if the connection is active

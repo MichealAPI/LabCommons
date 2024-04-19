@@ -12,8 +12,8 @@ public class AsyncDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
     private final Database<T> syncDatabase;
 
     @Override
-    public CompletableFuture<Boolean> connect(Class<T> pojoClass) {
-        return CompletableFuture.supplyAsync(() -> syncDatabase.connect(pojoClass));
+    public CompletableFuture<Boolean> connect(T pojoObject) {
+        return CompletableFuture.supplyAsync(() -> syncDatabase.connect(pojoObject));
     }
 
     @Override
