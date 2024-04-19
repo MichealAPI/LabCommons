@@ -9,6 +9,7 @@ import java.util.List;
 @UtilityClass
 public class PojoMapper {
 
+    @Deprecated
     @ApiStatus.Experimental
     public String simpleSerializer(List<String> list) {
         return list.toString();
@@ -19,11 +20,6 @@ public class PojoMapper {
         // Split the string by commas and whitespace, ignoring brackets
         return Arrays.asList(string.split("\\s*,\\s*"));
     }
-
-
-
-
-
 
 
 
