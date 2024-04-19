@@ -2,10 +2,8 @@ package it.mikeslab.widencommons.api.database.async;
 
 import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
-import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -29,22 +27,22 @@ public class AsyncDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
     }
 
     @Override
-    public CompletableFuture<T> get(int id, T pojoClass) {
-        return CompletableFuture.supplyAsync(() -> syncDatabase.get(id, pojoClass));
+    public CompletableFuture<T> get(T pojoObject) {
+        return CompletableFuture.supplyAsync(() -> syncDatabase.get(pojoObject));
     }
 
     @Override
-    public CompletableFuture<Integer> upsert(Optional<Integer> id, T pojoObject) {
-        return CompletableFuture.supplyAsync(() -> syncDatabase.upsert(id, pojoObject));
+    public CompletableFuture<Boolean> upsert(T pojoObject) {
+        return CompletableFuture.supplyAsync(() -> syncDatabase.upsert(pojoObject));
     }
 
     @Override
-    public CompletableFuture<Boolean> delete(int id) {
-        return CompletableFuture.supplyAsync(() -> syncDatabase.delete(id));
+    public CompletableFuture<Boolean> delete(T pojoObject) {
+        return CompletableFuture.supplyAsync(() -> syncDatabase.delete(pojoObject));
     }
 
     @Override
-    public CompletableFuture<RetrievedEntry> find(T pojoObject) {
+    public CompletableFuture<T> find(T pojoObject) {
         return CompletableFuture.supplyAsync(() -> syncDatabase.find(pojoObject));
     }
 }

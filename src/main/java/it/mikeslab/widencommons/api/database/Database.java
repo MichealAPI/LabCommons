@@ -1,9 +1,5 @@
 package it.mikeslab.widencommons.api.database;
 
-import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
-
-import java.util.Optional;
-
 public interface Database<T extends SerializableMapConvertible<T>> {
 
     /**
@@ -26,31 +22,30 @@ public interface Database<T extends SerializableMapConvertible<T>> {
 
     /**
      * Get a pojo object from the database
-     * @param id the id of the object
+     * @param pojoObject the pojoObject
      * @return the object if it exists, null otherwise
      */
-    T get(int id, T pojoClass);
+    T get(T pojoObject);
 
     /**
      * Insert a pojo object into the database
-     * @param id the id of the object, optional
      * @param pojoObject the object to insert
      * @return true if the insertion is successful, false otherwise
      */
-    int upsert(Optional<Integer> id, T pojoObject);
+    boolean upsert(T pojoObject);
 
     /**
      * Delete a pojo object from the database
-     * @param id the id of the object
+     * @param pojoObject the object to delete
      * @return true if the update is successful, false otherwise
      */
-    boolean delete(int id);
+    boolean delete(T pojoObject);
 
 
     /**
      * Find a pojo object from the database
      * @param pojoObject similar to the object to find
      */
-    RetrievedEntry find(T pojoObject);
+    T find(T pojoObject);
 
 }

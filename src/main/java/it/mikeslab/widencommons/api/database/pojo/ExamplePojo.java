@@ -47,6 +47,16 @@ public class ExamplePojo implements SerializableMapConvertible<ExamplePojo> {
         return conversionMap;
     }
 
+    @Override
+    public String getIdentifierName() {
+        return "test";
+    }
+
+    @Override
+    public Object getIdentifierValue() {
+        return test;
+    }
+
     public ExamplePojo filter(String test) {
         return new ExamplePojo(test, null);
     }

@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
-import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
 
@@ -17,13 +16,13 @@ import java.util.logging.Level;
 public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {
 
     private final URIBuilder uriBuilder;
-    private HikariConfig config = new HikariConfig();
-    private HikariDataSource dataSource;
+    private final HikariDataSource dataSource;
     private Connection connection;
 
     public SQLDatabaseImpl(URIBuilder uriBuilder) {
         this.uriBuilder = uriBuilder;
 
+        HikariConfig config = new HikariConfig();
         config.setJdbcUrl(uriBuilder.getUri());
 
         if(uriBuilder.getUsername() != null) config.setUsername(uriBuilder.getUsername());
@@ -42,8 +41,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             this.connection = dataSource.getConnection();
 
             if (!tableExists()) {
-
-                // todo Isn't working!
                 List<String> fields = Arrays.stream(pojoClass.getDeclaredFields())
                         .map(field -> field.getName())
                         .toList();
@@ -85,7 +82,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     }
 
     @Override
-    public T get(int id, T pojoClass) {
+    public T get(T pojoClass) {
 
         // Map that contains fields and their values of the pojo object
         Map<String, Object> values = new HashMap<>();
@@ -94,7 +91,10 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         // if it does, return the pojo object
 
         try {
-            PreparedStatement pst = connection.prepareStatement("SELECT * FROM " + uriBuilder.getTable() + " WHERE id = " + id);
+            PreparedStatement pst = connection.prepareStatement(
+                    "SELECT * FROM " + uriBuilder.getTable()
+                            + " WHERE " + pojoClass.getIdentifierName() + "=" + pojoClass.getIdentifierValue()
+            );
             ResultSet rs = pst.executeQuery();
 
             if (rs.next()) {
@@ -111,14 +111,13 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             );
         }
 
-        values.remove("id");
         return pojoClass.fromMap(values);
     }
 
 
 
     @Override
-    public int upsert(Optional<Integer> id, T pojoObject) {
+    public boolean upsert(T pojoObject) {
 
         Map<String, Object> values = pojoObject.toMap();
 
@@ -127,18 +126,16 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         // if it doesn't, insert the entry
         try {
 
-            final int finalId;
+            boolean exists = find(pojoObject) != null;
 
-            if (id.isPresent()) {
-                finalId = id.get();
-                this.update(finalId, values); // Returns the ID
-
+            // If the entry exists, update it, otherwise insert it
+            // Passing the parameter pojoObject is needed to get
+            // both the identifier name and value
+            if (exists) {
+                this.update(pojoObject, values); // Returns the ID
             } else {
-                finalId = getNextId();
-                this.insert(finalId, values); // Returns the ID
+                this.insert(pojoObject, values); // Returns the ID
             }
-
-            return finalId;
 
         } catch (Exception e) {
             LoggerUtil.log(
@@ -146,17 +143,21 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
                     LoggerUtil.LogSource.DATABASE,
                     e
             );
+
+            return false;
         }
 
 
-        return -1;
+        return true;
     }
 
     @Override
-    public boolean delete(int id) {
+    public boolean delete(T pojoObject) {
 
         try {
-            PreparedStatement pst = connection.prepareStatement("DELETE FROM " + uriBuilder.getTable() + " WHERE id = " + id);
+            PreparedStatement pst = connection.prepareStatement("DELETE FROM " + uriBuilder.getTable()
+                    + " WHERE " + pojoObject.getIdentifierName() + " = " + pojoObject.getIdentifierValue()
+            );
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(
@@ -170,7 +171,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     }
 
     @Override
-    public RetrievedEntry find(T pojoObject) {
+    public T find(T pojoObject) {
 
         Map<String, Object> values = pojoObject.toMap();
 
@@ -196,14 +197,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
                     resultValues.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
                 }
 
-                int id = (int) resultValues.get("id");
-
-                resultValues.remove("id");
-
-                return new RetrievedEntry(
-                        id,
-                        pojoObject.fromMap(resultValues)
-                );
+                return pojoObject.fromMap(resultValues);
             }
 
         } catch (Exception e) {
@@ -218,6 +212,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
     }
 
+    @Deprecated(forRemoval = true)
     private int getNextId() {
 
         try {
@@ -240,7 +235,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
     }
 
-    private int update(int id, Map<String, Object> values) {
+    private int update(T pojoObject, Map<String, Object> values) {
 
         try {
             // Convert the map to a list of "key = value" format
@@ -253,7 +248,9 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             String setClause = String.join(", ", keyValuePairs);
 
             // Prepared statement to update the entry
-            PreparedStatement updatePst = connection.prepareStatement("UPDATE " + uriBuilder.getTable() + " SET " + setClause + " WHERE id = " + id);
+            PreparedStatement updatePst = connection.prepareStatement("UPDATE " + uriBuilder.getTable() + " SET " + setClause
+                    + " WHERE " + pojoObject.getIdentifierName() + " = " + pojoObject.getIdentifierValue()
+            );
 
             return updatePst.executeUpdate();
         } catch (Exception e) {
@@ -268,7 +265,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     }
 
 
-    private int insert(int id, Map<String, Object> values) {
+    private boolean insert(T pojoObject, Map<String, Object> values) {
 
         try {
             // Convert the map to a list of keys
@@ -278,7 +275,9 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             List<Object> valuesList = new ArrayList<>(values.values());
 
             // Prepare the query
-            StringBuilder query = new StringBuilder("INSERT INTO " + uriBuilder.getTable() + " (id, ");
+            StringBuilder query = new StringBuilder("INSERT INTO " + uriBuilder.getTable() + " (");
+            query.append(pojoObject.getIdentifierName());
+            query.append(", ");
             query.append(String.join(", ", keys));
             query.append(") VALUES (?");
             query.append(", ?".repeat(valuesList.size()));
@@ -287,7 +286,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
             // Prepared statement to insert the entry
             PreparedStatement insertPst = connection.prepareStatement(query.toString());
-            insertPst.setInt(1, id);
+            insertPst.setObject(1, pojoObject.getIdentifierValue());
             for (int i = 0; i < valuesList.size(); i++) {
 
                 // Skips the first value because it's the id
@@ -295,7 +294,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
             }
 
-            return insertPst.executeUpdate();
+            return insertPst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(
                     Level.SEVERE,
@@ -304,7 +303,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             );
         }
 
-        return 0;
+        return false;
     }
 
 

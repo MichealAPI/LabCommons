@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
+@Deprecated(forRemoval = true)
 public class RetrievedEntry {
 
-    private final int id;
     private final Object object;
+    private final int id;
 
 }

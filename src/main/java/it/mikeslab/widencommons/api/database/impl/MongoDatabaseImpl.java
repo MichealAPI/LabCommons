@@ -1,6 +1,5 @@
 package it.mikeslab.widencommons.api.database.impl;
 
-import com.google.common.base.Stopwatch;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerApi;
@@ -12,9 +11,8 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
-import it.mikeslab.widencommons.api.database.pojo.RetrievedEntry;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
-import it.mikeslab.widencommons.api.database.util.PojoMapper;
+import it.mikeslab.widencommons.api.logger.LoggerUtil;
 import lombok.RequiredArgsConstructor;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
@@ -22,7 +20,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.Map;
-import java.util.Optional;
+import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {
@@ -74,9 +72,9 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
     }
 
     @Override
-    public T get(int id, T pojoClass) {
+    public T get(T pojoObject) {
 
-        Bson filter = Filters.eq("id", id);
+        Bson filter = generateIdFilter(pojoObject);
 
         Document resultDocument = mongoDatabase
                 .getCollection(uriBuilder.getTable())
@@ -85,41 +83,45 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
         if(resultDocument == null) return null;
 
-        // todo Remove? Does this still useful?
-        resultDocument.remove("_id"); // MongoDB's internal id
-        resultDocument.remove("id"); // The id is not needed in the POJO
-
-        return pojoClass.fromMap(resultDocument);
+        return pojoObject.fromMap(resultDocument);
     }
 
 
 
     @Override
-    public int upsert(Optional<Integer> id, T pojoObject) {
+    public boolean upsert(T pojoObject) {
 
-        Stopwatch stopwatch = Stopwatch.createStarted();
-        Map<String, Object> values = pojoObject.toMap();
-        stopwatch.stop();
-        System.out.println("To map took " + stopwatch.elapsed().toMillis() + " milliseconds");
+        try {
 
-        Document document = new Document(values);
+            Map<String, Object> values = pojoObject.toMap();
 
-        int finalId = id.orElseGet(this::getNextId); // Get the next id if it is not present
+            Document document = new Document(values);
 
-        UpdateOptions updateOptions = new UpdateOptions().upsert(true);
-        mongoDatabase.getCollection(uriBuilder.getTable())
-                .updateOne(
-                        Filters.eq("id", finalId),
-                        new Document("$set", document),
-                        updateOptions
-                );
+            UpdateOptions updateOptions = new UpdateOptions().upsert(true);
+            mongoDatabase.getCollection(uriBuilder.getTable())
+                    .updateOne(
+                            generateIdFilter(pojoObject),
+                            new Document("$set", document),
+                            updateOptions
+                    );
+
+        } catch (Exception e) {
+
+            LoggerUtil.log(
+                    Level.WARNING,
+                    LoggerUtil.LogSource.DATABASE,
+                    "Error during upsert: " + e
+            );
+
+            return false;
+        }
 
 
-        return finalId;
+        return true;
     }
 
     @Override
-    public RetrievedEntry find(T pojoObject) {
+    public T find(T pojoObject) {
 
         Map<String, Object> values = pojoObject.toMap();
 
@@ -132,29 +134,34 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
         if(resultDocument == null) return null;
 
-        int id = resultDocument.getInteger("id");
-
-        resultDocument.remove("_id"); // MongoDB's internal id
-        resultDocument.remove("id"); // The id is not needed in the POJO
-
-        return new RetrievedEntry(
-                id,
-                pojoObject.fromMap(resultDocument)
-        );
+        return pojoObject.fromMap(resultDocument);
 
     }
 
 
     @Override
-    public boolean delete(int id) {
-        Bson filter = Filters.eq("id", id);
+    public boolean delete(T pojoObject) {
 
-        mongoDatabase.getCollection(uriBuilder.getTable())
-                .deleteOne(filter);
+        try {
+            Bson filter = generateIdFilter(pojoObject);
+
+            mongoDatabase.getCollection(uriBuilder.getTable())
+                    .deleteOne(filter);
+
+        } catch (Exception e) {
+
+            LoggerUtil.log(
+                    Level.WARNING,
+                    LoggerUtil.LogSource.DATABASE,
+                    "Error during delete: " + e);
+
+            return false;
+        }
 
         return true;
     }
 
+    @Deprecated(forRemoval = true)
     private int getNextId() {
         // Performance optimization may be needed
         Document document = mongoDatabase.getCollection(uriBuilder.getTable())
@@ -166,6 +173,14 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         if(document == null) return 1;
 
         return document.getInteger("id") + 1;
+    }
+
+
+    private Bson generateIdFilter(T pojoObject) {
+        return Filters.eq(
+                pojoObject.getIdentifierName(),
+                pojoObject.getIdentifierValue()
+        );
     }
 
 }
