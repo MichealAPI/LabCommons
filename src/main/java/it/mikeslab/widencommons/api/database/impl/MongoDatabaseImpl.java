@@ -71,11 +71,6 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         return !isConnected();
     }
 
-    @Override
-    public T get(T pojoObject) {
-        return find(pojoObject);
-    }
-
 
 
     @Override
@@ -149,20 +144,6 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         }
 
         return true;
-    }
-
-    @Deprecated(forRemoval = true)
-    private int getNextId() {
-        // Performance optimization may be needed
-        Document document = mongoDatabase.getCollection(uriBuilder.getTable())
-                .find()
-                .sort(new Document("id", -1))
-                .limit(1)
-                .first();
-
-        if(document == null) return 1;
-
-        return document.getInteger("id") + 1;
     }
 
 

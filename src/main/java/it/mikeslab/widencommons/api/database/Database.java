@@ -21,14 +21,6 @@ public interface Database<T extends SerializableMapConvertible<T>> {
     boolean disconnect();
 
     /**
-     * Get a pojo object from the database
-     * @param pojoObject the pojoObject
-     * @return the object if it exists, null otherwise
-     */
-    @Deprecated(forRemoval = true)
-    T get(T pojoObject);
-
-    /**
      * Insert a pojo object into the database
      * @param pojoObject the object to insert
      * @return true if the insertion is successful, false otherwise

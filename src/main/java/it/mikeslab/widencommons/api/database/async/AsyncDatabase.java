@@ -29,13 +29,6 @@ public interface AsyncDatabase<T extends SerializableMapConvertible<T>> {
     CompletableFuture<Boolean> disconnect();
 
     /**
-     * Get a pojo object from the database
-     * @param pojoObject the pojoObject as filter
-     * @return the object if it exists, null otherwise
-     */
-    CompletableFuture<T> get(T pojoObject);
-
-    /**
      * Insert a pojo object into the database
      * @param pojoObject the object to insert
      * @return a {@link CompletableFuture} true if the insertion is successful, false otherwise

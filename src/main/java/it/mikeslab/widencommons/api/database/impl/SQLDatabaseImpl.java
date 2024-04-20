@@ -5,12 +5,12 @@ import com.zaxxer.hikari.HikariDataSource;
 import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
+import it.mikeslab.widencommons.api.database.util.SQLUtil;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -88,16 +88,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     }
 
     /**
-     * Get a pojo object from the database
-     * @param pojoClass the pojoObject
-     * @return the object if it exists, null otherwise
-     */
-    @Override
-    public T get(T pojoClass) {
-        return this.find(pojoClass);
-    }
-
-    /**
      * Upsert an object into the database
      * @param pojoObject the object to insert
      * @return true if the object is upserted, false otherwise
@@ -110,7 +100,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         Map<String, Object> updateQueryMap = new HashMap<>(values);
         updateQueryMap.remove(pojoObject.getIdentifierName());
 
-        try (PreparedStatement pst = prepareStatement(connection, getUpsertStatement(values, updateQueryMap), values)) {
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getUpsertStatement(values, updateQueryMap), values)) {
             int index = values.size() + 1;
             if (!updateQueryMap.isEmpty()) {
                 for (Object value : updateQueryMap.values()) {
@@ -142,7 +132,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
                 pojoObject.getIdentifierValue()
         );
 
-        try (PreparedStatement pst = prepareStatement(connection, sql, values)) {
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, sql, values)) {
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
@@ -160,10 +150,10 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     public T find(T pojoObject) {
         Map<String, Object> values = pojoObject.toMap();
 
-        try (PreparedStatement pst = prepareStatement(connection, getFindStatement(values), values)) {
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getFindStatement(values), values)) {
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
-                    return pojoObject.fromMap(getResultValues(rs));
+                    return pojoObject.fromMap(SQLUtil.getResultValues(rs));
                 }
             }
         } catch (Exception e) {
@@ -217,7 +207,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
         query.append(")");
 
-        try (PreparedStatement pst = prepareStatement(connection, query.toString(), Collections.emptyMap())) {
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, query.toString(), Collections.emptyMap())) {
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
@@ -271,24 +261,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         }
 
         return sb.toString();
-    }
-
-
-    private PreparedStatement prepareStatement(Connection connection, String sql, Map<String, Object> values) throws SQLException {
-        PreparedStatement pst = connection.prepareStatement(sql);
-        int index = 1;
-        for (Object value : values.values()) {
-            pst.setObject(index++, value);
-        }
-        return pst;
-    }
-
-    private Map<String, Object> getResultValues(ResultSet rs) throws SQLException {
-        Map<String, Object> resultValues = new LinkedHashMap<>();
-        for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-            resultValues.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
-        }
-        return resultValues;
     }
 
 

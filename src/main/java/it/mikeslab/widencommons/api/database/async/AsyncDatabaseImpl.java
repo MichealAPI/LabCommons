@@ -27,11 +27,6 @@ public class AsyncDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
     }
 
     @Override
-    public CompletableFuture<T> get(T pojoObject) {
-        return CompletableFuture.supplyAsync(() -> syncDatabase.get(pojoObject));
-    }
-
-    @Override
     public CompletableFuture<Boolean> upsert(T pojoObject) {
         return CompletableFuture.supplyAsync(() -> syncDatabase.upsert(pojoObject));
     }
