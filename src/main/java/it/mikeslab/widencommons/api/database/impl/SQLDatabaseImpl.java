@@ -160,39 +160,18 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         PreparedStatement pst = null;
 
         try {
-            StringBuilder sb = new StringBuilder();
 
-            sb.append("INSERT INTO ").append(uriBuilder.getTable()).append(" (");
-            sb.append(String.join(", ", values.keySet()));
-            sb.append(") VALUES (");
 
-            sb.append("?");
-
-            if (values.size() > 1) {
-                sb.append(", ?".repeat(values.size() - 1));
-            }
-
-            sb.append(")");
-
-            if (updateQueryMap.size() > 0) {
-                sb.append(" ON DUPLICATE KEY UPDATE ");
-                int i = 0;
-                for (Map.Entry<String, Object> entry : updateQueryMap.entrySet()) {
-                    sb.append(entry.getKey()).append(" = ?");
-                    if (i++ < updateQueryMap.size() - 1) {
-                        sb.append(", ");
-                    }
-                }
-            }
-
-            pst = connection.prepareStatement(sb.toString());
+            pst = connection.prepareStatement(
+                    getUpsertStatement(values, updateQueryMap)
+            );
 
             int index = 1;
             for (Object value : values.values()) {
                 pst.setObject(index++, value);
             }
 
-            if (updateQueryMap.size() > 0) {
+            if (!updateQueryMap.isEmpty()) {
                 for (Object value : updateQueryMap.values()) {
                     pst.setObject(index++, value);
                 }
@@ -281,16 +260,10 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         ResultSet rs = null;
 
         try {
-            // Convert the map to a list of "key = ?" format
-            StringBuilder whereClause = new StringBuilder();
-            for (String key : values.keySet()) {
-                if (whereClause.length() > 0) {
-                    whereClause.append(" AND ");
-                }
-                whereClause.append(key).append(" = ?");
-            }
 
-            pst = connection.prepareStatement("SELECT * FROM " + uriBuilder.getTable() + " WHERE " + whereClause);
+            pst = connection.prepareStatement(
+                    getFindStatement(values)
+            );
 
             // Set the values in the prepared statement
             int index = 1;
@@ -431,6 +404,54 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
 
         }
+    }
+
+
+    private String getFindStatement(Map<String, Object> values) {
+
+        // Convert the map to a list of "key = ?" format
+        StringBuilder whereClause = new StringBuilder();
+        for (String key : values.keySet()) {
+            if (whereClause.length() > 0) {
+                whereClause.append(" AND ");
+            }
+            whereClause.append(key).append(" = ?");
+
+        }
+
+        return "SELECT * FROM " + uriBuilder.getTable() + " WHERE " + whereClause;
+
+    }
+
+
+    private String getUpsertStatement(Map<String, Object> values, Map<String, Object> updateQueryMap) {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("INSERT INTO ").append(uriBuilder.getTable()).append(" (");
+        sb.append(String.join(", ", values.keySet()));
+        sb.append(") VALUES (");
+
+        sb.append("?");
+
+        if (values.size() > 1) {
+            sb.append(", ?".repeat(values.size() - 1));
+        }
+
+        sb.append(")");
+
+        if (updateQueryMap.size() > 0) {
+            sb.append(" ON DUPLICATE KEY UPDATE ");
+            int i = 0;
+            for (Map.Entry<String, Object> entry : updateQueryMap.entrySet()) {
+                sb.append(entry.getKey()).append(" = ?");
+                if (i++ < updateQueryMap.size() - 1) {
+                    sb.append(", ");
+                }
+            }
+        }
+
+        return sb.toString();
     }
 
 
