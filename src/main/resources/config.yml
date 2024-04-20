@@ -1,3 +1,7 @@
+sentry:
+  enabled: true
+  dsn: "https://" # Sentry DSN
+
 settings:
   type: MONGODB
   uri: "mongodb://localhost:27017"
