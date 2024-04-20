@@ -94,21 +94,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
      */
     @Override
     public T get(T pojoClass) {
-        String sql = "SELECT * FROM " + uriBuilder.getTable()
-                + " WHERE " + pojoClass.getIdentifierName() + " = ?";
-        Map<String, Object> values = Collections.singletonMap(pojoClass.getIdentifierName(), pojoClass.getIdentifierValue());
-
-        try (PreparedStatement pst = prepareStatement(connection, sql, values)) {
-            try (ResultSet rs = pst.executeQuery()) {
-                if (rs.next()) {
-                    return pojoClass.fromMap(getResultValues(rs));
-                }
-            }
-        } catch (Exception e) {
-            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
-        }
-
-        return null;
+        return this.find(pojoClass);
     }
 
     /**
@@ -150,7 +136,11 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     public boolean delete(T pojoObject) {
         String sql = "DELETE FROM " + uriBuilder.getTable()
                 + " WHERE " + pojoObject.getIdentifierName() + " = ?";
-        Map<String, Object> values = Collections.singletonMap(pojoObject.getIdentifierName(), pojoObject.getIdentifierValue());
+
+        Map<String, Object> values = Collections.singletonMap(
+                pojoObject.getIdentifierName(),
+                pojoObject.getIdentifierValue()
+        );
 
         try (PreparedStatement pst = prepareStatement(connection, sql, values)) {
             return pst.executeUpdate() > 0;

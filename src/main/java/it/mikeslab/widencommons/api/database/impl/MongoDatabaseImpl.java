@@ -73,17 +73,7 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
     @Override
     public T get(T pojoObject) {
-
-        Bson filter = generateIdFilter(pojoObject);
-
-        Document resultDocument = mongoDatabase
-                .getCollection(uriBuilder.getTable())
-                .find(filter)
-                .first();
-
-        if(resultDocument == null) return null;
-
-        return pojoObject.fromMap(resultDocument);
+        return find(pojoObject);
     }
 
 

@@ -25,6 +25,7 @@ public interface Database<T extends SerializableMapConvertible<T>> {
      * @param pojoObject the pojoObject
      * @return the object if it exists, null otherwise
      */
+    @Deprecated(forRemoval = true)
     T get(T pojoObject);
 
     /**
