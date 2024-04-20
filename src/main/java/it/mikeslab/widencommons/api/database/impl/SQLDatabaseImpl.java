@@ -94,53 +94,21 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
      */
     @Override
     public T get(T pojoClass) {
+        String sql = "SELECT * FROM " + uriBuilder.getTable()
+                + " WHERE " + pojoClass.getIdentifierName() + " = ?";
+        Map<String, Object> values = Collections.singletonMap(pojoClass.getIdentifierName(), pojoClass.getIdentifierValue());
 
-        // Map that contains fields and their values of the pojo object
-        Map<String, Object> values = new HashMap<>();
-
-        // check if the entry exists
-        // if it does, return the pojo object
-
-        PreparedStatement pst = null;
-
-        try {
-            pst = connection.prepareStatement(
-                    "SELECT * FROM " + uriBuilder.getTable()
-                            + " WHERE " + pojoClass.getIdentifierName() + " = '" + pojoClass.getIdentifierValue() + "'"
-            );
-            ResultSet rs = pst.executeQuery();
-
-            if (rs.next()) {
-                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    values.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
+        try (PreparedStatement pst = prepareStatement(connection, sql, values)) {
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return pojoClass.fromMap(getResultValues(rs));
                 }
             }
-
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
-                    e
-            );
-        } finally {
-
-            try {
-
-                if(pst != null) {
-                    pst.close();
-                }
-
-            } catch (SQLException ex) {
-                LoggerUtil.log(
-                        Level.SEVERE,
-                        LoggerUtil.LogSource.DATABASE,
-                        ex
-                );
-            }
-
+            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
         }
 
-        return pojoClass.fromMap(values);
+        return null;
     }
 
     /**
@@ -150,27 +118,14 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
      */
     @Override
     public boolean upsert(T pojoObject) {
-
         Map<String, Object> values = pojoObject.toMap();
 
         // A Map object for Updating, without Identifier
         Map<String, Object> updateQueryMap = new HashMap<>(values);
         updateQueryMap.remove(pojoObject.getIdentifierName());
 
-        PreparedStatement pst = null;
-
-        try {
-
-
-            pst = connection.prepareStatement(
-                    getUpsertStatement(values, updateQueryMap)
-            );
-
-            int index = 1;
-            for (Object value : values.values()) {
-                pst.setObject(index++, value);
-            }
-
+        try (PreparedStatement pst = prepareStatement(connection, getUpsertStatement(values, updateQueryMap), values)) {
+            int index = values.size() + 1;
             if (!updateQueryMap.isEmpty()) {
                 for (Object value : updateQueryMap.values()) {
                     pst.setObject(index++, value);
@@ -179,28 +134,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
-                    e
-            );
-        } finally {
-
-            try {
-
-                if(pst != null) {
-                    pst.close();
-                }
-
-            } catch (SQLException ex) {
-                LoggerUtil.log(
-                        Level.SEVERE,
-                        LoggerUtil.LogSource.DATABASE,
-                        ex
-                );
-            }
-
-
+            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
         }
 
         return false;
@@ -214,34 +148,14 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
      */
     @Override
     public boolean delete(T pojoObject) {
+        String sql = "DELETE FROM " + uriBuilder.getTable()
+                + " WHERE " + pojoObject.getIdentifierName() + " = ?";
+        Map<String, Object> values = Collections.singletonMap(pojoObject.getIdentifierName(), pojoObject.getIdentifierValue());
 
-        PreparedStatement pst = null;
-
-        try {
-            pst = connection.prepareStatement("DELETE FROM " + uriBuilder.getTable()
-                    + " WHERE " + pojoObject.getIdentifierName() + " = ?");
-            pst.setObject(1, pojoObject.getIdentifierValue());
+        try (PreparedStatement pst = prepareStatement(connection, sql, values)) {
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
-                    e
-            );
-        } finally {
-
-            try {
-                if(pst != null) {
-                    pst.close();
-                }
-            } catch (SQLException ex) {
-                LoggerUtil.log(
-                        Level.SEVERE,
-                        LoggerUtil.LogSource.DATABASE,
-                        ex
-                );
-            }
-
+            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
         }
 
         return false;
@@ -254,67 +168,19 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
      */
     @Override
     public T find(T pojoObject) {
-
         Map<String, Object> values = pojoObject.toMap();
-        PreparedStatement pst = null;
-        ResultSet rs = null;
 
-        try {
-
-            pst = connection.prepareStatement(
-                    getFindStatement(values)
-            );
-
-            // Set the values in the prepared statement
-            int index = 1;
-            for (Object value : values.values()) {
-                pst.setObject(index++, value);
-            }
-
-            rs = pst.executeQuery();
-
-            if (rs.next()) {
-                Map<String, Object> resultValues = new LinkedHashMap<>();
-                for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
-                    resultValues.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
+        try (PreparedStatement pst = prepareStatement(connection, getFindStatement(values), values)) {
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return pojoObject.fromMap(getResultValues(rs));
                 }
-
-                return pojoObject.fromMap(resultValues);
             }
-
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
-                    e
-            );
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    LoggerUtil.log(
-                            Level.SEVERE,
-                            LoggerUtil.LogSource.DATABASE,
-                            e
-                    );
-                }
-            }
-            if (pst != null) {
-                try {
-                    pst.close();
-                } catch (SQLException e) {
-                    LoggerUtil.log(
-                            Level.SEVERE,
-                            LoggerUtil.LogSource.DATABASE,
-                            e
-                    );
-                }
-            }
+            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
         }
 
         return null;
-
     }
 
     /**
@@ -323,30 +189,13 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
      */
     private boolean tableExists() {
 
-        PreparedStatement pst = null;
+        String sql = "SELECT * FROM " + uriBuilder.getTable();
 
-        try {
-            pst = connection.prepareStatement("SELECT * FROM " + uriBuilder.getTable());
+        try(PreparedStatement pst = connection.prepareStatement(sql)) {
             pst.executeQuery();
             return true;
         } catch (Exception e) {
             return false;
-
-        } finally {
-
-            try {
-                if (pst != null) {
-                    pst.close();
-                }
-            } catch (SQLException ex) {
-                LoggerUtil.log(
-                        Level.SEVERE,
-                        LoggerUtil.LogSource.DATABASE,
-                        ex
-                );
-
-            }
-
         }
     }
 
@@ -358,51 +207,31 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
      * @return true if the table is created, false otherwise
      */
     private boolean createTable(List<String> fields, T pojoObject) {
+        // Limit the length of the fixed id field
+        // MySQL doesn't support unique indexes with variable length
+        final int fixedIdFieldLengthLimit = 100;
 
-        PreparedStatement pst = null;
+        StringBuilder query = new StringBuilder(
+                "CREATE TABLE " + uriBuilder.getTable()
+                        + " (" + pojoObject.getIdentifierName() + " VARCHAR("
+                        + fixedIdFieldLengthLimit + ") PRIMARY KEY, "
+        );
+        List<String> fieldsClone = new ArrayList<>(fields);
+        fieldsClone.remove(pojoObject.getIdentifierName());
 
-        try {
-            // Limit the length of the fixed id field
-            // MySQL doesn't support unique indexes with variable length
-            final int fixedIdFieldLengthLimit = 100;
+        for (int i = 0; i < fieldsClone.size(); i++) {
+            query.append(fieldsClone.get(i));
+            query.append(" TEXT");
+            if (i != fieldsClone.size() - 1) query.append(", ");
+        }
 
-            StringBuilder query = new StringBuilder("CREATE TABLE " + uriBuilder.getTable() + " (" + pojoObject.getIdentifierName() + " VARCHAR(" + fixedIdFieldLengthLimit + ") PRIMARY KEY, ");
-            List<String> fieldsClone = new ArrayList<>(fields);
-            fieldsClone.remove(pojoObject.getIdentifierName());
+        query.append(")");
 
-            for (int i = 0; i < fieldsClone.size(); i++) {
-                query.append(fieldsClone.get(i));
-                query.append(" TEXT");
-                if (i != fieldsClone.size() - 1) query.append(", ");
-            }
-
-            query.append(")");
-            pst = connection.prepareStatement(query.toString());
-            pst.executeUpdate();
-            return true;
+        try (PreparedStatement pst = prepareStatement(connection, query.toString(), Collections.emptyMap())) {
+            return pst.executeUpdate() > 0;
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
-                    e
-            );
+            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
             return false;
-        } finally {
-
-            try {
-                if(pst != null) {
-                    pst.close();
-                }
-            } catch (Exception e) {
-                LoggerUtil.log(
-                        Level.SEVERE,
-                        LoggerUtil.LogSource.DATABASE,
-                        e
-                );
-            }
-
-
-
         }
     }
 
@@ -454,6 +283,23 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         return sb.toString();
     }
 
+
+    private PreparedStatement prepareStatement(Connection connection, String sql, Map<String, Object> values) throws SQLException {
+        PreparedStatement pst = connection.prepareStatement(sql);
+        int index = 1;
+        for (Object value : values.values()) {
+            pst.setObject(index++, value);
+        }
+        return pst;
+    }
+
+    private Map<String, Object> getResultValues(ResultSet rs) throws SQLException {
+        Map<String, Object> resultValues = new LinkedHashMap<>();
+        for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+            resultValues.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
+        }
+        return resultValues;
+    }
 
 
 }
