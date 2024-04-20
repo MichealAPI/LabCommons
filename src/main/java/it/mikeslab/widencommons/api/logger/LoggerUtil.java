@@ -1,43 +1,51 @@
 package it.mikeslab.widencommons.api.logger;
 
 import io.sentry.Sentry;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
+@UtilityClass
 public class LoggerUtil {
-    protected static String pluginName;
 
-    public static void setPluginName(String pluginName) {
-        LoggerUtil.pluginName = pluginName;
-    }
-
-    public static void log(Level logLevel, LogSource logSource, Exception exception) {
+    public void log(final String pluginName, Level logLevel, LogSource logSource, Exception exception) {
         Bukkit.getLogger().log(logLevel, "[" + pluginName + "] -> (" + logSource.sourceDisplayName + "): " + exception.getMessage());
 
-        sentryLog(LogType.EXCEPTION, exception, logLevel, logSource);
+        sentryLog(new SentryLogObject(
+                pluginName,
+                logLevel,
+                logSource,
+                exception,
+                LogType.EXCEPTION));
     }
 
-    public static void log(Level logLevel, LogSource logSource, String message) {
+    public void log(final String pluginName, Level logLevel, LogSource logSource, String message) {
         Bukkit.getLogger().log(logLevel, "[" + pluginName + "] -> (" + logSource.sourceDisplayName + "): " + message);
 
-        sentryLog(LogType.MESSAGE, message, logLevel, logSource);
+        sentryLog(new SentryLogObject(
+                pluginName,
+                logLevel,
+                logSource,
+                message,
+                LogType.MESSAGE));
 
     }
 
 
-    private static void sentryLog(LogType logType, Object logObject, Level logLevel, LogSource logSource) {
+    private void sentryLog(SentryLogObject sentryLogObject) {
 
         CompletableFuture.runAsync(() -> {
-            Sentry.setTag("level", logLevel.getName());
-            Sentry.setTag("plugin", pluginName);
-            Sentry.setTag("source", logSource.sourceDisplayName);
+            Sentry.setTag("level", sentryLogObject.logLevel.getName());
+            Sentry.setTag("plugin", sentryLogObject.pluginName);
+            Sentry.setTag("source", sentryLogObject.logSource.sourceDisplayName);
             Sentry.setTag("server", Bukkit.getServer().getName());
 
-            switch (logType) {
-                case MESSAGE -> Sentry.captureMessage((String) logObject);
-                case EXCEPTION -> Sentry.captureException((Exception) logObject);
+            switch (sentryLogObject.logType) {
+                case MESSAGE -> Sentry.captureMessage((String) sentryLogObject.logObject);
+                case EXCEPTION -> Sentry.captureException((Exception) sentryLogObject.logObject);
             }
         });
     }
@@ -67,5 +75,14 @@ public class LoggerUtil {
     private enum LogType {
         EXCEPTION,
         MESSAGE
+    }
+
+    @RequiredArgsConstructor
+    private class SentryLogObject {
+        private final String pluginName;
+        private final Level logLevel;
+        private final LogSource logSource;
+        private final Object logObject;
+        private final LogType logType;
     }
 }

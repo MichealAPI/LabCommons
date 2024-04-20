@@ -1,5 +1,6 @@
 package it.mikeslab.widencommons.api.inventory.config;
 
+import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.component.ComponentsUtil;
 import it.mikeslab.widencommons.api.inventory.GuiType;
 import it.mikeslab.widencommons.api.inventory.pojo.GuiDetails;
@@ -8,7 +9,6 @@ import it.mikeslab.widencommons.api.inventory.util.config.FileUtil;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class GuiConfigImpl implements GuiConfig {
@@ -37,6 +36,7 @@ public class GuiConfigImpl implements GuiConfig {
         Optional<FileConfiguration> config = new FileUtil(instance).getConfig(fileName);
         if(!config.isPresent()) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     String.format("Config '%s' not found", fileName)
@@ -57,6 +57,7 @@ public class GuiConfigImpl implements GuiConfig {
 
         if(config == null) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     "Config not loaded, load it first"
@@ -82,6 +83,7 @@ public class GuiConfigImpl implements GuiConfig {
         // all checks are done in the GuiConfig#getGuiDetails method
         if(section == null) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     String.format("Invalid section '%s'", section.getName())

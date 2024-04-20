@@ -9,6 +9,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
+import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
@@ -93,6 +94,7 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         } catch (Exception e) {
 
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.DATABASE,
                     "Error during upsert: " + e
@@ -136,6 +138,7 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         } catch (Exception e) {
 
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.DATABASE,
                     "Error during delete: " + e);

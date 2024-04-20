@@ -2,6 +2,7 @@ package it.mikeslab.widencommons.api.database.impl;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
@@ -57,6 +58,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return true;
         } catch (Exception e) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -79,6 +81,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return true;
         } catch (Exception e) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -110,7 +113,12 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
-            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
+            LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
+                    Level.SEVERE,
+                    LoggerUtil.LogSource.DATABASE,
+                    e
+            );
         }
 
         return false;
@@ -135,7 +143,12 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         try (PreparedStatement pst = SQLUtil.prepareStatement(connection, sql, values)) {
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
-            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
+            LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
+                    Level.SEVERE,
+                    LoggerUtil.LogSource.DATABASE,
+                    e
+            );
         }
 
         return false;
@@ -157,7 +170,12 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
                 }
             }
         } catch (Exception e) {
-            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
+            LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
+                    Level.SEVERE,
+                    LoggerUtil.LogSource.DATABASE,
+                    e
+            );
         }
 
         return null;
@@ -210,7 +228,12 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         try (PreparedStatement pst = SQLUtil.prepareStatement(connection, query.toString(), Collections.emptyMap())) {
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
-            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.DATABASE, e);
+            LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
+                    Level.SEVERE,
+                    LoggerUtil.LogSource.DATABASE,
+                    e
+            );
             return false;
         }
     }

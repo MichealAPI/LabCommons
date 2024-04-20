@@ -2,13 +2,15 @@ package it.mikeslab.widencommons;
 
 import io.sentry.Sentry;
 import it.mikeslab.widencommons.api.formatter.FormatUtil;
-import it.mikeslab.widencommons.api.logger.LoggerUtil;
 import lombok.Getter;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
 public final class WidenCommons extends JavaPlugin implements Listener {
+
+    public static final String PLUGIN_NAME = "WidenCommons";
+
 
     @Override
     public void onEnable() {
@@ -17,7 +19,6 @@ public final class WidenCommons extends JavaPlugin implements Listener {
 
         FormatUtil.printStartupInfos(this, "00FF72");
 
-        LoggerUtil.setPluginName(this.getName());
         if(this.getConfig().getBoolean("sentry.enabled")) {
             this.initSentry();
         }

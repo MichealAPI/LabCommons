@@ -1,5 +1,6 @@
 package it.mikeslab.widencommons.api.inventory.util;
 
+import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.inventory.GuiType;
 import it.mikeslab.widencommons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.widencommons.api.inventory.pojo.GuiElement;
@@ -41,6 +42,7 @@ public class GuiChecker {
 
         if(!GuiChecker.isSizeValid(guiDetails)) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "Invalid size (must be a multiple of 9 and less than 54)"
@@ -52,6 +54,7 @@ public class GuiChecker {
 
         if(type == null) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "Null inventory type"
@@ -64,6 +67,7 @@ public class GuiChecker {
         // If it's empty, inventory will just be empty
         if(elements == null) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "Null elements map"
@@ -77,6 +81,7 @@ public class GuiChecker {
         if(flag == 0) {
             if(!elements.isEmpty() && isLayoutValid(layout)) {
                 LoggerUtil.log(
+                        WidenCommons.PLUGIN_NAME,
                         Level.WARNING,
                         LoggerUtil.LogSource.API,
                         "Invalid layout"

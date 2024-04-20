@@ -1,5 +1,6 @@
 package it.mikeslab.widencommons.api.lang;
 
+import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.component.ComponentsUtil;
 import it.mikeslab.widencommons.api.lang.impl.ConfigurableImpl;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
@@ -76,6 +77,7 @@ public interface Configurable {
 
         if(isNull) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     "Configuration is null"

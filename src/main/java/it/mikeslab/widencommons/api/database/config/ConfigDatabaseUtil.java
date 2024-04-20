@@ -1,5 +1,6 @@
 package it.mikeslab.widencommons.api.database.config;
 
+import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.SupportedDatabase;
@@ -26,6 +27,7 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
 
         if(dbType == null) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     String.format("Invalid database type: %s", typeAsString)
@@ -36,6 +38,7 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
         URIBuilder uriBuilder = composeUriBuilder(section);
         if(uriBuilder == null) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.CONFIG,
                     "An error occurred. Check for previous error messages in console."
@@ -65,7 +68,12 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
 
         String uri = section.getString("uri", null);
         if(uri == null) {
-            LoggerUtil.log(Level.SEVERE, LoggerUtil.LogSource.CONFIG, "Database URI is null! Check your config!");
+            LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
+                    Level.SEVERE,
+                    LoggerUtil.LogSource.CONFIG,
+                    "Database URI is null! Check your config!"
+            );
             return null;
         }
 

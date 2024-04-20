@@ -1,5 +1,6 @@
 package it.mikeslab.widencommons.api.inventory;
 
+import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.widencommons.api.inventory.pojo.GuiElement;
 import it.mikeslab.widencommons.api.inventory.pojo.RowPopulationContext;
@@ -33,6 +34,7 @@ public class CustomGui implements InventoryHolder {
 
         if(!GuiChecker.isValid(guiDetails)) {
             LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     "Invalid gui details"
