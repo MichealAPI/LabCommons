@@ -88,7 +88,7 @@ public class CustomGui implements InventoryHolder {
         }
 
         // Initialize a map to cache items and a counter for the row number
-        Map<Character, ItemStack> cashedItems = new HashMap<>();
+        Map<Character, ItemStack> cachedItems = new HashMap<>();
         int row = 0;
 
         // Get the type and row length from the GuiDetails
@@ -100,7 +100,7 @@ public class CustomGui implements InventoryHolder {
             // Create a new context for each row
             RowPopulationContext context = new RowPopulationContext(
                     elements,
-                    cashedItems,
+                    cachedItems,
                     s,
                     row,
                     perRowLength,
@@ -132,7 +132,12 @@ public class CustomGui implements InventoryHolder {
                 int slot = context.getRow() * context.getPerRowLength() + column;
 
                 // Get the item from the cache or create a new one if it does not exist
-                ItemStack item = context.getCachedItems().getOrDefault(key, element.create());
+                ItemStack item = context.getCachedItems().getOrDefault(
+                        key,
+                        element.create(
+                                guiDetails.getPlaceholders()
+                        )
+                );
 
                 // Add the item to the cache and set it in the inventory
                 context.getCachedItems().put(key, item);

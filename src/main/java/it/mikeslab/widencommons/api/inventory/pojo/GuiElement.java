@@ -4,12 +4,15 @@ import it.mikeslab.widencommons.api.inventory.util.ItemCreator;
 import lombok.Builder;
 import lombok.Data;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -37,4 +40,59 @@ public class GuiElement {
         return new ItemCreator().create(this);
     }
 
+
+    /**
+     * Quick method to create the itemStack
+     * with Placeholders support
+     * @return The itemStack
+     */
+    public ItemStack create(Map<String, String> placeholders) {
+
+        if (amount == null) amount = 1;
+
+        if (displayName != null) {
+            replaceDisplayName(placeholders);
+        }
+
+        if(lore != null) {
+            this.replaceLore(placeholders);
+        }
+
+        return new ItemCreator().create(this);
+    }
+
+    private void replaceDisplayName(Map<String, String> placeholders) {
+        for(Map.Entry<String, String> entry : placeholders.entrySet()) {
+            displayName = replace(displayName, entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void replaceLore(Map<String, String> placeholders) {
+        for(int i = 0; i < lore.size(); i++) {
+            Component component = lore.get(i);
+
+            for(Map.Entry<String, String> entry : placeholders.entrySet()) {
+                component = replace(component, entry.getKey(), entry.getValue());
+            }
+
+            lore.set(i, component);
+
+        }
+    }
+
+    private Component replace(Component component, String firstValue, String secondValue) {
+        return component.replaceText(
+                this.generateReplacement(
+                        firstValue,
+                        secondValue
+                )
+        );
+    }
+
+    private TextReplacementConfig generateReplacement(String firstValue, String secondValue) {
+        return TextReplacementConfig.builder()
+                .matchLiteral(firstValue)
+                .replacement(secondValue)
+                .build();
+    }
 }

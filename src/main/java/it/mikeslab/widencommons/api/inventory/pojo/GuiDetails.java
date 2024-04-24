@@ -19,6 +19,7 @@ public class GuiDetails {
     private InventoryHolder holder;
     private Component inventoryName = Component.empty();
     private int inventorySize; // calculated or fixed, in case of a chest
+    private Map<String, String> placeholders;
 
     public GuiDetails(String[] inventoryLayout, GuiType guiType) {
 
@@ -29,6 +30,7 @@ public class GuiDetails {
         this.inventoryLayout = inventoryLayout;
 
         this.elements = new HashMap<>();
+        this.placeholders = new HashMap<>();
 
     }
 
