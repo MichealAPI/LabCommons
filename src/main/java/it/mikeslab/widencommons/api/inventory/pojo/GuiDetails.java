@@ -4,6 +4,7 @@ import it.mikeslab.widencommons.api.inventory.GuiType;
 import lombok.Data;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,9 @@ public class GuiDetails {
     private Component inventoryName = Component.empty();
     private int inventorySize; // calculated or fixed, in case of a chest
     private Map<String, String> placeholders;
+
+    @ApiStatus.Experimental
+    private String text; // valid only for anvil menus
 
     public GuiDetails(String[] inventoryLayout, GuiType guiType) {
 

@@ -5,10 +5,14 @@ import it.mikeslab.widencommons.api.inventory.GuiType;
 import it.mikeslab.widencommons.api.inventory.factory.GuiFactoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,38 +22,50 @@ public class GuiListener implements Listener {
 
     private final GuiFactoryImpl guiFactoryImpl;
 
+    // Since this is a separate event, we may need
+    // to get custom gui details after 1ms delay
+    // to ensure both events are fired
+    //@EventHandler
+    @ApiStatus.Experimental
+    public void onAnvilMenuPrepare(PrepareAnvilEvent event) {
 
+        AnvilInventory anvilInventory = event.getInventory();
+
+        CustomGui customGui = findCustomGui(anvilInventory);
+
+        if(customGui != null) {
+
+            // Set the text of the anvil
+            customGui.getGuiDetails()
+                    .setText(anvilInventory.getRenameText());
+
+        }
+
+    }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
-        if(event.getClickedInventory() == null) {
+        if (event.getClickedInventory() == null) {
             return;
         }
 
         Inventory clickedInventory = event.getClickedInventory();
 
-        for(int id : guiFactoryImpl.getCachedGuis().keySet()) {
+        CustomGui customGui = findCustomGui(clickedInventory);
 
-            CustomGui customGui = guiFactoryImpl.getCachedGuis().get(id);
 
-            if(isCustomGui(clickedInventory)) {
+        if (customGui != null) {
 
-                event.setCancelled(true);
+            event.setCancelled(true);
 
-                this.performClickAction(
-                        event.getSlot(),
-                        customGui,
-                        event
-                );
+            this.performClickAction(
+                    event.getSlot(),
+                    customGui,
+                    event
+            );
 
-                // Stops searching for the gui
-                // to prevent multiple actions
-                return;
-
-            }
         }
-
     }
 
 
@@ -95,12 +111,27 @@ public class GuiListener implements Listener {
 
     }
 
+    private CustomGui findCustomGui(Inventory inventory) {
+        for(int id : guiFactoryImpl.getCachedGuis().keySet()) {
+
+            CustomGui customGui = guiFactoryImpl.getCachedGuis().get(id);
+
+            if(isCustomGui(inventory)) {
+                return customGui;
+            }
+
+        }
+        return null;
+    }
 
     private boolean isCustomGui(Inventory inventory) {
         return inventory.getHolder() instanceof CustomGui;
     }
 
-
+    @ApiStatus.Experimental
+    private boolean isAnvilMenu(GuiType guiType) {
+        return guiType == GuiType.ANVIL;
+    }
 
 
 

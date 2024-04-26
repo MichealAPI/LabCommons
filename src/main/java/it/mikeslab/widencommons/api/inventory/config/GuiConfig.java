@@ -15,7 +15,7 @@ public interface GuiConfig {
      * Load the config file
      * @param fileName The name of the file
      */
-    void loadConfig(String fileName);
+    void loadConfig(String fileName, boolean isResource);
 
     /**
      * Get the details of the gui

@@ -31,10 +31,13 @@ public class GuiConfigImpl implements GuiConfig {
     private FileConfiguration config;
 
     @Override
-    public void loadConfig(String fileName) {
+    public void loadConfig(String fileName, boolean isResource) {
 
         Optional<FileConfiguration> config = new FileUtil(instance).getConfig(fileName);
         if(!config.isPresent()) {
+
+            instance.saveResource(fileName, isResource);
+
             LoggerUtil.log(
                     WidenCommons.PLUGIN_NAME,
                     Level.WARNING,
