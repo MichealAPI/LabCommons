@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,11 +34,14 @@ public class GuiConfigImpl implements GuiConfig {
     @Override
     public void loadConfig(String fileName, boolean isResource) {
 
+        // Check if the file exists, if not, save it
+        File file = new File(instance.getDataFolder(), fileName);
+        if(!file.exists() && isResource) {
+            instance.saveResource(fileName, false);
+        }
+
         Optional<FileConfiguration> config = new FileUtil(instance).getConfig(fileName);
         if(!config.isPresent()) {
-
-            instance.saveResource(fileName, isResource);
-
             LoggerUtil.log(
                     WidenCommons.PLUGIN_NAME,
                     Level.WARNING,

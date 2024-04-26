@@ -54,7 +54,6 @@ public class GuiListener implements Listener {
 
         CustomGui customGui = findCustomGui(clickedInventory);
 
-
         if (customGui != null) {
 
             event.setCancelled(true);
@@ -112,11 +111,18 @@ public class GuiListener implements Listener {
     }
 
     private CustomGui findCustomGui(Inventory inventory) {
+
+        if(!isCustomGui(inventory)) {
+            return null;
+        }
+
         for(int id : guiFactoryImpl.getCachedGuis().keySet()) {
 
             CustomGui customGui = guiFactoryImpl.getCachedGuis().get(id);
 
-            if(isCustomGui(inventory)) {
+            CustomGui inventoryHolder = (CustomGui) inventory.getHolder();
+
+            if(customGui.equals(inventoryHolder)) {
                 return customGui;
             }
 

@@ -50,5 +50,8 @@ public class GuiDetails {
         this.elements.remove(key);
     }
 
+    public GuiDetails clone() {
+        return new GuiDetails(inventoryLayout, guiType);
+    }
 
 }
