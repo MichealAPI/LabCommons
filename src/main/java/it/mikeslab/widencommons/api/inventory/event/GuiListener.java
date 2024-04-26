@@ -128,11 +128,6 @@ public class GuiListener implements Listener {
         return inventory.getHolder() instanceof CustomGui;
     }
 
-    @ApiStatus.Experimental
-    private boolean isAnvilMenu(GuiType guiType) {
-        return guiType == GuiType.ANVIL;
-    }
-
 
 
 
