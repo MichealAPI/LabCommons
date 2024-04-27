@@ -23,24 +23,4 @@ public class ConfigurableImpl implements Configurable {
         return configuration;
     }
 
-    @Override
-    public Component getComponent(ConfigurableEnum configurableEnum) {
-        return Configurable.super.getComponent(configurableEnum);
-    }
-
-    @Override
-    public List<Component> getComponentList(ConfigurableEnum configurableEnum) {
-        return Configurable.super.getComponentList(configurableEnum);
-    }
-
-    @Override
-    public boolean validateConfig() {
-        return Configurable.super.validateConfig();
-    }
-
-    @Override
-    public String getString(ConfigurableEnum configurableEnum) {
-        return Configurable.super.getString(configurableEnum);
-    }
-
 }

@@ -58,6 +58,39 @@ public interface Configurable {
         return getConfiguration().getString(path, String.valueOf(defaultValue));
     }
 
+    default int getInt(ConfigurableEnum configurableEnum) {
+        String path = configurableEnum.getPath();
+        Object defaultValue = configurableEnum.getDefaultValue();
+
+        if(!validateConfig()) {
+            return (int) defaultValue;
+        }
+
+        return getConfiguration().getInt(path, (int) defaultValue);
+    }
+
+    default boolean getBoolean(ConfigurableEnum configurableEnum) {
+        String path = configurableEnum.getPath();
+        Object defaultValue = configurableEnum.getDefaultValue();
+
+        if(!validateConfig()) {
+            return (boolean) defaultValue;
+        }
+
+        return getConfiguration().getBoolean(path, (boolean) defaultValue);
+    }
+
+    default double getDouble(ConfigurableEnum configurableEnum) {
+        String path = configurableEnum.getPath();
+        Object defaultValue = configurableEnum.getDefaultValue();
+
+        if(!validateConfig()) {
+            return (double) defaultValue;
+        }
+
+        return getConfiguration().getDouble(path, (double) defaultValue);
+    }
+
     /**
      * Get a component list from the configuration
      */
@@ -101,7 +134,6 @@ public interface Configurable {
         // return true if the configuration is not null
         return !isNull;
     }
-
 
 
     /**
