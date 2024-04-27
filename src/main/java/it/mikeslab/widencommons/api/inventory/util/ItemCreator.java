@@ -36,9 +36,12 @@ public class ItemCreator {
             meta.lore(lore);
         }
 
-
         if(glow != null && glow) {
             applyGlow(meta);
+        }
+
+        if(element.getCustomModelData() != -1) {
+            meta.setCustomModelData(element.getCustomModelData());
         }
 
         item.setItemMeta(meta);

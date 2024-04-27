@@ -14,7 +14,7 @@ public class GuiDetails {
 
     private final String[] inventoryLayout;
     private final GuiType guiType;
-    private final Map<Character, GuiElement> elements;
+    private Map<Character, GuiElement> elements;
 
     // Optional
     private InventoryHolder holder;
@@ -51,7 +51,19 @@ public class GuiDetails {
     }
 
     public GuiDetails clone() {
-        return new GuiDetails(inventoryLayout, guiType);
-    }
 
+        GuiDetails clone = new GuiDetails(inventoryLayout, guiType);
+
+        clone.setHolder(holder);
+        clone.setInventoryName(inventoryName);
+        clone.setInventorySize(inventorySize);
+        clone.setPlaceholders(new HashMap<>(placeholders));
+        clone.setText(text);
+
+        for (Map.Entry<Character, GuiElement> entry : elements.entrySet()) {
+            clone.addElement(entry.getKey(), entry.getValue().clone());
+        }
+
+        return clone;
+    }
 }

@@ -25,3 +25,4 @@ elements:
     amount: 17
     glowing: true
     action: "TEST"
+    data: 0

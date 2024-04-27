@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -25,6 +26,8 @@ public class GuiElement {
     private List<Component> lore;
     private Integer amount;
     private Boolean glow;
+
+    private int customModelData = -1;
 
     // Consumers
     private Consumer<InventoryClickEvent> onClick;
@@ -95,4 +98,17 @@ public class GuiElement {
                 .replacement(secondValue)
                 .build();
     }
+
+    public GuiElement clone() {
+        return GuiElement.builder()
+                .material(material)
+                .displayName(displayName)
+                .lore(lore != null ? new ArrayList<>(lore) : null)
+                .amount(amount)
+                .glow(glow)
+                .customModelData(customModelData)
+                .onClick(onClick)
+                .build();
+    }
+
 }

@@ -151,7 +151,10 @@ public class GuiConfigImpl implements GuiConfig {
 
             boolean glowing = element.getBoolean(ConfigField.GLOWING.getField(), false);
 
+            int customModelData = element.getInt(ConfigField.CUSTOM_MODEL_DATA.getField(), -1);
+
             GuiElement guiElement = GuiElement.builder()
+                    .customModelData(customModelData)
                     .displayName(displayName)
                     .lore(lore)
                     .material(material)
