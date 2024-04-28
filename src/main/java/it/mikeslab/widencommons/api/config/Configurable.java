@@ -5,6 +5,8 @@ import it.mikeslab.widencommons.api.component.ComponentsUtil;
 import it.mikeslab.widencommons.api.config.impl.ConfigurableImpl;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -89,6 +91,18 @@ public interface Configurable {
         }
 
         return getConfiguration().getDouble(path, (double) defaultValue);
+    }
+
+    default String getSerializedString(ConfigurableEnum configurableEnum) {
+        Object defaultValue = configurableEnum.getDefaultValue();
+
+        if(!validateConfig()) {
+            return (String) defaultValue;
+        }
+
+        return LegacyComponentSerializer.legacySection().serialize(
+                this.getComponent(configurableEnum)
+        );
     }
 
     /**
