@@ -3,6 +3,8 @@ package it.mikeslab.widencommons.api.component;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.List;
@@ -23,8 +25,8 @@ public class ComponentsUtil {
         );
     }
 
-    public Component getComponent(String key) {
-        return MiniMessage.miniMessage().deserialize(key);
+    public Component getComponent(String key, TagResolver.Single... placeholders) {
+        return MiniMessage.miniMessage().deserialize(key, placeholders);
     }
 
     public List<Component> getComponentList(List<String> keys) {

@@ -6,6 +6,7 @@ import it.mikeslab.widencommons.api.config.impl.ConfigurableImpl;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -45,6 +46,25 @@ public interface Configurable {
                 path
         );
     }
+
+    default Component getComponent(ConfigurableEnum configurableEnum, TagResolver.Single... placeholders) {
+
+        String path = configurableEnum.getPath();
+        Object defaultValue = configurableEnum.getDefaultValue();
+
+        if(!validateConfig()) {
+            return ComponentsUtil.getComponent(
+                    String.valueOf(defaultValue),
+                    placeholders
+            );
+        }
+
+        return ComponentsUtil.getComponent(
+                getConfiguration().getString(path),
+                placeholders
+        );
+    }
+
 
     /**
      * Get a string from the configuration
