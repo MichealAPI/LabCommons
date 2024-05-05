@@ -8,6 +8,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
 import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.database.Database;
@@ -46,6 +47,10 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         // Create a new client and connect to the server
         mongoClient = MongoClients.create(settings);
         mongoDatabase = mongoClient.getDatabase(uriBuilder.getDatabase());
+
+        // Create an index on the identifier field
+        mongoDatabase.getCollection(uriBuilder.getTable())
+                .createIndex(Indexes.text(pojoObject.getIdentifierName()));
 
         return isConnected();
     }

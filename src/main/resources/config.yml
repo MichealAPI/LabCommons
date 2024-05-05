@@ -2,27 +2,4 @@ sentry:
   enabled: true
   dsn: "https://" # Sentry DSN
 
-settings:
-  type: MONGODB
-  uri: "mongodb://localhost:27017"
-  password: ""
-  username: ""
-  table: "testunit"
-  database: "widennetwork"
-
-title: "<red>Test"
-layout:
-  - "   "
-  - " a "
-  - "   "
-type: DISPENSER
-size: 9
-elements:
-  'a':
-    displayName: "<green>Wow!"
-    lore: []
-    material: DIAMOND
-    amount: 17
-    glowing: true
-    action: "TEST"
-    data: 0
+mongo-info-logging: false

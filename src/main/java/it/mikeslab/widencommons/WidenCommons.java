@@ -4,6 +4,7 @@ import io.sentry.Sentry;
 import it.mikeslab.widencommons.api.formatter.FormatUtil;
 import it.mikeslab.widencommons.api.inventory.CustomGui;
 import lombok.Getter;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -24,8 +25,12 @@ public final class WidenCommons extends JavaPlugin implements Listener {
 
         FormatUtil.printStartupInfos(this, "00FF72");
 
-        if(this.getConfig().getBoolean("sentry.enabled")) {
+        if(this.getConfig().getBoolean("sentry.enabled", false)) {
             this.initSentry();
+        }
+
+        if(!this.getConfig().getBoolean("mongo-info-logging", false)) {
+            this.disableMongoInfoLogging();
         }
 
     }
@@ -64,6 +69,20 @@ public final class WidenCommons extends JavaPlugin implements Listener {
             options.setTracesSampleRate(1.0);
 
         });
+    }
+
+
+    /**
+     * Set the log level to WARN for the MongoDB driver
+     */
+    private void disableMongoInfoLogging() {
+
+        // Set the log level to WARN for the MongoDB driver
+        Configurator.setLevel(
+                "org.mongodb.driver",
+                org.apache.logging.log4j.Level.WARN
+        );
+
     }
 
 }
