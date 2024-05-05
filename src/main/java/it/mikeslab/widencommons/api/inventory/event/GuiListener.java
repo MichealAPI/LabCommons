@@ -4,10 +4,12 @@ import it.mikeslab.widencommons.api.inventory.CustomGui;
 import it.mikeslab.widencommons.api.inventory.GuiType;
 import it.mikeslab.widencommons.api.inventory.factory.GuiFactoryImpl;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
@@ -75,6 +77,26 @@ public class GuiListener implements Listener {
 
         if(isCustomGui(draggedInventory)) {
             event.setCancelled(true);
+        }
+
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+
+        Inventory inventory = event.getInventory();
+
+        if(isCustomGui(inventory)) {
+
+            CustomGui customGui = findCustomGui(inventory);
+
+            if(customGui == null) return;
+            if(event.getReason() == InventoryCloseEvent.Reason.PLUGIN) return;
+            if(customGui.getGuiDetails().isCloseable()) return;
+
+            Player player = (Player) event.getPlayer();
+            player.openInventory(customGui.getInventory());
+
         }
 
     }

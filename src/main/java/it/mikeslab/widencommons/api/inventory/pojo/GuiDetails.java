@@ -22,6 +22,8 @@ public class GuiDetails {
     private int inventorySize; // calculated or fixed, in case of a chest
     private Map<String, String> placeholders;
 
+    private boolean closeable = true;
+
     @ApiStatus.Experimental
     private String text; // valid only for anvil menus
 
