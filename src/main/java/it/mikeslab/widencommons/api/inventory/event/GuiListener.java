@@ -94,23 +94,15 @@ public class GuiListener implements Listener {
 
         Inventory inventory = event.getInventory();
 
-        System.out.println("Closing inventory");
-
         if(isCustomGui(inventory)) {
-
-            System.out.println("Closing custom gui");
 
             Map.Entry<Integer, CustomGui> guiEntry = findCustomGui(inventory);
 
             if(guiEntry == null) return;
 
             CustomGui customGui = guiEntry.getValue();
-            int id = guiEntry.getKey();
-
-            System.out.println(1);
 
             if(customGui == null) return;
-
 
             if(event.getReason() == InventoryCloseEvent.Reason.PLUGIN || event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
             if(customGui.getGuiDetails().isCloseable()) return;
