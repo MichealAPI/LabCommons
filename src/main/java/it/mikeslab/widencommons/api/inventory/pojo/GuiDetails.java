@@ -22,7 +22,7 @@ public class GuiDetails {
     private int inventorySize; // calculated or fixed, in case of a chest
     private Map<String, String> placeholders;
 
-    private boolean closeable = true;
+    private boolean closeable;
 
     @ApiStatus.Experimental
     private String text; // valid only for anvil menus
@@ -37,6 +37,8 @@ public class GuiDetails {
 
         this.elements = new HashMap<>();
         this.placeholders = new HashMap<>();
+
+        this.closeable = true;
 
     }
 
@@ -61,6 +63,8 @@ public class GuiDetails {
         clone.setInventorySize(inventorySize);
         clone.setPlaceholders(new HashMap<>(placeholders));
         clone.setText(text);
+
+        clone.setCloseable(closeable);
 
         for (Map.Entry<Character, GuiElement> entry : elements.entrySet()) {
             clone.addElement(entry.getKey(), entry.getValue().clone());

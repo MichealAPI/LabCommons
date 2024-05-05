@@ -4,9 +4,9 @@ import it.mikeslab.widencommons.api.inventory.CustomGui;
 import it.mikeslab.widencommons.api.inventory.GuiType;
 import it.mikeslab.widencommons.api.inventory.factory.GuiFactoryImpl;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -14,8 +14,11 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -23,6 +26,7 @@ import java.util.function.Consumer;
 public class GuiListener implements Listener {
 
     private final GuiFactoryImpl guiFactoryImpl;
+    private final JavaPlugin instance;
 
     // Since this is a separate event, we may need
     // to get custom gui details after 1ms delay
@@ -33,9 +37,11 @@ public class GuiListener implements Listener {
 
         AnvilInventory anvilInventory = event.getInventory();
 
-        CustomGui customGui = findCustomGui(anvilInventory);
+        Map.Entry<Integer, CustomGui> guiEntry = findCustomGui(anvilInventory);
 
-        if(customGui != null) {
+        if(guiEntry != null && guiEntry.getValue() != null) {
+
+            CustomGui customGui = guiEntry.getValue();
 
             // Set the text of the anvil
             customGui.getGuiDetails()
@@ -54,9 +60,11 @@ public class GuiListener implements Listener {
 
         Inventory clickedInventory = event.getClickedInventory();
 
-        CustomGui customGui = findCustomGui(clickedInventory);
+        Map.Entry<Integer, CustomGui> guiEntry = findCustomGui(clickedInventory);
 
-        if (customGui != null) {
+        if (guiEntry != null && guiEntry.getValue() != null) {
+
+            CustomGui customGui = guiEntry.getValue();
 
             event.setCancelled(true);
 
@@ -86,16 +94,35 @@ public class GuiListener implements Listener {
 
         Inventory inventory = event.getInventory();
 
+        System.out.println("Closing inventory");
+
         if(isCustomGui(inventory)) {
 
-            CustomGui customGui = findCustomGui(inventory);
+            System.out.println("Closing custom gui");
+
+            Map.Entry<Integer, CustomGui> guiEntry = findCustomGui(inventory);
+
+            if(guiEntry == null) return;
+
+            CustomGui customGui = guiEntry.getValue();
+            int id = guiEntry.getKey();
+
+            System.out.println(1);
 
             if(customGui == null) return;
-            if(event.getReason() == InventoryCloseEvent.Reason.PLUGIN) return;
+
+
+            if(event.getReason() == InventoryCloseEvent.Reason.PLUGIN || event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
             if(customGui.getGuiDetails().isCloseable()) return;
 
             Player player = (Player) event.getPlayer();
-            player.openInventory(customGui.getInventory());
+
+            // Inventory needs to be reopened after 1 tick, otherwise it will fire up the OPEN_NEW reason when closed again
+            // by the player
+            Bukkit.getServer().getScheduler().runTaskLater(instance, () -> {
+                player.openInventory(customGui.getInventory());
+            }, 1L);
+
 
         }
 
@@ -132,7 +159,7 @@ public class GuiListener implements Listener {
 
     }
 
-    private CustomGui findCustomGui(Inventory inventory) {
+    private Map.Entry<Integer, CustomGui> findCustomGui(Inventory inventory) {
 
         if(!isCustomGui(inventory)) {
             return null;
@@ -145,7 +172,7 @@ public class GuiListener implements Listener {
             CustomGui inventoryHolder = (CustomGui) inventory.getHolder();
 
             if(customGui.equals(inventoryHolder)) {
-                return customGui;
+                return new AbstractMap.SimpleEntry<>(id, customGui);
             }
 
         }
@@ -155,6 +182,7 @@ public class GuiListener implements Listener {
     private boolean isCustomGui(Inventory inventory) {
         return inventory.getHolder() instanceof CustomGui;
     }
+
 
 
 
