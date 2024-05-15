@@ -169,6 +169,11 @@ public interface Configurable {
         return !isNull;
     }
 
+    /**
+     * Get the file of the configuration
+     */
+    File getFile();
+
 
     /**
      * Create a new instance of the ConfigurableImpl class
