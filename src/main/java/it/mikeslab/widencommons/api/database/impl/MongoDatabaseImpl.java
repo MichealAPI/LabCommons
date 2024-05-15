@@ -4,6 +4,7 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerApi;
 import com.mongodb.ServerApiVersion;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -21,7 +22,9 @@ import org.bson.BsonInt64;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 @RequiredArgsConstructor
@@ -114,20 +117,33 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
     @Override
     public T find(T pojoObject) {
+        return findAll(pojoObject)
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
 
+
+    @Override
+    public Set<T> findAll(T pojoObject) {
         Map<String, Object> values = pojoObject.toMap();
 
         Document document = new Document(values);
 
-        Document resultDocument = mongoDatabase
+        FindIterable<Document> resultDocument = mongoDatabase
                 .getCollection(uriBuilder.getTable())
-                .find(document)
-                .first();
+                .find(document);
 
-        if(resultDocument == null) return null;
+        if(resultDocument.first() == null) return null;
 
-        return pojoObject.fromMap(resultDocument);
+        Set<T> pojoObjects = new HashSet<>();
 
+        for(Document doc : resultDocument) {
+            pojoObject.fromMap(doc);
+            pojoObjects.add(pojoObject);
+        }
+
+        return pojoObjects;
     }
 
 

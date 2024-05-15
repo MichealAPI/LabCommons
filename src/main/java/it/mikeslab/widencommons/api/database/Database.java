@@ -1,5 +1,7 @@
 package it.mikeslab.widencommons.api.database;
 
+import java.util.Set;
+
 public interface Database<T extends SerializableMapConvertible<T>> {
 
     /**
@@ -40,5 +42,11 @@ public interface Database<T extends SerializableMapConvertible<T>> {
      * @param pojoObject similar to the object to find
      */
     T find(T pojoObject);
+
+    /**
+     * Find all pojo objects from the database
+     * @param pojoObject similar to the object to find
+     */
+    Set<T> findAll(T pojoObject);
 
 }

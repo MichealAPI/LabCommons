@@ -161,12 +161,26 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
      */
     @Override
     public T find(T pojoObject) {
+        return findAll(pojoObject)
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+
+
+    @Override
+    public Set<T> findAll(T pojoObject) {
+
         Map<String, Object> values = pojoObject.toMap();
+        Set<T> foundPojoObjects = new HashSet<>();
 
         try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getFindStatement(values), values)) {
             try (ResultSet rs = pst.executeQuery()) {
-                if (rs.next()) {
-                    return pojoObject.fromMap(SQLUtil.getResultValues(rs));
+                while (rs.next()) {
+                    foundPojoObjects.add(
+                            pojoObject.fromMap(SQLUtil.getResultValues(rs))
+                    );
                 }
             }
         } catch (Exception e) {
@@ -178,8 +192,9 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             );
         }
 
-        return null;
+        return foundPojoObjects;
     }
+
 
     /**
      * Check if the table exists in the database
