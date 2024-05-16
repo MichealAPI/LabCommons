@@ -160,8 +160,8 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
      * @return the object if it exists, null otherwise
      */
     @Override
-    public T find(T pojoObject) {
-        return findAll(pojoObject)
+    public T findOne(T pojoObject) {
+        return findMany(pojoObject)
                 .stream()
                 .findFirst()
                 .orElse(null);
@@ -170,7 +170,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
 
     @Override
-    public Set<T> findAll(T pojoObject) {
+    public Set<T> findMany(T pojoObject) {
 
         Map<String, Object> values = pojoObject.toMap();
         Set<T> foundPojoObjects = new HashSet<>();

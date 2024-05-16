@@ -41,12 +41,12 @@ public interface Database<T extends SerializableMapConvertible<T>> {
      * Find a pojo object from the database
      * @param pojoObject similar to the object to find
      */
-    T find(T pojoObject);
+    T findOne(T pojoObject);
 
     /**
      * Find all pojo objects from the database
      * @param pojoObject similar to the object to find
      */
-    Set<T> findAll(T pojoObject);
+    Set<T> findMany(T pojoObject);
 
 }

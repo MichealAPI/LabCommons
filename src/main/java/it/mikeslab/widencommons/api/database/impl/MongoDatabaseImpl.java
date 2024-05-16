@@ -116,8 +116,8 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
     }
 
     @Override
-    public T find(T pojoObject) {
-        return findAll(pojoObject)
+    public T findOne(T pojoObject) {
+        return this.findMany(pojoObject)
                 .stream()
                 .findFirst()
                 .orElse(null);
@@ -125,7 +125,7 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
 
     @Override
-    public Set<T> findAll(T pojoObject) {
+    public Set<T> findMany(T pojoObject) {
         Map<String, Object> values = pojoObject.toMap();
 
         Document document = new Document(values);
