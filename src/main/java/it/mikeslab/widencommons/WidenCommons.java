@@ -3,6 +3,7 @@ package it.mikeslab.widencommons;
 import io.sentry.Sentry;
 import it.mikeslab.widencommons.api.formatter.FormatUtil;
 import it.mikeslab.widencommons.api.inventory.CustomGui;
+import it.mikeslab.widencommons.api.inventory.config.GuiConfig;
 import lombok.Getter;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.bukkit.Bukkit;
@@ -12,16 +13,18 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
 public final class WidenCommons extends JavaPlugin implements Listener {
 
     public static final String PLUGIN_NAME = "WidenCommons";
 
-
     @Override
     public void onEnable() {
-        saveDefaultConfig();
 
+        saveDefaultConfig();
 
         FormatUtil.printStartupInfos(this, "00FF72");
 

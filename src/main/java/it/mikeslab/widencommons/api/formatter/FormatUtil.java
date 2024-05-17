@@ -5,7 +5,11 @@ import io.papermc.paper.plugin.configuration.PluginMeta;
 import it.mikeslab.widencommons.api.component.ComponentsUtil;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @UtilityClass
@@ -45,6 +49,32 @@ public class FormatUtil {
         );
 
         console.sendMessage(header);
+
+    }
+
+
+    /**
+     * Send the running infos to the player
+     * @param entity The entity
+     * @param instance The plugin instance
+     * @param colorCode The color code
+     */
+    public void sendRunningInfos(HumanEntity entity, JavaPlugin instance, String colorCode) {
+
+        PluginMeta pluginMeta = instance.getPluginMeta();
+
+        String authors = pluginMeta.getAuthors()
+                .toString()
+                .replace("[", "")
+                .replace("]", "");
+
+        entity.sendMessage(
+                ComponentsUtil.getComponent(
+                        "<#{colorCode}>This server is currently running <gold><plugin> v<version> <#{colorCode}>made by <gold><author>".replace("{colorCode}", colorCode),
+                        Placeholder.unparsed("plugin", pluginMeta.getName()),
+                        Placeholder.unparsed("version", pluginMeta.getVersion()),
+                        Placeholder.unparsed("author", authors))
+        );
 
     }
 
