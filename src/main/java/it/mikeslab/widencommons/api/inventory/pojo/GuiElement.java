@@ -107,6 +107,7 @@ public class GuiElement {
                 .amount(amount)
                 .glow(glow)
                 .customModelData(customModelData)
+                .internalValue(internalValue)
                 .onClick(onClick)
                 .build();
     }

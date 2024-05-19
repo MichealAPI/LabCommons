@@ -4,6 +4,7 @@ import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.inventory.CustomGui;
 import it.mikeslab.widencommons.api.inventory.GuiFactory;
 import it.mikeslab.widencommons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.widencommons.api.inventory.pojo.GuiElement;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
 import lombok.Getter;
 import org.bukkit.entity.HumanEntity;

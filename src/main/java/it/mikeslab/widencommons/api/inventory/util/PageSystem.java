@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
@@ -57,14 +59,22 @@ public class PageSystem {
             return this.elementsPerPage;
         }
 
+        System.out.println("Getting elements per page for id " + id);
         CustomGui customGui = guiFactory.getCustomGui(id);
         if(customGui == null) {
+            System.out.println("Custom gui is null");
             return 0;
+        }
+
+        System.out.println("Getting elements per page for internal value " + internalValue);
+
+        for(String key : customGui.getInternalValuesSlots().keySet()) {
+            System.out.println("Key: " + key);
         }
 
         this.elementsPerPage = customGui
                 .getInternalValuesSlots()
-                .getOrDefault(internalValue, new HashSet<>())
+                .getOrDefault(internalValue.toUpperCase(), new ArrayList<>())
                 .size();
 
         return this.elementsPerPage;
@@ -74,23 +84,25 @@ public class PageSystem {
     /**
      * Calculate the sublist of elements that should be displayed on the current page.
      */
-    private List<GuiElement> calculateSubList() {
-        // Calculate the starting index for the sublist. This is done by subtracting 1 from the current page number
-        // (since pages are 1-indexed but list indices are 0-indexed) and multiplying by the number of elements per page.
-        // This gives the index of the first element on the current page.
+    public List<GuiElement> calculateSubList() {
+        if (elements == null || elements.isEmpty()) {
+            return List.of();
+        }
+
+        int totalElements = elements.size();
         int start = (page - 1) * getElementsPerPage();
+        int end = Math.min(page * getElementsPerPage(), totalElements);
 
-        // Calculate the ending index for the sublist. This is done by multiplying the current page number by the number
-        // of elements per page. However, this might exceed the size of the elements list, so we take the minimum of this
-        // value and the size of the elements list. This gives the index of the first element on the next page, or the end
-        // of the list if there is no next page.
-        int end = Math.min(page * getElementsPerPage(), elements.size());
+        // Ensure the start index is within the bounds of the list
+        if (start >= totalElements || start < 0) {
+            return List.of();
+        }
 
-        // Create a sublist of the elements list that includes only the elements on the current page. This is done by
-        // creating a stream from the elements list, skipping the elements before the start index, and limiting the stream
-        // to the number of elements from the start index to the end index. The resulting stream is then collected into a
-        // new list, which replaces the old elements list.
-        return elements.stream().skip(start).limit(end - start).toList();
+        // Create the sublist using skip and limit
+        return elements.stream()
+                .skip(start)
+                .limit(end - start)
+                .collect(Collectors.toList());
     }
 
     /**

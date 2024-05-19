@@ -153,7 +153,11 @@ public class GuiConfigImpl implements GuiConfig {
 
             int customModelData = element.getInt(ConfigField.CUSTOM_MODEL_DATA.getField(), -1);
 
+            System.out.println("Loads till here");
+
             String internalValue = element.getString(ConfigField.INTERNAL_VALUE.getField(), null);
+
+            System.out.println("Internal Value for slot " + charKey + " is " + internalValue);
 
             boolean isInternalValuePresent = internalValue != null;
 
@@ -175,9 +179,7 @@ public class GuiConfigImpl implements GuiConfig {
                 this.parseConsumers(element, consumers, guiElement);
             }
 
-            if(!isInternalValuePresent) { // If it is a normal item/gui element
-                guiDetails.addElement(charKey.charAt(0), guiElement);
-            }
+            guiDetails.addElement(charKey.charAt(0), guiElement);
         }
 
     }

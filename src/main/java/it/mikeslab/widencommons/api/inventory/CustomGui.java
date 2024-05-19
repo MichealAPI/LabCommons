@@ -28,7 +28,7 @@ public class CustomGui implements InventoryHolder {
     private Inventory inventory;
 
     // todo change integer to a set of slots, amount could be the size of the set
-    private Map<String, Set<Integer>> internalValuesSlots; // Amount of items that should be built in a specific way by the plugin, internally
+    private Map<String, List<Integer>> internalValuesSlots; // Amount of items that should be built in a specific way by the plugin, internally
                                                        // This is useful for paged inventories since allow us to know how many items are there for each page
 
     public void generateInventory() {
@@ -69,9 +69,9 @@ public class CustomGui implements InventoryHolder {
             inventory = Bukkit.createInventory(this, size, title);
         }
 
+
         // Populating inventory
         this.populateInventory(
-                guiDetails,
                 inventory
         );
 
@@ -80,7 +80,7 @@ public class CustomGui implements InventoryHolder {
 
 
 
-    public void populateInventory(GuiDetails guiDetails, Inventory inventory) {
+    public void populateInventory(Inventory inventory) {
         // Get the elements and layout from the GuiDetails
         Map<Character, GuiElement> elements = guiDetails.getElements();
         String[] layout = guiDetails.getInventoryLayout();
@@ -100,6 +100,7 @@ public class CustomGui implements InventoryHolder {
 
         // Iterate over the layout
         for (String s : layout) {
+
             // Create a new context for each row
             RowPopulationContext context = new RowPopulationContext(
                     elements,
@@ -109,6 +110,7 @@ public class CustomGui implements InventoryHolder {
                     perRowLength,
                     inventory
             );
+
 
             // Populate the row with items
             populateRow(context);
@@ -135,9 +137,11 @@ public class CustomGui implements InventoryHolder {
                 if(element.getInternalValue() != null) { // If that element should be built in a specific way by the plugin, internally
                     // Increment the amount of internal value items for this value
 
-                    Set<Integer> internalValues = this.getInternalValuesSlots().getOrDefault(
+                    System.out.println("test");
+
+                    List<Integer> internalValues = this.getInternalValuesSlots().getOrDefault(
                             element.getInternalValue(),
-                            new HashSet<>()
+                            new ArrayList<>()
                     );
 
                     int slot = context.getRow() * context.getPerRowLength() + column;
@@ -145,7 +149,7 @@ public class CustomGui implements InventoryHolder {
                     System.out.println("Internal value: " + element.getInternalValue() + " - " + internalValues.size() + " - " + context.getRow() + " - " + column);
 
                     this.getInternalValuesSlots().put(
-                            element.getInternalValue(),
+                            element.getInternalValue().toUpperCase(),
                             internalValues
                     );
 
@@ -180,10 +184,11 @@ public class CustomGui implements InventoryHolder {
     public void populateInternals(String internalValue, List<GuiElement> internalElements) {
         // Iterate over the internal elements
 
-        Set<Integer> internalSlots = this.internalValuesSlots.getOrDefault(
+        List<Integer> internalSlots = this.internalValuesSlots.getOrDefault(
                 internalValue,
-                new HashSet<>()
+                new ArrayList<>()
         );
+
 
         int j = 0;
 
