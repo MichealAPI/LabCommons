@@ -142,6 +142,7 @@ public class CustomGui implements InventoryHolder {
 
                     int slot = context.getRow() * context.getPerRowLength() + column;
                     internalValues.add(slot);
+                    System.out.println("Internal value: " + element.getInternalValue() + " - " + internalValues.size() + " - " + context.getRow() + " - " + column);
 
                     this.getInternalValuesSlots().put(
                             element.getInternalValue(),
@@ -179,7 +180,10 @@ public class CustomGui implements InventoryHolder {
     public void populateInternals(String internalValue, List<GuiElement> internalElements) {
         // Iterate over the internal elements
 
-        Set<Integer> internalSlots = this.internalValuesSlots.get(internalValue);
+        Set<Integer> internalSlots = this.internalValuesSlots.getOrDefault(
+                internalValue,
+                new HashSet<>()
+        );
 
         int j = 0;
 

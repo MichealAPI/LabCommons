@@ -6,6 +6,8 @@ import it.mikeslab.widencommons.api.inventory.pojo.GuiElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.List;
 public class PageSystem {
 
     private final GuiFactory guiFactory;
+    private final JavaPlugin instance;
     private final int id;
     private final String internalValue;
     private final List<GuiElement> elements;
@@ -75,13 +78,13 @@ public class PageSystem {
         // Calculate the starting index for the sublist. This is done by subtracting 1 from the current page number
         // (since pages are 1-indexed but list indices are 0-indexed) and multiplying by the number of elements per page.
         // This gives the index of the first element on the current page.
-        int start = (page - 1) * elementsPerPage;
+        int start = (page - 1) * getElementsPerPage();
 
         // Calculate the ending index for the sublist. This is done by multiplying the current page number by the number
         // of elements per page. However, this might exceed the size of the elements list, so we take the minimum of this
         // value and the size of the elements list. This gives the index of the first element on the next page, or the end
         // of the list if there is no next page.
-        int end = Math.min(page * elementsPerPage, elements.size());
+        int end = Math.min(page * getElementsPerPage(), elements.size());
 
         // Create a sublist of the elements list that includes only the elements on the current page. This is done by
         // creating a stream from the elements list, skipping the elements before the start index, and limiting the stream
@@ -109,11 +112,12 @@ public class PageSystem {
 
         // Update the inventory for all viewers
         customGui.getInventory().getViewers().forEach(
-                viewer -> viewer.openInventory(customGui.getInventory())
+                viewer -> {
+                    Bukkit.getScheduler().runTaskLater(instance, () -> {
+                        viewer.openInventory(customGui.getInventory());
+                    }, 1L);
+                }
         );
-
-
-
 
     }
 

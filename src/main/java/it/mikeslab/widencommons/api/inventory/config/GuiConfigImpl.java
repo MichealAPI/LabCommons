@@ -155,7 +155,9 @@ public class GuiConfigImpl implements GuiConfig {
 
             String internalValue = element.getString(ConfigField.INTERNAL_VALUE.getField(), null);
 
-            if(internalValue != null) {
+            boolean isInternalValuePresent = internalValue != null;
+
+            if(isInternalValuePresent) {
                 internalValue = internalValue.toUpperCase(); // to avoid case sensitivity
             }
 
@@ -173,8 +175,9 @@ public class GuiConfigImpl implements GuiConfig {
                 this.parseConsumers(element, consumers, guiElement);
             }
 
-            guiDetails.addElement(charKey.charAt(0), guiElement);
-
+            if(!isInternalValuePresent) { // If it is a normal item/gui element
+                guiDetails.addElement(charKey.charAt(0), guiElement);
+            }
         }
 
     }

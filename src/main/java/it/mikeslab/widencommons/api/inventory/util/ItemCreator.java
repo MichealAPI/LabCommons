@@ -28,6 +28,11 @@ public class ItemCreator {
         ItemStack item = new ItemStack(material, amount);
         ItemMeta meta = item.getItemMeta();
 
+        // If the item has no meta, return the item as is
+        if(meta == null) {
+            return item;
+        }
+
         if(displayName != null) {
             meta.displayName(displayName);
         }
