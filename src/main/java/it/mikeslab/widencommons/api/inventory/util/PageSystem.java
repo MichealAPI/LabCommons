@@ -6,15 +6,20 @@ import it.mikeslab.widencommons.api.inventory.pojo.GuiElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public class PageSystem {
 
-    private int page, elementsPerPage;
-
+    private GuiFactory guiFactory;
+    private int id;
+    private int page; // Start at page 1
+    private String internalValue;
     private List<GuiElement> elements;
+
+    private int elementsPerPage = -1;
 
     public boolean hasNext() {
         return page < getMaxPages();
@@ -37,8 +42,29 @@ public class PageSystem {
     }
 
     public int getMaxPages() {
-        return (int) Math.ceil((double) elements.size() / elementsPerPage);
+        return (int) Math.ceil((double) elements.size() / getElementsPerPage());
     }
+
+    public int getElementsPerPage() {
+
+        // Cache the elements per page value
+        if(this.elementsPerPage != -1) {
+            return this.elementsPerPage;
+        }
+
+        CustomGui customGui = guiFactory.getCustomGui(id);
+        if(customGui == null) {
+            return 0;
+        }
+
+        this.elementsPerPage = customGui
+                .getInternalValuesSlots()
+                .getOrDefault(internalValue, new HashSet<>())
+                .size();
+
+        return this.elementsPerPage;
+    }
+
 
     /**
      * Calculate the sublist of elements that should be displayed on the current page.
@@ -64,11 +90,8 @@ public class PageSystem {
 
     /**
      * Update the inventory for the specified gui factory with the specified id and internal value.
-     * @param guiFactory The gui factory to update
-     * @param id The id of the custom gui to update
-     * @param internalValue The internal value to populate
      */
-    public void updateInventory(GuiFactory guiFactory, int id, String internalValue) {
+    public void updateInventory() {
 
         // Get the custom gui with the specified id
         CustomGui customGui = guiFactory.getCustomGui(id);
