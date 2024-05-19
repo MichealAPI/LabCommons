@@ -5,19 +5,21 @@ import it.mikeslab.widencommons.api.inventory.GuiFactory;
 import it.mikeslab.widencommons.api.inventory.pojo.GuiElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PageSystem {
 
-    private GuiFactory guiFactory;
-    private int id;
-    private int page; // Start at page 1
-    private String internalValue;
-    private List<GuiElement> elements;
+    private final GuiFactory guiFactory;
+    private final int id;
+    private final String internalValue;
+    private final List<GuiElement> elements;
+
+    private int page = 1; // Start at page 1
 
     private int elementsPerPage = -1;
 
