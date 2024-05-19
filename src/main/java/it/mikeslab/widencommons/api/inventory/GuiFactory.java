@@ -2,6 +2,8 @@ package it.mikeslab.widencommons.api.inventory;
 
 import it.mikeslab.widencommons.api.inventory.pojo.GuiDetails;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This interface is used to create and manage custom inventories.
@@ -40,6 +42,14 @@ public interface GuiFactory {
      * @param id The id of the inventory
      * @param newGuiDetails The new details of the inventory
      */
-    void update(int id, GuiDetails newGuiDetails);
+    void update(int id, @NotNull GuiDetails newGuiDetails);
+
+    /**
+     * Gets the custom inventory with the given id
+     * @param id The id of the inventory
+     * @return The custom inventory
+     */
+    @Nullable
+    CustomGui getCustomGui(int id);
 
 }

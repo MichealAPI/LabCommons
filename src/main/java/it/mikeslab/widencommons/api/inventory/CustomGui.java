@@ -15,8 +15,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 @Data
@@ -28,9 +27,13 @@ public class CustomGui implements InventoryHolder {
     // Note: the holder will also use this
     private Inventory inventory;
 
-
+    // todo change integer to a set of slots, amount could be the size of the set
+    private Map<String, Set<Integer>> internalValuesSlots; // Amount of items that should be built in a specific way by the plugin, internally
+                                                       // This is useful for paged inventories since allow us to know how many items are there for each page
 
     public void generateInventory() {
+
+        this.internalValuesSlots = new HashMap<>();
 
         if(!GuiChecker.isValid(guiDetails)) {
             LoggerUtil.log(
@@ -114,6 +117,7 @@ public class CustomGui implements InventoryHolder {
     }
 
     private void populateRow(RowPopulationContext context) {
+
         // Iterate over the elements in the context
         for (Map.Entry<Character, GuiElement> entry : context.getElements().entrySet()) {
             char key = entry.getKey();
@@ -125,6 +129,25 @@ public class CustomGui implements InventoryHolder {
 
                 // If the character in the layout does not match the key, skip this iteration
                 if (c != key) {
+                    continue;
+                }
+
+                if(element.getInternalValue() != null) { // If that element should be built in a specific way by the plugin, internally
+                    // Increment the amount of internal value items for this value
+
+                    Set<Integer> internalValues = this.getInternalValuesSlots().getOrDefault(
+                            element.getInternalValue(),
+                            new HashSet<>()
+                    );
+
+                    int slot = context.getRow() * context.getPerRowLength() + column;
+                    internalValues.add(slot);
+
+                    this.getInternalValuesSlots().put(
+                            element.getInternalValue(),
+                            internalValues
+                    );
+
                     continue;
                 }
 
@@ -144,6 +167,44 @@ public class CustomGui implements InventoryHolder {
                 context.getInventory().setItem(slot, item);
             }
         }
+    }
+
+
+    /**
+     * Populate the inventory with internal elements
+     * @param internalValue The internal value to populate
+     * @param internalElements The internal elements
+     *
+     */
+    public void populateInternals(String internalValue, List<GuiElement> internalElements) {
+        // Iterate over the internal elements
+
+        Set<Integer> internalSlots = this.internalValuesSlots.get(internalValue);
+
+        int j = 0;
+
+        // Iterate over the internal slots
+        for(int slot : internalSlots) {
+
+            if(j >= internalElements.size()) {
+                break;
+            }
+
+            // Get the element
+            GuiElement element = internalElements.get(j);
+
+            // Create the item and replace the placeholders in it
+            ItemStack item = element.create(
+                    guiDetails.getPlaceholders()
+            );
+
+            // Set the item in the inventory
+            inventory.setItem(slot, item);
+
+            // Go to the next element
+            j++;
+        }
+
     }
 
 

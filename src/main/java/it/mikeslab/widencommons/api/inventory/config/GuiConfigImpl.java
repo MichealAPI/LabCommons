@@ -153,6 +153,12 @@ public class GuiConfigImpl implements GuiConfig {
 
             int customModelData = element.getInt(ConfigField.CUSTOM_MODEL_DATA.getField(), -1);
 
+            String internalValue = element.getString(ConfigField.INTERNAL_VALUE.getField(), null);
+
+            if(internalValue != null) {
+                internalValue = internalValue.toUpperCase(); // to avoid case sensitivity
+            }
+
             GuiElement guiElement = GuiElement.builder()
                     .customModelData(customModelData)
                     .displayName(displayName)
@@ -160,6 +166,7 @@ public class GuiConfigImpl implements GuiConfig {
                     .material(material)
                     .amount(amount)
                     .glow(glowing)
+                    .internalValue(internalValue)
                     .build();
 
             if(areActionConsumersEnabled) {

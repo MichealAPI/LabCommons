@@ -8,6 +8,8 @@ import it.mikeslab.widencommons.api.logger.LoggerUtil;
 import lombok.Getter;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,7 +85,7 @@ public class GuiFactoryImpl implements GuiFactory {
 
 
     @Override
-    public void update(int id, GuiDetails newGuiDetails) {
+    public void update(int id, @NotNull GuiDetails newGuiDetails) {
 
         if(!cachedGuis.containsKey(id)) {
             LoggerUtil.log(
@@ -98,6 +100,12 @@ public class GuiFactoryImpl implements GuiFactory {
         CustomGui customGui = new CustomGui(newGuiDetails);
         cachedGuis.put(id, customGui);
 
+    }
+
+    @Override
+    @Nullable
+    public CustomGui getCustomGui(int id) {
+        return cachedGuis.getOrDefault(id, null);
     }
 
 

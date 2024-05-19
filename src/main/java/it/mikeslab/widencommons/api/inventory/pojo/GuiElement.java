@@ -25,6 +25,7 @@ public class GuiElement {
     private List<Component> lore;
     private Integer amount;
     private Boolean glow;
+    private String internalValue; // If that element should be built in a specific way by the plugin, internally
 
     private int customModelData = -1;
 

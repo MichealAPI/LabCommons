@@ -18,7 +18,8 @@ public enum ConfigField {
     SIZE("size"),
     MATERIAL("material"),
     ACTION("action"),
-    CUSTOM_MODEL_DATA("data");
+    CUSTOM_MODEL_DATA("data"),
+    INTERNAL_VALUE("internalValue");
 
     private final String field;
 
