@@ -12,12 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 public class PageSystem {
 
-    private int page, maxPage, elementsPerPage;
+    private int page, elementsPerPage;
 
     private List<GuiElement> elements;
 
     public boolean hasNext() {
-        return page < maxPage;
+        return page < getMaxPages();
     }
 
     public boolean hasPrevious() {
@@ -34,6 +34,10 @@ public class PageSystem {
         if (hasPrevious()) {
             page--;
         }
+    }
+
+    public int getMaxPages() {
+        return (int) Math.ceil((double) elements.size() / elementsPerPage);
     }
 
     /**
