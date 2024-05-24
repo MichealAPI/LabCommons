@@ -15,6 +15,7 @@ public class GuiDetails {
     private final String[] inventoryLayout;
     private final GuiType guiType;
     private Map<Character, GuiElement> elements;
+    private Map<Integer, GuiElement> tempPageElements;
 
     // Optional
     private InventoryHolder holder;
@@ -36,6 +37,8 @@ public class GuiDetails {
         this.inventoryLayout = inventoryLayout;
 
         this.elements = new HashMap<>();
+        this.tempPageElements = new HashMap<>();
+
         this.placeholders = new HashMap<>();
 
         this.closeable = true;

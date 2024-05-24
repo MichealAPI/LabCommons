@@ -210,6 +210,9 @@ public class CustomGui implements InventoryHolder {
             // Set the item in the inventory
             inventory.setItem(slot, item);
 
+            // Add the element to the temporary page elements
+            guiDetails.getTempPageElements().put(slot, element);
+
             // Go to the next element
             j++;
         }

@@ -134,9 +134,9 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
                 .getCollection(uriBuilder.getTable())
                 .find(document);
 
-        if(resultDocument.first() == null) return null;
-
         Set<T> pojoObjects = new HashSet<>();
+
+        if(resultDocument.first() == null) return pojoObjects; // Return empty set if no results
 
         for(Document doc : resultDocument) {
             pojoObject.fromMap(doc);

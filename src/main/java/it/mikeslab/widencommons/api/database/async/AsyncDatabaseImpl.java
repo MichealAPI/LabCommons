@@ -2,11 +2,13 @@ package it.mikeslab.widencommons.api.database.async;
 
 import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+@Getter
 @RequiredArgsConstructor
 public class AsyncDatabaseImpl<T extends SerializableMapConvertible<T>> implements AsyncDatabase<T> {
 

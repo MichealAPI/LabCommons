@@ -3,6 +3,7 @@ package it.mikeslab.widencommons.api.inventory.event;
 import it.mikeslab.widencommons.api.inventory.CustomGui;
 import it.mikeslab.widencommons.api.inventory.GuiType;
 import it.mikeslab.widencommons.api.inventory.factory.GuiFactoryImpl;
+import it.mikeslab.widencommons.api.inventory.pojo.GuiElement;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -139,13 +140,15 @@ public class GuiListener implements Listener {
 
         if(gui.getGuiDetails().getElements().containsKey(clickedChar)) {
 
-            Optional<Consumer<InventoryClickEvent>> consumer = Optional.ofNullable(
-                    gui.getGuiDetails().getElements()
-                            .get(clickedChar)
-                            .getOnClick()
-            );
+            // Check if the slot is a gui element
+            Optional.ofNullable(gui.getGuiDetails().getElements().get(clickedChar))
+                    .map(GuiElement::getOnClick)
+                    .ifPresent(consumer -> consumer.accept(event));
 
-            consumer.ifPresent(lambdaConsumer -> lambdaConsumer.accept(event));
+            // Check if the slot is a temp element
+            Optional.ofNullable(gui.getGuiDetails().getTempPageElements().get(clickedSlot))
+                    .map(GuiElement::getOnClick)
+                    .ifPresent(consumer -> consumer.accept(event));
 
         }
 
