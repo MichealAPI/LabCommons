@@ -196,7 +196,12 @@ public class CustomGui implements InventoryHolder {
         for(int slot : internalSlots) {
 
             if(j >= internalElements.size()) {
-                break;
+
+                // Clear if unused
+                inventory.setItem(slot, null);
+                guiDetails.getTempPageElements().remove(slot);
+
+                continue;
             }
 
             // Get the element
