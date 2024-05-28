@@ -27,6 +27,8 @@ public class GuiElement {
     private Boolean glow;
     private String internalValue; // If that element should be built in a specific way by the plugin, internally
 
+    private Map<String, String> replacements;
+
     private int customModelData = -1;
 
     // Consumers
@@ -39,6 +41,11 @@ public class GuiElement {
     public ItemStack create() {
 
         if(amount == null) amount = 1;
+
+        // If there are replacements, we need to create the itemStack with placeholders support
+        if(replacements != null) {
+            return this.create(replacements);
+        }
 
         return new ItemCreator().create(this);
     }
@@ -54,7 +61,7 @@ public class GuiElement {
         if (amount == null) amount = 1;
 
         if (displayName != null) {
-            replaceDisplayName(placeholders);
+            this.replaceDisplayName(placeholders);
         }
 
         if(lore != null) {
