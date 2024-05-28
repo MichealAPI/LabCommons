@@ -1,10 +1,13 @@
 package it.mikeslab.widencommons.api.various.delay;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class DelayHandlerImpl<T extends DelayedAction> implements DelayHandler<T> {
 
@@ -73,5 +76,27 @@ public class DelayHandlerImpl<T extends DelayedAction> implements DelayHandler<T
     @Override
     public String format(long time) {
         return new SimpleDateFormat(this.timeFormat).format(time);
+    }
+
+    @Override
+    public void performDelayed(Player player, T delayType, Component delayActive, Consumer<Void> action) {
+        long remainingTime = this.getRemainingTime(player, delayType);
+
+        if(remainingTime > 0) {
+
+            TextReplacementConfig config = TextReplacementConfig.builder()
+                    .matchLiteral("<remaining>")
+                    .replacement(this.format(remainingTime))
+                    .build();
+
+            player.sendMessage(
+                    delayActive.replaceText(config)
+            );
+            return;
+        }
+
+        action.accept(null);
+
+        this.registerDelay(player, delayType);
     }
 }

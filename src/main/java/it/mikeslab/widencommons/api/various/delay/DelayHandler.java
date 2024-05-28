@@ -1,6 +1,9 @@
 package it.mikeslab.widencommons.api.various.delay;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+
+import java.util.function.Consumer;
 
 public interface DelayHandler<T extends DelayedAction> {
 
@@ -42,5 +45,15 @@ public interface DelayHandler<T extends DelayedAction> {
      * @return the formatted time
      */
     String format(long time);
+
+    /**
+     * Perform a delayed action
+     * @param player the player to perform the action for
+     * @param delayType the delay type
+     * @param delayActive the delay active message
+     * @param action the action to perform
+     */
+    void performDelayed(Player player, T delayType, Component delayActive, Consumer<Void> action);
+
 
 }
