@@ -31,9 +31,16 @@ public interface DelayHandler<T extends DelayedAction> {
      *
      * @param player    the player to check
      * @param delayType the delay type
-     * @return
+     * @return 0 if the player has no delay, otherwise the remaining time
      */
-    boolean hasDelay(Player player, T delayType);
+    long getRemainingTime(Player player, T delayType);
 
+
+    /**
+     * Check if the player has a delay
+     * @param time the time to check
+     * @return the formatted time
+     */
+    String format(long time);
 
 }

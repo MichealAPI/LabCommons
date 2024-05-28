@@ -2,15 +2,18 @@ package it.mikeslab.widencommons.api.various.delay;
 
 import org.bukkit.entity.Player;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DelayHandlerImpl<T extends DelayedAction> implements DelayHandler<T> {
 
     private final Map<Player, Map<T, Long>> delays;
+    private final String timeFormat;
 
-    public DelayHandlerImpl() {
+    public DelayHandlerImpl(String timeFormat) {
         this.delays = new HashMap<>();
+        this.timeFormat = timeFormat;
     }
 
     @Override
@@ -46,7 +49,7 @@ public class DelayHandlerImpl<T extends DelayedAction> implements DelayHandler<T
     }
 
     @Override
-    public boolean hasDelay(Player player, T delayType) {
+    public long getRemainingTime(Player player, T delayType) {
         Map<T, Long> playerDelays = delays.getOrDefault(player, null);
 
         if(playerDelays != null) {
@@ -56,10 +59,19 @@ public class DelayHandlerImpl<T extends DelayedAction> implements DelayHandler<T
 
                 // check if the player has the bypass permission,
                 // otherwise, apply the existing delay
-                return !player.hasPermission(delayType.getBypassPermission());
+                if(player.hasPermission(delayType.getBypassPermission())) {
+                    return 0;
+                }
+
+                return delay - System.currentTimeMillis();
             }
         }
 
-        return false;
+        return 0;
+    }
+
+    @Override
+    public String format(long time) {
+        return new SimpleDateFormat(this.timeFormat).format(time);
     }
 }
