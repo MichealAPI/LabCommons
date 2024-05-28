@@ -15,10 +15,4 @@ public interface DelayedAction {
      */
     String getBypassPermission();
 
-    /**
-     * The name of the action
-     * @return the name of the action
-     */
-    String getActionName();
-
 }
