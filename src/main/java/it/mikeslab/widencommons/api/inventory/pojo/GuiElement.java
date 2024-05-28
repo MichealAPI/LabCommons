@@ -60,6 +60,10 @@ public class GuiElement {
 
         if (amount == null) amount = 1;
 
+        if(this.replacements != null) {
+            placeholders.putAll(this.replacements);
+        }
+
         if (displayName != null) {
             this.replaceDisplayName(placeholders);
         }

@@ -22,9 +22,7 @@ import org.bson.BsonInt64;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 @RequiredArgsConstructor
@@ -125,7 +123,7 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
 
     @Override
-    public Set<T> findMany(T pojoObject) {
+    public List<T> findMany(T pojoObject) {
         Map<String, Object> values = pojoObject.toMap();
 
         Document document = new Document(values);
@@ -134,7 +132,7 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
                 .getCollection(uriBuilder.getTable())
                 .find(document);
 
-        Set<T> pojoObjects = new HashSet<>();
+        List<T> pojoObjects = new ArrayList<>();
 
         if(resultDocument.first() == null) return pojoObjects; // Return empty set if no results
 

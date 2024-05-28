@@ -2,6 +2,7 @@ package it.mikeslab.widencommons.api.database.async;
 
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -54,6 +55,6 @@ public interface AsyncDatabase<T extends SerializableMapConvertible<T>> {
      * Find all pojo objects from the database
      * @param pojoObject similar to the object to find
      */
-    CompletableFuture<Set<T>> findMany(T pojoObject);
+    CompletableFuture<List<T>> findMany(T pojoObject);
 
 }

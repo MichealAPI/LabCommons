@@ -170,10 +170,10 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
 
     @Override
-    public Set<T> findMany(T pojoObject) {
+    public List<T> findMany(T pojoObject) {
 
         Map<String, Object> values = pojoObject.toMap();
-        Set<T> foundPojoObjects = new HashSet<>();
+        List<T> foundPojoObjects = new ArrayList<>();
 
         try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getFindStatement(values), values)) {
             try (ResultSet rs = pst.executeQuery()) {
