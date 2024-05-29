@@ -3,6 +3,7 @@ package it.mikeslab.widencommons;
 import io.sentry.Sentry;
 import it.mikeslab.widencommons.api.formatter.FormatUtil;
 import it.mikeslab.widencommons.api.inventory.CustomGui;
+import it.mikeslab.widencommons.api.various.aggregate.AggregatorManager;
 import lombok.Getter;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.bukkit.Bukkit;
@@ -16,6 +17,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class WidenCommons extends JavaPlugin implements Listener {
 
     public static final String PLUGIN_NAME = "WidenCommons";
+
+    private AggregatorManager aggregatorManager;
 
     @Override
     public void onEnable() {
@@ -31,6 +34,8 @@ public final class WidenCommons extends JavaPlugin implements Listener {
         if(!this.getConfig().getBoolean("mongo-info-logging", false)) {
             this.disableMongoInfoLogging();
         }
+
+        this.initialize();
 
     }
 
@@ -49,6 +54,13 @@ public final class WidenCommons extends JavaPlugin implements Listener {
             }
 
         }
+
+    }
+
+    private void initialize() {
+
+        // Initialize the aggregator manager
+        this.aggregatorManager = new AggregatorManager();
 
     }
 

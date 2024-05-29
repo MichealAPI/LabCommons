@@ -15,6 +15,6 @@ public interface Aggregator<T> {
      * @param reference the reference to aggregate
      * @return a {@link CompletableFuture} of the aggregated data
      */
-    CompletableFuture<Document> aggregate(T reference);
+    CompletableFuture<Document> aggregate(Object reference);
 
 }
