@@ -8,6 +8,7 @@ import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
 import it.mikeslab.widencommons.api.database.util.SQLUtil;
 import it.mikeslab.widencommons.api.logger.LoggerUtil;
+import org.bson.Document;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -193,6 +194,38 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         }
 
         return foundPojoObjects;
+    }
+
+    @Override
+    public Document findDocument(Document document) {
+        return findDocuments(document)
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public List<Document> findDocuments(Document document) {
+
+        List<Document> foundDocuments = new ArrayList<>();
+
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getFindStatement(document), document)) {
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    foundDocuments.add(new Document(SQLUtil.getResultValues(rs)));
+                }
+            }
+        } catch (Exception e) {
+            LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
+                    Level.SEVERE,
+                    LoggerUtil.LogSource.DATABASE,
+                    e
+            );
+        }
+
+        return foundDocuments;
+
     }
 
 

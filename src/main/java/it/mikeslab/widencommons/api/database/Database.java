@@ -1,5 +1,7 @@
 package it.mikeslab.widencommons.api.database;
 
+import org.bson.Document;
+
 import java.util.List;
 import java.util.Set;
 
@@ -49,5 +51,20 @@ public interface Database<T extends SerializableMapConvertible<T>> {
      * @param pojoObject similar to the object to find
      */
     List<T> findMany(T pojoObject);
+
+    /**
+     * Find all pojo objects from the database
+     * @param document similar to the document to find
+     * @return the document
+     */
+    Document findDocument(Document document);
+
+    /**
+     * Find all pojo objects from the database
+     * @param document similar to the document to find
+     * @return the document
+     */
+    List<Document> findDocuments(Document document);
+
 
 }

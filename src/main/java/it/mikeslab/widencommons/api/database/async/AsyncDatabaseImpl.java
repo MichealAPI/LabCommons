@@ -4,6 +4,7 @@ import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bson.Document;
 
 import java.util.List;
 import java.util.Set;
@@ -48,5 +49,15 @@ public class AsyncDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
     @Override
     public CompletableFuture<List<T>> findMany(T pojoObject) {
         return CompletableFuture.supplyAsync(() -> syncDatabase.findMany(pojoObject));
+    }
+
+    @Override
+    public CompletableFuture<Document> findDocument(Document document) {
+        return CompletableFuture.supplyAsync(() -> syncDatabase.findDocument(document));
+    }
+
+    @Override
+    public CompletableFuture<List<Document>> findDocuments(Document document) {
+        return CompletableFuture.supplyAsync(() -> syncDatabase.findDocuments(document));
     }
 }

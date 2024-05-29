@@ -1,6 +1,7 @@
 package it.mikeslab.widencommons.api.database.async;
 
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
+import org.bson.Document;
 
 import java.util.List;
 import java.util.Set;
@@ -56,5 +57,19 @@ public interface AsyncDatabase<T extends SerializableMapConvertible<T>> {
      * @param pojoObject similar to the object to find
      */
     CompletableFuture<List<T>> findMany(T pojoObject);
+
+    /**
+     * Find a document from the database
+     * @param document similar to the document to find
+     * @return the document
+     */
+    CompletableFuture<Document> findDocument(Document document);
+
+    /**
+     * Find all documents from the database
+     * @param document similar to the document to find
+     * @return the document
+     */
+    CompletableFuture<List<Document>> findDocuments(Document document);
 
 }

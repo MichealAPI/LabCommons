@@ -144,6 +144,28 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         return pojoObjects;
     }
 
+    @Override
+    public Document findDocument(Document document) {
+        return mongoDatabase.getCollection(uriBuilder.getTable())
+                .find(document)
+                .first();
+    }
+
+    @Override
+    public List<Document> findDocuments(Document document) {
+        List<Document> documents = new ArrayList<>();
+
+        FindIterable<Document> resultDocument = mongoDatabase
+                .getCollection(uriBuilder.getTable())
+                .find(document);
+
+        for(Document doc : resultDocument) {
+            documents.add(doc);
+        }
+
+        return documents;
+    }
+
 
     @Override
     public boolean delete(T pojoObject) {
