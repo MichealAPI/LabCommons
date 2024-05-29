@@ -4,6 +4,7 @@ import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * This aggregator manager will allow multiple aggregators
@@ -41,15 +42,26 @@ public class AggregatorManager {
      * @param reference the reference to aggregate
      * @return the aggregated data
      */
-    public Document aggregate(Object reference) {
+    public CompletableFuture<Document> aggregate(Object reference) {
+        List<CompletableFuture<Document>> futures = new ArrayList<>();
 
-        Document result = new Document();
-
-        for (Aggregator<?> aggregator : this.aggregators) {
-            aggregator.aggregate(reference).thenAccept(result::putAll);
+        for (Aggregator<?> aggregator : aggregators) {
+            CompletableFuture<Document> future = aggregator.aggregate(reference);
+            futures.add(future);
         }
 
-        return result;
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(
+                futures.toArray(new CompletableFuture[0])
+        );
+
+        return allFutures.thenApply(ignored -> {
+            Document result = new Document();
+
+            for (CompletableFuture<Document> future : futures) {
+                result.putAll(future.join());
+            }
+            return result;
+        });
     }
 
 }
