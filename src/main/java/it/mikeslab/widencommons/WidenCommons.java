@@ -1,6 +1,8 @@
 package it.mikeslab.widencommons;
 
 import io.sentry.Sentry;
+import it.mikeslab.widencommons.api.chat.ChatMessagingHandler;
+import it.mikeslab.widencommons.api.chat.ChatMessagingListener;
 import it.mikeslab.widencommons.api.formatter.FormatUtil;
 import it.mikeslab.widencommons.api.inventory.CustomGui;
 import it.mikeslab.widencommons.api.various.aggregate.AggregatorManager;
@@ -19,6 +21,7 @@ public final class WidenCommons extends JavaPlugin implements Listener {
     public static final String PLUGIN_NAME = "WidenCommons";
 
     private AggregatorManager aggregatorManager;
+    private ChatMessagingHandler chatMessagingHandler;
 
     @Override
     public void onEnable() {
@@ -61,6 +64,9 @@ public final class WidenCommons extends JavaPlugin implements Listener {
 
         // Initialize the aggregator manager
         this.aggregatorManager = new AggregatorManager();
+
+        // Register Chat Messaging listener
+        this.chatMessagingHandler = new ChatMessagingListener(this);
 
     }
 
