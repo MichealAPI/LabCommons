@@ -45,7 +45,10 @@ public class ChatMessagingListener implements ChatMessagingHandler, Listener {
         if(context.getCondition().test(message)) {
 
             context.getSuccess()
-                    .accept(event.getPlayer());
+                    .accept(
+                            event.getPlayer(),
+                            message
+                    );
 
             this.contextMap.remove(playerUUID);
 

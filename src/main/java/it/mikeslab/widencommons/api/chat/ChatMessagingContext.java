@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.entity.Player;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -16,8 +17,9 @@ public class ChatMessagingContext {
 
     private final Consumer<Player> start,
             failure,
-            success,
             timeOutConsumer;
+
+    private final BiConsumer<Player, String> success;
 
     @Setter private long timeOut;
 
