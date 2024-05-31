@@ -2,6 +2,7 @@ package it.mikeslab.widencommons.api.chat;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 
 import java.util.function.Consumer;
@@ -18,8 +19,8 @@ public class ChatMessagingContext {
             success,
             timeOutConsumer;
 
-    private long timeOut;
+    @Setter private long timeOut;
 
-    private boolean abortOnFailure;
+    @Setter private boolean abortOnFailure;
 
 }
