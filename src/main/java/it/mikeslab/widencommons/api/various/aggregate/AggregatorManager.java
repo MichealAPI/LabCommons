@@ -49,8 +49,6 @@ public class AggregatorManager {
         for (Aggregator<?> aggregator : aggregators) {
             CompletableFuture<Map<String, Object>> future = aggregator.aggregate(reference);
 
-            System.out.println(future.join().toString());
-
             futures.add(future);
         }
 
