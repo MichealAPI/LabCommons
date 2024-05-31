@@ -94,7 +94,7 @@ public class ChatMessagingListener implements ChatMessagingHandler, Listener {
 
         // Check if the timeout time is -1, if so, don't run the
         // timeout scheduler for this operation
-        if(context.getTimeOutTime() == -1) return;
+        if(context.getTimeOut() == -1) return;
 
         // Run the timeout scheduler
         this.runTimeoutScheduler(referenceUUID, context);
@@ -118,13 +118,13 @@ public class ChatMessagingListener implements ChatMessagingHandler, Listener {
                 instance,
                 () -> {
                     if(contextMap.containsKey(referenceUUID)) {
-                        context.getTimeOut().accept(
+                        context.getTimeOutConsumer().accept(
                                 instance.getServer().getPlayer(referenceUUID)
                         );
                         abort(referenceUUID);
                     }
                 },
-                context.getTimeOutTime()
+                context.getTimeOut()
         );
 
     }

@@ -11,16 +11,14 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class ChatMessagingContext {
 
-    private final int timeout;
-
     private final Predicate<String> condition;
 
     private final Consumer<Player> start,
             failure,
             success,
-            timeOut;
+            timeOutConsumer;
 
-    private long timeOutTime;
+    private long timeOut;
 
     private boolean abortOnFailure;
 
