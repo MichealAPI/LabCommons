@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,15 +44,18 @@ public class ChatMessagingListener implements ChatMessagingHandler, Listener {
         ChatMessagingContext context = contextMap.get(playerUUID);
         String message = MiniMessage.miniMessage().serialize(event.message());
 
+        event.setCancelled(true);
+
         if(context.getCondition().test(message)) {
+
+            this.cancelTimeoutTask(playerUUID);
+            this.contextMap.remove(playerUUID); // Reversed to allow a context-boxing
 
             context.getSuccess()
                     .accept(
                             event.getPlayer(),
                             message
                     );
-
-            this.contextMap.remove(playerUUID);
 
         } else {
 
@@ -110,6 +115,17 @@ public class ChatMessagingListener implements ChatMessagingHandler, Listener {
     @Override
     public void abort(UUID referenceUUID) {
         contextMap.remove(referenceUUID);
+
+        this.cancelTimeoutTask(referenceUUID);
+
+    }
+
+    private void cancelTimeoutTask(UUID referenceUUID) {
+        if(contextMap.containsKey(referenceUUID)) {
+            contextMap.get(referenceUUID)
+                    .getTimeoutTask()
+                    .cancel();
+        }
     }
 
     /**
@@ -119,18 +135,24 @@ public class ChatMessagingListener implements ChatMessagingHandler, Listener {
      */
     private void runTimeoutScheduler(UUID referenceUUID, ChatMessagingContext context) {
 
-        instance.getServer().getScheduler().runTaskLater(
+        BukkitTask task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(contextMap.containsKey(referenceUUID)) {
+                    context.getTimeOutConsumer().accept(
+                            instance.getServer().getPlayer(referenceUUID)
+                    );
+                    abort(referenceUUID);
+                }
+            }
+        }.runTaskLater(
                 instance,
-                () -> {
-                    if(contextMap.containsKey(referenceUUID)) {
-                        context.getTimeOutConsumer().accept(
-                                instance.getServer().getPlayer(referenceUUID)
-                        );
-                        abort(referenceUUID);
-                    }
-                },
                 context.getTimeOut()
         );
+
+        this.contextMap
+                .get(referenceUUID)
+                .setTimeoutTask(task);
 
     }
 

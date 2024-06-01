@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -24,5 +25,7 @@ public class ChatMessagingContext {
     @Setter private long timeOut;
 
     @Setter private boolean abortOnFailure;
+
+    @Setter private BukkitTask timeoutTask;
 
 }
