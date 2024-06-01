@@ -41,10 +41,11 @@ public class ComponentsUtil {
     }
 
     @Nullable
-    public List<Component> getComponentList(List<String> keys) {
+    public List<Component> getComponentList(List<String> keys, TagResolver.Single... placeholders) {
+
         return keys.stream()
                 .filter(s -> s != null && !s.isEmpty())
-                .map(MiniMessage.miniMessage()::deserialize)
+                .map(s -> MiniMessage.miniMessage().deserialize(s, placeholders))
                 .collect(Collectors.toList());
     }
 

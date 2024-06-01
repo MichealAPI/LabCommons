@@ -66,7 +66,6 @@ public interface Configurable {
         );
     }
 
-
     /**
      * Get a string from the configuration
      */
@@ -85,12 +84,11 @@ public interface Configurable {
         String result = this.getString(configurableEnum);
 
         for(Map.Entry<String, String> entry : placeholders.entrySet()) {
-            result = result.replace(entry.getKey(), entry.getValue());
+            result = result.replace("<" + entry.getKey() + ">", entry.getValue());
         }
 
         return result;
     }
-
 
 
     default int getInt(ConfigurableEnum configurableEnum) {
@@ -141,7 +139,7 @@ public interface Configurable {
     /**
      * Get a component list from the configuration
      */
-    default List<Component> getComponentList(ConfigurableEnum configurableEnum) {
+    default List<Component> getComponentList(ConfigurableEnum configurableEnum, TagResolver.Single... placeholders) {
 
         String path = configurableEnum.getPath();
         Object defaultValue = configurableEnum.getDefaultValue();
@@ -150,7 +148,8 @@ public interface Configurable {
             return ComponentsUtil.getComponentList(
 
                     // todo unchecked
-                    (List<String>) defaultValue
+                    (List<String>) defaultValue,
+                    placeholders
             );
         }
 
