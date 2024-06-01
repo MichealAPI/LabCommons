@@ -173,27 +173,12 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     @Override
     public List<T> findMany(T pojoObject) {
 
-        Map<String, Object> values = pojoObject.toMap();
-        List<T> foundPojoObjects = new ArrayList<>();
+        Document filterDocument = new Document(pojoObject.toMap());
 
-        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getFindStatement(values), values)) {
-            try (ResultSet rs = pst.executeQuery()) {
-                while (rs.next()) {
-                    foundPojoObjects.add(
-                            pojoObject.fromMap(SQLUtil.getResultValues(rs))
-                    );
-                }
-            }
-        } catch (Exception e) {
-            LoggerUtil.log(
-                    WidenCommons.PLUGIN_NAME,
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
-                    e
-            );
-        }
-
-        return foundPojoObjects;
+        return this.findDocuments(filterDocument)
+                .stream()
+                .map(pojoObject::fromMap)
+                .toList();
     }
 
     @Override
