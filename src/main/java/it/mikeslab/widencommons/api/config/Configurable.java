@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 public interface Configurable {
@@ -79,6 +80,18 @@ public interface Configurable {
 
         return getConfiguration().getString(path, String.valueOf(defaultValue));
     }
+
+    default String getString(ConfigurableEnum configurableEnum, Map<String, String> placeholders) {
+        String result = this.getString(configurableEnum);
+
+        for(Map.Entry<String, String> entry : placeholders.entrySet()) {
+            result = result.replace(entry.getKey(), entry.getValue());
+        }
+
+        return result;
+    }
+
+
 
     default int getInt(ConfigurableEnum configurableEnum) {
         String path = configurableEnum.getPath();
