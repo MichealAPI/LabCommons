@@ -29,10 +29,8 @@ public class ComponentsUtil {
     }
 
     @Nullable
-    public List<Component> getComponentList(ConfigurationSection section, String key) {
-        return getComponentList(
-                section.getStringList(key)
-        );
+    public List<Component> getComponentList(ConfigurationSection section, String key, TagResolver.Single... placeholders) {
+        return getComponentList(section.getStringList(key), placeholders);
     }
 
     @NotNull

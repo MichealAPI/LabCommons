@@ -155,7 +155,8 @@ public interface Configurable {
 
         return ComponentsUtil.getComponentList(
                 getConfiguration(),
-                path
+                path,
+                placeholders
         );
     }
 
