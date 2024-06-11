@@ -11,12 +11,14 @@ import it.mikeslab.widencommons.api.logger.LoggerUtil;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.io.File;
 import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
 
     private final ConfigurationSection section;
+    private final File dataFolder;
 
 
     public Database<T> getDatabaseInstance() {
@@ -77,7 +79,11 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
             return null;
         }
 
+        uri = uri.replace("{dataFolder}", dataFolder.getAbsolutePath());
+
         uriBuilderBuilder.uri(uri);
+
+        System.out.println(uri);
 
         String password = section.getString("password", null);
         String username = section.getString("username", null);

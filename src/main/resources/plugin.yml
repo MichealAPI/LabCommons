@@ -11,3 +11,4 @@ softdepend:
 
 libraries:
   - "com.zaxxer:HikariCP:5.1.0"
+  - "org.mongodb:mongodb-driver-sync:5.0.1"
