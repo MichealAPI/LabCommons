@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -78,7 +79,7 @@ public class PageSystem {
      */
     public List<GuiElement> calculateSubList() {
         if (elements == null || elements.isEmpty()) {
-            return List.of();
+            return Collections.emptyList();
         }
 
         int totalElements = elements.size();
@@ -87,7 +88,7 @@ public class PageSystem {
 
         // Ensure the start index is within the bounds of the list
         if (start >= totalElements || start < 0) {
-            return List.of();
+            return Collections.emptyList();
         }
 
         // Create the sublist using skip and limit

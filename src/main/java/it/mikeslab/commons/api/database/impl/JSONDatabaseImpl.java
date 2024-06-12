@@ -10,10 +10,7 @@ import org.bson.Document;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -101,7 +98,7 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
 
     @Override
     public List<Document> findDocuments(Document document) {
-        return List.of(); // todo
+        return Collections.emptyList(); // todo
     }
 
     private boolean createSourceFile(File file) {

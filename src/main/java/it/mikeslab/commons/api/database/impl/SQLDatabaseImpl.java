@@ -2,7 +2,7 @@ package it.mikeslab.commons.api.database.impl;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import it.mikeslab.commons.MikeCommons;
+import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.database.Database;
 import it.mikeslab.commons.api.database.SerializableMapConvertible;
 import it.mikeslab.commons.api.database.pojo.URIBuilder;
@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {
 
@@ -48,7 +49,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             if (!tableExists()) {
                 List<String> fields = Arrays.stream(pojoClass.getDeclaredFields())
                         .map(field -> field.getName())
-                        .toList();
+                        .collect(Collectors.toList());
 
                 createTable(
                         fields,
@@ -63,7 +64,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return true;
         } catch (Exception e) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -86,7 +87,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return true;
         } catch (Exception e) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -119,7 +120,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -149,7 +150,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -182,7 +183,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         return this.findDocuments(filterDocument)
                 .stream()
                 .map(pojoObject::fromMap)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -206,7 +207,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             }
         } catch (Exception e) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -266,7 +267,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -334,7 +335,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             pst.executeUpdate();
         } catch (Exception e) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e

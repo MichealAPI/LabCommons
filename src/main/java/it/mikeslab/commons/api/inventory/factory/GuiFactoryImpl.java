@@ -1,6 +1,6 @@
 package it.mikeslab.commons.api.inventory.factory;
 
-import it.mikeslab.commons.MikeCommons;
+import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
@@ -45,7 +45,7 @@ public class GuiFactoryImpl implements GuiFactory {
 
         if(!cachedGuis.containsKey(id)) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "(OPEN) Gui with id " + id + " not found"
@@ -89,7 +89,7 @@ public class GuiFactoryImpl implements GuiFactory {
 
         if(!cachedGuis.containsKey(id)) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "(UPDATE) Gui with id " + id + " not found"

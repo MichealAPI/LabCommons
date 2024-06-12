@@ -1,6 +1,6 @@
 package it.mikeslab.commons.api.inventory;
 
-import it.mikeslab.commons.MikeCommons;
+import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
@@ -39,7 +39,7 @@ public class CustomGui implements InventoryHolder {
 
         if(!GuiChecker.isValid(guiDetails)) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     "Invalid gui details"

@@ -1,6 +1,6 @@
 package it.mikeslab.commons.api.inventory.config;
 
-import it.mikeslab.commons.MikeCommons;
+import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
@@ -43,7 +43,7 @@ public class GuiConfigImpl implements GuiConfig {
         Optional<FileConfiguration> config = new FileUtil(instance).getConfig(fileName);
         if(!config.isPresent()) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     String.format("Config '%s' not found", fileName)
@@ -64,7 +64,7 @@ public class GuiConfigImpl implements GuiConfig {
 
         if(config == null) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     "Config not loaded, load it first"
@@ -90,7 +90,7 @@ public class GuiConfigImpl implements GuiConfig {
         // all checks are done in the GuiConfig#getGuiDetails method
         if(section == null) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     String.format("Invalid section '%s'", section.getName())

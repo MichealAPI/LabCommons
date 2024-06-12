@@ -50,7 +50,7 @@ public class ComponentsUtil {
     public List<String> serialize(List<Component> components) {
         return components.stream()
                 .map(MiniMessage.miniMessage()::serialize)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @NotNull

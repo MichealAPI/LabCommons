@@ -5,7 +5,6 @@ import it.mikeslab.commons.api.chat.ChatMessagingHandler;
 import it.mikeslab.commons.api.chat.ChatMessagingListener;
 import it.mikeslab.commons.api.formatter.FormatUtil;
 import it.mikeslab.commons.api.inventory.CustomGui;
-import it.mikeslab.commons.api.various.aggregate.AggregatorManager;
 import lombok.Getter;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -17,9 +16,9 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
-public final class MikeCommons extends JavaPlugin implements Listener {
+public final class LabCommons extends JavaPlugin implements Listener {
 
-    public static final String PLUGIN_NAME = "MikeCommons";
+    public static final String PLUGIN_NAME = "LabCommons";
 
     private ChatMessagingHandler chatMessagingHandler;
 

@@ -1,6 +1,6 @@
 package it.mikeslab.commons.api.database.config;
 
-import it.mikeslab.commons.MikeCommons;
+import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.database.Database;
 import it.mikeslab.commons.api.database.SerializableMapConvertible;
 import it.mikeslab.commons.api.database.SupportedDatabase;
@@ -30,7 +30,7 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
 
         if(dbType == null) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     String.format("Invalid database type: %s", typeAsString)
@@ -41,7 +41,7 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
         URIBuilder uriBuilder = composeUriBuilder(section);
         if(uriBuilder == null) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.CONFIG,
                     "An error occurred. Check for previous error messages in console."
@@ -72,7 +72,7 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
         String uri = section.getString("uri", null);
         if(uri == null) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.CONFIG,
                     "Database URI is null! Check your config!"

@@ -1,6 +1,6 @@
 package it.mikeslab.commons.api.config;
 
-import it.mikeslab.commons.MikeCommons;
+import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.config.impl.ConfigurableImpl;
 import it.mikeslab.commons.api.logger.LoggerUtil;
@@ -170,7 +170,7 @@ public interface Configurable {
 
         if(isNull) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     "Configuration is null"

@@ -1,6 +1,6 @@
 name: WidenCommons
 version: '${project.version}'
-main: it.mikeslab.commons.MikeCommons
+main: it.mikeslab.commons.LabCommons
 api-version: '1.14'
 website: mikeslab.it
 author: MikesLab

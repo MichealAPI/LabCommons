@@ -1,6 +1,6 @@
 package it.mikeslab.commons.api.inventory.util;
 
-import it.mikeslab.commons.MikeCommons;
+import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
@@ -42,7 +42,7 @@ public class GuiChecker {
 
         if(!GuiChecker.isSizeValid(guiDetails)) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "Invalid size (must be a multiple of 9 and less than 54)"
@@ -54,7 +54,7 @@ public class GuiChecker {
 
         if(type == null) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "Null inventory type"
@@ -67,7 +67,7 @@ public class GuiChecker {
         // If it's empty, inventory will just be empty
         if(elements == null) {
             LoggerUtil.log(
-                    MikeCommons.PLUGIN_NAME,
+                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "Null elements map"
@@ -81,7 +81,7 @@ public class GuiChecker {
         if(flag == 0) {
             if(!elements.isEmpty() && isLayoutValid(layout)) {
                 LoggerUtil.log(
-                        MikeCommons.PLUGIN_NAME,
+                        LabCommons.PLUGIN_NAME,
                         Level.WARNING,
                         LoggerUtil.LogSource.API,
                         "Invalid layout"
