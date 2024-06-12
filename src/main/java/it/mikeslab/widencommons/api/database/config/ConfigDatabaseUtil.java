@@ -4,6 +4,7 @@ import it.mikeslab.widencommons.WidenCommons;
 import it.mikeslab.widencommons.api.database.Database;
 import it.mikeslab.widencommons.api.database.SerializableMapConvertible;
 import it.mikeslab.widencommons.api.database.SupportedDatabase;
+import it.mikeslab.widencommons.api.database.impl.JSONDatabaseImpl;
 import it.mikeslab.widencommons.api.database.impl.MongoDatabaseImpl;
 import it.mikeslab.widencommons.api.database.impl.SQLDatabaseImpl;
 import it.mikeslab.widencommons.api.database.pojo.URIBuilder;
@@ -55,7 +56,7 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
 
             case SQL -> databaseInstance = new SQLDatabaseImpl<>(uriBuilder);
             case MONGODB -> databaseInstance = new MongoDatabaseImpl<>(uriBuilder);
-
+            case JSON -> databaseInstance = new JSONDatabaseImpl<>(uriBuilder);
         }
 
         return databaseInstance;
@@ -79,11 +80,14 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
             return null;
         }
 
-        uri = uri.replace("{dataFolder}", dataFolder.getAbsolutePath());
+        uri = uri.replace("{dataFolder}", dataFolder.getAbsolutePath())
+                .replace("/", File.separator)
+                .replace("\\", File.separator);
 
         uriBuilderBuilder.uri(uri);
 
-        System.out.println(uri);
+        // check if it's sqlite
+        uriBuilderBuilder.isSqlite(uri.startsWith("jdbc:sqlite"));
 
         String password = section.getString("password", null);
         String username = section.getString("username", null);

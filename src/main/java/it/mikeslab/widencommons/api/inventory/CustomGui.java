@@ -137,8 +137,6 @@ public class CustomGui implements InventoryHolder {
                 if(element.getInternalValue() != null) { // If that element should be built in a specific way by the plugin, internally
                     // Increment the amount of internal value items for this value
 
-                    System.out.println("test");
-
                     List<Integer> internalValues = this.getInternalValuesSlots().getOrDefault(
                             element.getInternalValue(),
                             new ArrayList<>()
@@ -146,7 +144,6 @@ public class CustomGui implements InventoryHolder {
 
                     int slot = context.getRow() * context.getPerRowLength() + column;
                     internalValues.add(slot);
-                    System.out.println("Internal value: " + element.getInternalValue() + " - " + internalValues.size() + " - " + context.getRow() + " - " + column);
 
                     this.getInternalValuesSlots().put(
                             element.getInternalValue().toUpperCase(),

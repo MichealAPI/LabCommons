@@ -54,6 +54,10 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
                         fields,
                         pojoObject
                 );
+
+                this.createIndexesIfNotExists(
+                        pojoObject.getIdentifierName()
+                );
             }
 
             return true;
@@ -104,7 +108,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         Map<String, Object> updateQueryMap = new HashMap<>(values);
         updateQueryMap.remove(pojoObject.getIdentifierName());
 
-        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getUpsertStatement(values, updateQueryMap), values)) {
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getUpsertStatement(values, updateQueryMap, pojoObject.getIdentifierName()), values)) {
             int index = values.size() + 1;
             if (!updateQueryMap.isEmpty()) {
                 for (Object value : updateQueryMap.values()) {
@@ -289,7 +293,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     }
 
 
-    private String getUpsertStatement(Map<String, Object> values, Map<String, Object> updateQueryMap) {
+    private String getUpsertStatement(Map<String, Object> values, Map<String, Object> updateQueryMap, String identifierFieldName) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -306,7 +310,11 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         sb.append(")");
 
         if (updateQueryMap.size() > 0) {
-            sb.append(" ON DUPLICATE KEY UPDATE ");
+
+            sb.append(" ON ");
+            sb.append(uriBuilder.isSqlite() ? " CONFLICT(" + identifierFieldName + ") DO UPDATE SET " :
+                    " DUPLICATE KEY UPDATE ");
+
             int i = 0;
             for (Map.Entry<String, Object> entry : updateQueryMap.entrySet()) {
                 sb.append(entry.getKey()).append(" = ?");
@@ -317,6 +325,21 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         }
 
         return sb.toString();
+    }
+
+
+    private void createIndexesIfNotExists(String identifierName) {
+        String sql = "CREATE INDEX IF NOT EXISTS " + uriBuilder.getTable() + "_" + identifierName + "_index ON " + uriBuilder.getTable() + " (" + identifierName + ")";
+        try (PreparedStatement pst = connection.prepareStatement(sql)) {
+            pst.executeUpdate();
+        } catch (Exception e) {
+            LoggerUtil.log(
+                    WidenCommons.PLUGIN_NAME,
+                    Level.SEVERE,
+                    LoggerUtil.LogSource.DATABASE,
+                    e
+            );
+        }
     }
 
 

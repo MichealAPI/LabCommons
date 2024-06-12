@@ -153,11 +153,7 @@ public class GuiConfigImpl implements GuiConfig {
 
             int customModelData = element.getInt(ConfigField.CUSTOM_MODEL_DATA.getField(), -1);
 
-            System.out.println("Loads till here");
-
             String internalValue = element.getString(ConfigField.INTERNAL_VALUE.getField(), null);
-
-            System.out.println("Internal Value for slot " + charKey + " is " + internalValue);
 
             boolean isInternalValuePresent = internalValue != null;
 

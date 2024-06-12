@@ -14,4 +14,6 @@ public class URIBuilder {
             database,
             table;
 
+    private boolean isSqlite;
+
 }

@@ -59,17 +59,12 @@ public class PageSystem {
             return this.elementsPerPage;
         }
 
-        System.out.println("Getting elements per page for id " + id);
         CustomGui customGui = guiFactory.getCustomGui(id);
         if(customGui == null) {
-            System.out.println("Custom gui is null");
             return 0;
         }
 
-        System.out.println("Getting elements per page for internal value " + internalValue);
-
         for(String key : customGui.getInternalValuesSlots().keySet()) {
-            System.out.println("Key: " + key);
         }
 
         this.elementsPerPage = customGui
