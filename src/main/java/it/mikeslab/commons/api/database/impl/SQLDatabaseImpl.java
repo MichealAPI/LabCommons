@@ -305,7 +305,11 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         sb.append("?");
 
         if (values.size() > 1) {
-            sb.append(", ?".repeat(values.size() - 1));
+
+            for(int i = 1; i < values.size(); i++) {
+                sb.append(", ?");
+            }
+
         }
 
         sb.append(")");

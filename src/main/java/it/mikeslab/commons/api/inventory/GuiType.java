@@ -17,13 +17,22 @@ public enum GuiType {
 
     public InventoryType toInventoryType() {
 
-        return switch (this) {
-            case DISPENSER -> InventoryType.DISPENSER;
-            case DROPPER -> InventoryType.DROPPER;
+        InventoryType result;
+
+        switch (this) {
+            case DISPENSER:
+                result = InventoryType.DISPENSER;
+                break;
+            case DROPPER:
+                result = InventoryType.DROPPER;
+                break;
             //case ANVIL -> InventoryType.ANVIL;
-            default -> InventoryType.CHEST;
+            default:
+                result = InventoryType.CHEST;
+                break;
         };
 
+        return result;
 
     }
 

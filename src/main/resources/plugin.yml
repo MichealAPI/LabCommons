@@ -10,5 +10,5 @@ softdepend:
   - PlaceholderAPI
 
 libraries:
-  - "com.zaxxer:HikariCP:5.1.0"
+  - "com.zaxxer:HikariCP:4.0.3"
   - "org.mongodb:mongodb-driver-sync:5.0.1"

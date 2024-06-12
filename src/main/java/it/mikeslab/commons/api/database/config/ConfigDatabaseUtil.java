@@ -54,9 +54,17 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
         Database<T> databaseInstance = null;
         switch (dbType) {
 
-            case SQL -> databaseInstance = new SQLDatabaseImpl<>(uriBuilder);
-            case MONGODB -> databaseInstance = new MongoDatabaseImpl<>(uriBuilder);
-            case JSON -> databaseInstance = new JSONDatabaseImpl<>(uriBuilder);
+            case SQL:
+                databaseInstance = new SQLDatabaseImpl<>(uriBuilder);
+                break;
+
+            case MONGODB:
+                databaseInstance = new MongoDatabaseImpl<>(uriBuilder);
+                break;
+
+            case JSON:
+                databaseInstance = new JSONDatabaseImpl<>(uriBuilder);
+                break;
         }
 
         return databaseInstance;

@@ -44,8 +44,13 @@ public class LoggerUtil {
             Sentry.setTag("server", Bukkit.getServer().getName());
 
             switch (sentryLogObject.logType) {
-                case MESSAGE -> Sentry.captureMessage((String) sentryLogObject.logObject);
-                case EXCEPTION -> Sentry.captureException((Exception) sentryLogObject.logObject);
+                case MESSAGE:
+                    Sentry.captureMessage((String) sentryLogObject.logObject);
+                    break;
+
+                case EXCEPTION:
+                    Sentry.captureException((Exception) sentryLogObject.logObject);
+                    break;
             }
         });
     }
