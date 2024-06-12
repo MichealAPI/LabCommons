@@ -1,10 +1,10 @@
 name: WidenCommons
 version: '${project.version}'
-main: it.mikeslab.widencommons.WidenCommons
-api-version: '1.20'
+main: it.mikeslab.commons.MikeCommons
+api-version: '1.14'
 website: mikeslab.it
 author: MikesLab
-description: Commons plugin for MikesLab servers, Paper based.
+description: Commons plugin for MikesLab plug-ins
 
 softdepend:
   - PlaceholderAPI
