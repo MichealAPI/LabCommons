@@ -6,6 +6,7 @@ import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.pojo.InventoryPopulationContext;
+import it.mikeslab.commons.api.inventory.pojo.PopulateRowContext;
 import it.mikeslab.commons.api.inventory.util.GuiChecker;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
 import it.mikeslab.commons.api.logger.LoggerUtil;
@@ -166,21 +167,31 @@ public class CustomGui implements InventoryHolder {
     private void populateSlots(InventoryPopulationContext context, char targetChar, List<Integer> slots, ItemStack item) {
         int slotCounter = 0;
         for (String row : guiDetails.getInventoryLayout()) {
-            slotCounter = populateRow(context, targetChar, slots, item, slotCounter, row);
+            slotCounter = populateRow(
+                    new PopulateRowContext(
+                            context,
+                            targetChar,
+                            slots,
+                            item,
+                            slotCounter,
+                            row
+                    )
+            );
+
             if (slotCounter >= slots.size()) {
                 break;
             }
         }
     }
 
-    private int populateRow(InventoryPopulationContext context, char targetChar, List<Integer> slots, ItemStack item, int slotCounter, String row) {
-        for (int i = 0; i < row.length(); i++) {
-            if (row.charAt(i) == targetChar) {
-                context.getInventory().setItem(slots.get(slotCounter), item);
-                slotCounter++;
+    private int populateRow(PopulateRowContext context) {
+        for (int i = 0; i < context.getRow().length(); i++) {
+            if (context.getRow().charAt(i) == context.getTargetChar()) {
+                context.getContext().getInventory().setItem(context.getSlots().get(context.getSlotCounter()), context.getItem());
+                context.setSlotCounter(context.getSlotCounter() + 1);
             }
         }
-        return slotCounter;
+        return context.getSlotCounter();
     }
 
     private void mapCharToSlot(String[] layout) {
