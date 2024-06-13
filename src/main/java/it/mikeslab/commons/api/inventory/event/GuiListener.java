@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.inventory.event;
 
+import it.mikeslab.commons.api.inventory.ConsumerFilter;
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.factory.GuiFactoryImpl;
@@ -189,6 +190,14 @@ public class GuiListener implements Listener {
                         .getGuiDetails()
                         .getClickActions()
                         .get(internalValue)
+                        .accept(guiInteractEvent);
+            }
+
+            // Global action
+            if(gui.getGuiDetails().getClickActions().containsKey(ConsumerFilter.ANY.getFilter())) {
+                gui.getGuiDetails()
+                        .getClickActions()
+                        .get(ConsumerFilter.ANY.getFilter())
                         .accept(guiInteractEvent);
             }
 
