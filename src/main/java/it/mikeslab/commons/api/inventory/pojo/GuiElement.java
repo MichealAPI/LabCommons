@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.inventory.pojo;
 
+import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.util.ItemCreator;
 import lombok.Builder;
 import lombok.Data;
@@ -35,7 +36,7 @@ public class GuiElement {
     // private int order;
 
     // Consumers
-    private Consumer<InventoryClickEvent> onClick;
+    private Consumer<GuiInteractEvent> onClick;
 
     /**
      * Quick method to create the itemStack

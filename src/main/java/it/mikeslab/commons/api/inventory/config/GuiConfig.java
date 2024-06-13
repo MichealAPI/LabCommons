@@ -1,6 +1,7 @@
 package it.mikeslab.commons.api.inventory.config;
 
 
+import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -22,12 +23,12 @@ public interface GuiConfig {
      * @param key The key of the gui
      * @return The details of the gui
      */
-    GuiDetails getGuiDetails(Optional<String> key, Optional<Map<String, Consumer<InventoryClickEvent>>> consumers);
+    GuiDetails getGuiDetails(Optional<String> key, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers);
 
     /**
      * Parse the details of the gui
      * @param section The section of the config
      */
-    void parseDetails(ConfigurationSection section, Optional<Map<String, Consumer<InventoryClickEvent>>> consumers);
+    void parseDetails(ConfigurationSection section, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers);
 
 }

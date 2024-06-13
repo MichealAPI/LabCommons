@@ -3,6 +3,7 @@ package it.mikeslab.commons.api.inventory.config;
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.GuiType;
+import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.util.config.FileUtil;
@@ -61,7 +62,7 @@ public class GuiConfigImpl implements GuiConfig {
 
 
     @Override
-    public GuiDetails getGuiDetails(Optional<String> key, Optional<Map<String, Consumer<InventoryClickEvent>>> consumers) {
+    public GuiDetails getGuiDetails(Optional<String> key, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers) {
 
         if(config == null) {
             LoggerUtil.log(
@@ -86,7 +87,7 @@ public class GuiConfigImpl implements GuiConfig {
 
 
     @Override
-    public void parseDetails(ConfigurationSection section, Optional<Map<String, Consumer<InventoryClickEvent>>> consumers) {
+    public void parseDetails(ConfigurationSection section, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers) {
 
         // all checks are done in the GuiConfig#getGuiDetails method
         if(section == null) {
@@ -132,7 +133,7 @@ public class GuiConfigImpl implements GuiConfig {
      * @param section The section of the config from which to load the elements
      * @param consumers Optional consumers to attach to the elements of the gui
      */
-    private void loadElements(ConfigurationSection section, Optional<Map<String, Consumer<InventoryClickEvent>>> consumers) {
+    private void loadElements(ConfigurationSection section, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers) {
 
         ConfigurationSection elements = section.getConfigurationSection(ConfigField.ELEMENTS.getField());
 
@@ -189,15 +190,15 @@ public class GuiConfigImpl implements GuiConfig {
 
     }
 
-    private void parseConsumers(ConfigurationSection section, Optional<Map<String, Consumer<InventoryClickEvent>>> consumers, GuiElement guiElement) {
+    private void parseConsumers(ConfigurationSection section, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers, GuiElement guiElement) {
 
         // To avoid another param in the method, we will stringify the enum
         String internalValue = section.getString(ConfigField.INTERNAL_VALUE.getField(), "");
 
-        for(Map.Entry<String, Consumer<InventoryClickEvent>> entry : consumers.get().entrySet()) {
+        for(Map.Entry<String, Consumer<GuiInteractEvent>> entry : consumers.get().entrySet()) {
 
             String actionKey = entry.getKey();
-            Consumer<InventoryClickEvent> actionConsumer = entry.getValue();
+            Consumer<GuiInteractEvent> actionConsumer = entry.getValue();
 
             if(internalValue == null) continue;
 

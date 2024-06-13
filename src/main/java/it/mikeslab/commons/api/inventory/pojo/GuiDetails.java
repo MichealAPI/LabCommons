@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import it.mikeslab.commons.api.inventory.GuiType;
+import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import lombok.Data;
 import net.kyori.adventure.text.Component;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,7 +29,7 @@ public class GuiDetails {
     private int inventorySize; // calculated or fixed, in case of a chest
     private Map<String, String> placeholders;
 
-    private Map<String, Consumer<InventoryClickEvent>> clickActions;
+    private Map<String, Consumer<GuiInteractEvent>> clickActions;
 
     private boolean closeable;
 

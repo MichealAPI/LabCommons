@@ -163,6 +163,17 @@ public class GuiListener implements Listener {
 
             if(clickedElement == null) return;
 
+            // Fire the click event
+            GuiInteractEvent guiInteractEvent = new GuiInteractEvent(
+                    (Player) event.getWhoClicked(),
+                    clickedElement
+            );
+
+            Bukkit.getPluginManager().callEvent(guiInteractEvent);
+
+            if(guiInteractEvent.isCancelled()) return;
+            // End of fire the click event
+
             String internalValue = clickedElement.getInternalValue();
             if(internalValue == null) return;
 
@@ -178,7 +189,7 @@ public class GuiListener implements Listener {
                         .getGuiDetails()
                         .getClickActions()
                         .get(internalValue)
-                        .accept(event);
+                        .accept(guiInteractEvent);
             }
 
         }

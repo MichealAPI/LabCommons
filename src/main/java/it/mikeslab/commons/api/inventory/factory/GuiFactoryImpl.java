@@ -3,6 +3,7 @@ package it.mikeslab.commons.api.inventory.factory;
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiFactory;
+import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
 import it.mikeslab.commons.api.logger.LoggerUtil;
@@ -163,7 +164,7 @@ public class GuiFactoryImpl implements GuiFactory {
 
         if(!hasPageSystems) return customGui.getGuiDetails(); // default if no pages
 
-        Map<String, Consumer<InventoryClickEvent>> result = new HashMap<>();
+        Map<String, Consumer<GuiInteractEvent>> result = new HashMap<>();
 
         customGui.getPageSystemMap().forEach(
                 (character, pageSystem) -> {
@@ -182,9 +183,6 @@ public class GuiFactoryImpl implements GuiFactory {
                     result.put(
                             previousActionIdentifier,
                             event -> {
-
-                                System.out.println(pageSystem.getPage() + " JACK LO SQUARTATORE");
-
                                 pageSystem.previousPage();
                                 pageSystem.updateInventory();
                             }

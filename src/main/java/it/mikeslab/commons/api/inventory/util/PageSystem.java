@@ -115,15 +115,11 @@ public class PageSystem {
      */
     public void updateInventory() {
 
-        System.out.println(elements.size() + " BETA ALFA GAMMA");
-
         // Get the custom gui with the specified id
         CustomGui customGui = guiFactory.getCustomGui(id);
         if(customGui == null) {
             return;
         }
-
-        System.out.println(page + " P age");
 
         // Populate the internals of the custom gui with the specified internal value
         customGui.populatePage(
