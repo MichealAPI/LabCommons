@@ -20,7 +20,7 @@ public class GuiDetails {
     private final String[] inventoryLayout;
     private final GuiType guiType;
     private Multimap<Character, GuiElement> elements;
-    private Map<Integer, GuiElement> tempPageElements;
+    private Map<Character, Map<Integer, GuiElement>> tempPageElements;
 
     // Optional
     private InventoryHolder holder;

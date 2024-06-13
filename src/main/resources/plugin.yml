@@ -1,4 +1,4 @@
-name: WidenCommons
+name: LabCommons
 version: '${project.version}'
 main: it.mikeslab.commons.LabCommons
 api-version: '1.14'

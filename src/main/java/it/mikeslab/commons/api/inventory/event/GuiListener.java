@@ -66,7 +66,6 @@ public class GuiListener implements Listener {
             event.setCancelled(true);
 
             this.performClickAction(
-                    event.getSlot(),
                     customGui,
                     event
             );
@@ -121,11 +120,12 @@ public class GuiListener implements Listener {
 
     /**
      * Perform the click action
-     * @param clickedSlot The slot clicked
      * @param gui The gui
      * @param event The event
      */
-    private void performClickAction(int clickedSlot, CustomGui gui, InventoryClickEvent event) {
+    private void performClickAction(CustomGui gui, InventoryClickEvent event) {
+
+        int clickedSlot = event.getSlot();
 
         String[] layout = gui.getGuiDetails().getInventoryLayout();
         GuiType guiType = gui.getGuiDetails().getGuiType();
@@ -135,8 +135,6 @@ public class GuiListener implements Listener {
 
         char clickedChar = layout[clickedRow].charAt(clickedSlot % rowLength);
 
-        int slot = event.getSlot();
-
         if(gui.getGuiDetails().getElements().containsKey(clickedChar)) {
 
             GuiElement clickedElement;
@@ -144,12 +142,13 @@ public class GuiListener implements Listener {
             boolean isPageElement = gui
                     .getGuiDetails()
                     .getTempPageElements()
-                    .containsKey(slot);
+                    .containsKey(clickedChar);
 
             if(isPageElement) {
                 clickedElement = gui.getGuiDetails()
                         .getTempPageElements()
-                        .get(slot);
+                        .get(clickedChar)
+                        .get(clickedSlot);
 
             } else {
 
@@ -164,7 +163,11 @@ public class GuiListener implements Listener {
 
             if(clickedElement == null) return;
 
-            String internalValue = clickedElement.getInternalValue().toUpperCase();
+            String internalValue = clickedElement.getInternalValue();
+            if(internalValue == null) return;
+
+            internalValue = internalValue.toUpperCase();
+
             boolean hasAction = gui
                     .getGuiDetails()
                     .getClickActions()

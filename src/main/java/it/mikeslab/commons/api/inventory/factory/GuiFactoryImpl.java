@@ -9,12 +9,14 @@ import it.mikeslab.commons.api.logger.LoggerUtil;
 import lombok.Getter;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class GuiFactoryImpl implements GuiFactory {
@@ -38,11 +40,12 @@ public class GuiFactoryImpl implements GuiFactory {
 
         int id = getAndIncrementId();
         CustomGui customGui = new CustomGui(
-                guiDetails,
                 this,
                 instance,
                 id
         );
+
+        customGui.setGuiDetails(guiDetails);
 
         this.cachedGuis.put(id, customGui);
 
@@ -66,6 +69,10 @@ public class GuiFactoryImpl implements GuiFactory {
 
         CustomGui customGui = cachedGuis.get(id);
         customGui.generateInventory();
+
+        // Inject page system consumers
+        GuiDetails guiDetails = injectPageSystemConsumers(customGui);
+        customGui.setGuiDetails(guiDetails);
 
         player.openInventory(customGui.getInventory());
 
@@ -114,11 +121,12 @@ public class GuiFactoryImpl implements GuiFactory {
         }
 
         CustomGui customGui = new CustomGui(
-                newGuiDetails,
                 this,
                 instance,
                 id
         );
+
+        customGui.setGuiDetails(newGuiDetails);
 
         cachedGuis.put(id, customGui);
 
@@ -144,5 +152,51 @@ public class GuiFactoryImpl implements GuiFactory {
         return counterCopy;
     }
 
+    /**
+     * Inject the page system consumers
+     * to go to the next and previous page
+     * @param customGui The custom gui
+     */
+    private GuiDetails injectPageSystemConsumers(CustomGui customGui) {
+
+        boolean hasPageSystems = !customGui.getPageSystemMap().isEmpty();
+
+        if(!hasPageSystems) return customGui.getGuiDetails(); // default if no pages
+
+        Map<String, Consumer<InventoryClickEvent>> result = new HashMap<>();
+
+        customGui.getPageSystemMap().forEach(
+                (character, pageSystem) -> {
+
+                    String nextActionIdentifier = "NEXT_PAGE_" + Character.toUpperCase(character);
+                    String previousActionIdentifier = "PREVIOUS_PAGE_" + Character.toUpperCase(character);
+
+                    result.put(
+                            nextActionIdentifier,
+                            event -> {
+                                pageSystem.nextPage();
+                                pageSystem.updateInventory();
+                            }
+                    );
+
+                    result.put(
+                            previousActionIdentifier,
+                            event -> {
+
+                                System.out.println(pageSystem.getPage() + " JACK LO SQUARTATORE");
+
+                                pageSystem.previousPage();
+                                pageSystem.updateInventory();
+                            }
+                    );
+                }
+        );
+
+        customGui.getGuiDetails()
+                .getClickActions()
+                .putAll(result);
+
+        return customGui.getGuiDetails();
+    }
 
 }

@@ -27,6 +27,9 @@ public final class LabCommons extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
 
+        // Initialize Adventure
+        this.audiences = BukkitAudiences.create(this);
+
         saveDefaultConfig();
 
         FormatUtil.printStartupInfos(this, audiences, "00FF72");
@@ -65,9 +68,6 @@ public final class LabCommons extends JavaPlugin implements Listener {
 
         // Register Chat Messaging listener
         this.chatMessagingHandler = new ChatMessagingListener(this);
-
-        // Initialize Adventure
-        this.audiences = BukkitAudiences.create(this);
 
     }
 

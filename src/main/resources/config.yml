@@ -1,5 +1,5 @@
 sentry:
-  enabled: true
+  enabled: false
   dsn: "https://" # Sentry DSN
 
 mongo-info-logging: false

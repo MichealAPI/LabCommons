@@ -31,6 +31,9 @@ public class GuiElement {
 
     private int customModelData = -1;
 
+    private boolean isGroupElement;
+    // private int order;
+
     // Consumers
     private Consumer<InventoryClickEvent> onClick;
 
@@ -120,6 +123,7 @@ public class GuiElement {
                 .customModelData(customModelData)
                 .internalValue(internalValue)
                 .onClick(onClick)
+                .isGroupElement(isGroupElement)
                 .build();
     }
 

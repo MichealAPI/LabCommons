@@ -27,22 +27,20 @@ import java.util.logging.Level;
 @RequiredArgsConstructor
 public class CustomGui implements InventoryHolder {
 
-    private final GuiDetails guiDetails;
     private final GuiFactory guiFactory;
     private final JavaPlugin instance;
     private final int id;
 
+    private GuiDetails guiDetails;
+
     // Note: the holder will also use this
     private Inventory inventory;
 
-    private Map<Character, List<Integer>> characterListMap; // A mapping of slots to characters
+    private Map<Character, List<Integer>> characterListMap = new HashMap<>(); // A mapping of slots to characters
 
-    private Map<Character, PageSystem> pageSystemMap;
+    private Map<Character, PageSystem> pageSystemMap = new HashMap<>();
 
     public void generateInventory() {
-
-        this.pageSystemMap = new HashMap<>();
-        this.characterListMap = new HashMap<>();
 
         if (!GuiChecker.isValid(guiDetails)) {
             LoggerUtil.log(
@@ -116,55 +114,41 @@ public class CustomGui implements InventoryHolder {
     }
 
     private void populate(InventoryPopulationContext context) {
-
-        for(Map.Entry<Character, List<Integer>> mappedSlots : characterListMap.entrySet()) {
-
+        for (Map.Entry<Character, List<Integer>> mappedSlots : characterListMap.entrySet()) {
             char targetChar = mappedSlots.getKey();
             List<Integer> slots = mappedSlots.getValue();
 
-            if(slots.size() > 1) {
-
-                this.pageSystemMap.put(
-                        targetChar,
-                        new PageSystem(
-                                guiFactory,
-                                instance,
-                                id,
-                                targetChar,
-                                new ArrayList<>(context.getElements().get(targetChar))
-                        )
-                );
-
+            boolean isGroupElement = context.getElements().get(targetChar).iterator().next().isGroupElement();
+            if (isGroupElement && context.getElements().get(targetChar).size() > slots.size()) {
+                this.pageSystemMap.put(targetChar, new PageSystem(guiFactory, instance, id, targetChar, new ArrayList<>(context.getElements().get(targetChar))));
                 continue;
             }
 
-            GuiElement element = context.getElements()
-                    .get(targetChar)
-                    .iterator()
-                    .next();
+            GuiElement element = context.getElements().get(targetChar).iterator().next();
+            if (element == null) continue;
 
-            if(element == null) continue;
-
-            boolean isCached = context.getCachedItems().containsKey(targetChar);
-            ItemStack item;
-            if(!isCached) {
-                item = element.create(
-                        guiDetails.getPlaceholders()
-                );
-
+            ItemStack item = context.getCachedItems().get(targetChar);
+            if (item == null) {
+                item = element.create(guiDetails.getPlaceholders());
                 context.getCachedItems().put(targetChar, item);
             }
 
-            item = context.getCachedItems().get(targetChar);
-            int slot = slots.get(0); // Since it's not a page item, it has only one slot
+            int slotCounter = 0;
+            for (String row : guiDetails.getInventoryLayout()) {
+                for (int i = 0; i < row.length(); i++) {
+                    char c = row.charAt(i);
+                    if (c == targetChar) {
+                        if (slotCounter >= slots.size()) {
+                            break;
+                        }
 
-            context.getInventory().setItem(slot, item);
-
+                        int slot = slots.get(slotCounter);
+                        context.getInventory().setItem(slot, item);
+                        slotCounter++;
+                    }
+                }
+            }
         }
-
-
-
-
     }
 
 
@@ -192,24 +176,32 @@ public class CustomGui implements InventoryHolder {
         if(!isTargetValid) return;
 
         List<Integer> slots = this.getCharacterListMap().get(targetChar);
+        Map<Integer, GuiElement> tempSlots = new HashMap<>();
 
         for(int i = 0; i < slots.size(); i++) {
 
             int slot = slots.get(i);
-            GuiElement element = subList.get(i);
-
-            if(element == null) {
+            if(subList.size() <= i) {
                 this.getInventory().setItem(slot, null);
                 continue;
             }
+
+            GuiElement element = subList.get(i);
 
             ItemStack item = element.create(
                     guiDetails.getPlaceholders()
             );
 
             this.getInventory().setItem(slot, item);
+            tempSlots.put(slot, element);
 
         }
+
+        // Register by this way to enable click events for each page element
+        guiDetails
+                .getTempPageElements()
+                .put(targetChar, tempSlots);
+
     }
 
 

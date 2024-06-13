@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -120,6 +121,7 @@ public class GuiConfigImpl implements GuiConfig {
 
         this.guiDetails.setInventoryName(guiTitle);
         this.guiDetails.setInventorySize(size);
+        this.guiDetails.setClickActions(consumers.orElse(new HashMap<>())); // default empty map for consumers
 
         this.loadElements(section, consumers);
 
@@ -161,6 +163,10 @@ public class GuiConfigImpl implements GuiConfig {
                 internalValue = internalValue.toUpperCase(); // to avoid case sensitivity
             }
 
+            boolean isGroupElement = element.getBoolean(ConfigField.IS_GROUP_ELEMENT.getField(), false);
+
+            // int order = isGrouped ? Integer.parseInt(charKey.split("-")[1]) : -1;
+
             GuiElement guiElement = GuiElement.builder()
                     .customModelData(customModelData)
                     .displayName(displayName)
@@ -169,6 +175,9 @@ public class GuiConfigImpl implements GuiConfig {
                     .amount(amount)
                     .glow(glowing)
                     .internalValue(internalValue)
+                    .isGroupElement(isGroupElement)
+                    //.isGrouped(isGrouped)
+                    //.order(order)
                     .build();
 
             if(areActionConsumersEnabled) {
@@ -183,14 +192,16 @@ public class GuiConfigImpl implements GuiConfig {
     private void parseConsumers(ConfigurationSection section, Optional<Map<String, Consumer<InventoryClickEvent>>> consumers, GuiElement guiElement) {
 
         // To avoid another param in the method, we will stringify the enum
-        String action = section.getString(ConfigField.ACTION.getField(), "");
+        String internalValue = section.getString(ConfigField.INTERNAL_VALUE.getField(), "");
 
         for(Map.Entry<String, Consumer<InventoryClickEvent>> entry : consumers.get().entrySet()) {
 
             String actionKey = entry.getKey();
             Consumer<InventoryClickEvent> actionConsumer = entry.getValue();
 
-            if(action.equalsIgnoreCase(actionKey)) {
+            if(internalValue == null) continue;
+
+            if(internalValue.equalsIgnoreCase(actionKey)) {
                 guiElement.setOnClick(actionConsumer);
             }
 
