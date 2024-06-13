@@ -3,10 +3,7 @@ package it.mikeslab.commons.api.inventory;
 import com.google.common.collect.Multimap;
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
-import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
-import it.mikeslab.commons.api.inventory.pojo.GuiElement;
-import it.mikeslab.commons.api.inventory.pojo.InventoryPopulationContext;
-import it.mikeslab.commons.api.inventory.pojo.PopulateRowContext;
+import it.mikeslab.commons.api.inventory.pojo.*;
 import it.mikeslab.commons.api.inventory.util.GuiChecker;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
 import it.mikeslab.commons.api.logger.LoggerUtil;
@@ -217,23 +214,23 @@ public class CustomGui implements InventoryHolder {
     }
 
 
-    public void populatePage(char targetChar, List<GuiElement> subList) {
+    public void populatePage(PopulatePageContext context) {
 
-        boolean isTargetValid = this.getCharacterListMap().containsKey(targetChar);
+        boolean isTargetValid = this.getCharacterListMap().containsKey(context.getTargetChar());
         if(!isTargetValid) return;
 
-        List<Integer> slots = this.getCharacterListMap().get(targetChar);
+        List<Integer> slots = this.getCharacterListMap().get(context.getTargetChar());
         Map<Integer, GuiElement> tempSlots = new HashMap<>();
 
         for(int i = 0; i < slots.size(); i++) {
 
             int slot = slots.get(i);
-            if(subList.size() <= i) {
+            if(context.getSubList().size() <= i) {
                 this.getInventory().setItem(slot, null);
                 continue;
             }
 
-            GuiElement element = subList.get(i);
+            GuiElement element = context.getSubList().get(i);
 
             ItemStack item = element.create(
                     guiDetails.getPlaceholders()
@@ -247,7 +244,7 @@ public class CustomGui implements InventoryHolder {
         // Register by this way to enable click events for each page element
         guiDetails
                 .getTempPageElements()
-                .put(targetChar, tempSlots);
+                .put(context.getTargetChar(), tempSlots);
 
     }
 
