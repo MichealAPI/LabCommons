@@ -295,9 +295,18 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
 
     private String getUpsertStatement(Map<String, Object> values, Map<String, Object> updateQueryMap, String identifierFieldName) {
-
         StringBuilder sb = new StringBuilder();
 
+        sb.append(buildInsertStatement(values));
+        if (!updateQueryMap.isEmpty()) {
+            sb.append(buildUpdateStatement(updateQueryMap, identifierFieldName));
+        }
+
+        return sb.toString();
+    }
+
+    private String buildInsertStatement(Map<String, Object> values) {
+        StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO ").append(uriBuilder.getTable()).append(" (");
         sb.append(String.join(", ", values.keySet()));
         sb.append(") VALUES (");
@@ -305,30 +314,28 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         sb.append("?");
 
         if (values.size() > 1) {
-
             for(int i = 1; i < values.size(); i++) {
                 sb.append(", ?");
             }
-
         }
 
         sb.append(")");
+        return sb.toString();
+    }
 
-        if (updateQueryMap.size() > 0) {
+    private String buildUpdateStatement(Map<String, Object> updateQueryMap, String identifierFieldName) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ON ");
+        sb.append(uriBuilder.isSqlite() ? " CONFLICT(" + identifierFieldName + ") DO UPDATE SET " :
+                " DUPLICATE KEY UPDATE ");
 
-            sb.append(" ON ");
-            sb.append(uriBuilder.isSqlite() ? " CONFLICT(" + identifierFieldName + ") DO UPDATE SET " :
-                    " DUPLICATE KEY UPDATE ");
-
-            int i = 0;
-            for (Map.Entry<String, Object> entry : updateQueryMap.entrySet()) {
-                sb.append(entry.getKey()).append(" = ?");
-                if (i++ < updateQueryMap.size() - 1) {
-                    sb.append(", ");
-                }
+        int i = 0;
+        for (Map.Entry<String, Object> entry : updateQueryMap.entrySet()) {
+            sb.append(entry.getKey()).append(" = ?");
+            if (i++ < updateQueryMap.size() - 1) {
+                sb.append(", ");
             }
         }
-
         return sb.toString();
     }
 
