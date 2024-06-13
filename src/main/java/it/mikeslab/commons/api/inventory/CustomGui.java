@@ -142,56 +142,67 @@ public class CustomGui implements InventoryHolder {
     }
 
     private void handleSingleElement(InventoryPopulationContext context, char targetChar, List<Integer> slots) {
-        // Get the GuiElement for the current character
-        GuiElement element = context.getElements().get(targetChar).iterator().next();
+        GuiElement element = getGuiElement(context, targetChar);
         if (element == null) return;
 
-        // Get the ItemStack for the current character, or create a new one if it doesn't exist
+        ItemStack item = getItem(context, targetChar, element);
+        populateSlots(context, targetChar, slots, item);
+    }
+
+    private GuiElement getGuiElement(InventoryPopulationContext context, char targetChar) {
+        Iterator<GuiElement> iterator = context.getElements().get(targetChar).iterator();
+        return iterator.hasNext() ? iterator.next() : null;
+    }
+
+    private ItemStack getItem(InventoryPopulationContext context, char targetChar, GuiElement element) {
         ItemStack item = context.getCachedItems().get(targetChar);
         if (item == null) {
             item = element.create(guiDetails.getPlaceholders());
             context.getCachedItems().put(targetChar, item);
         }
+        return item;
+    }
 
-        // Counter for the number of slots filled
+    private void populateSlots(InventoryPopulationContext context, char targetChar, List<Integer> slots, ItemStack item) {
         int slotCounter = 0;
-        // Iterate over each row in the inventory layout
         for (String row : guiDetails.getInventoryLayout()) {
-            // Iterate over each character in the row
-            for (int i = 0; i < row.length(); i++) {
-                char c = row.charAt(i);
-                // If the character matches the target character, set the item in the corresponding slot
-                if (c == targetChar) {
-                    // If all slots for this character have been filled, break the loop
-                    if (slotCounter >= slots.size()) {
-                        break;
-                    }
-
-                    // Get the slot for the current item and set the item in the inventory
-                    int slot = slots.get(slotCounter);
-                    context.getInventory().setItem(slot, item);
-                    slotCounter++;
-                }
+            slotCounter = populateRow(context, targetChar, slots, item, slotCounter, row);
+            if (slotCounter >= slots.size()) {
+                break;
             }
         }
     }
 
-
-    private void mapCharToSlot(String[] layout) {
-
-        // Map characters to slots
-        for (int i = 0; i < layout.length; i++) {
-            String row = layout[i];
-            for (int j = 0; j < row.length(); j++) {
-                char c = row.charAt(j);
-                if (c != ' ') {
-                    if (!characterListMap.containsKey(c)) {
-                        characterListMap.put(c, new ArrayList<>());
-                    }
-                    characterListMap.get(c).add(i * 9 + j);
-                }
+    private int populateRow(InventoryPopulationContext context, char targetChar, List<Integer> slots, ItemStack item, int slotCounter, String row) {
+        for (int i = 0; i < row.length(); i++) {
+            if (row.charAt(i) == targetChar) {
+                context.getInventory().setItem(slots.get(slotCounter), item);
+                slotCounter++;
             }
         }
+        return slotCounter;
+    }
+
+    private void mapCharToSlot(String[] layout) {
+        for (int i = 0; i < layout.length; i++) {
+            mapRowToSlots(layout[i], i);
+        }
+    }
+
+    private void mapRowToSlots(String row, int rowIndex) {
+        for (int j = 0; j < row.length(); j++) {
+            char c = row.charAt(j);
+            if (c != ' ') {
+                addCharToMap(c, rowIndex * 9 + j);
+            }
+        }
+    }
+
+    private void addCharToMap(char c, int slot) {
+        if (!characterListMap.containsKey(c)) {
+            characterListMap.put(c, new ArrayList<>());
+        }
+        characterListMap.get(c).add(slot);
     }
 
 
