@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.inventory.util;
 
+import com.google.common.collect.Multimap;
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
@@ -62,7 +63,7 @@ public class GuiChecker {
             flag = 1;
         }
 
-        Map<Character, GuiElement> elements = guiDetails.getElements();
+        Multimap<Character, GuiElement> elements = guiDetails.getElements();
 
         // If it's empty, inventory will just be empty
         if(elements == null) {

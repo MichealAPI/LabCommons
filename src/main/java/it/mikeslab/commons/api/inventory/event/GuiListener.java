@@ -135,17 +135,48 @@ public class GuiListener implements Listener {
 
         char clickedChar = layout[clickedRow].charAt(clickedSlot % rowLength);
 
+        int slot = event.getSlot();
+
         if(gui.getGuiDetails().getElements().containsKey(clickedChar)) {
 
-            // Check if the slot is a gui element
-            Optional.ofNullable(gui.getGuiDetails().getElements().get(clickedChar))
-                    .map(GuiElement::getOnClick)
-                    .ifPresent(consumer -> consumer.accept(event));
+            GuiElement clickedElement;
 
-            // Check if the slot is a temp element
-            Optional.ofNullable(gui.getGuiDetails().getTempPageElements().get(clickedSlot))
-                    .map(GuiElement::getOnClick)
-                    .ifPresent(consumer -> consumer.accept(event));
+            boolean isPageElement = gui
+                    .getGuiDetails()
+                    .getTempPageElements()
+                    .containsKey(slot);
+
+            if(isPageElement) {
+                clickedElement = gui.getGuiDetails()
+                        .getTempPageElements()
+                        .get(slot);
+
+            } else {
+
+                // We can directly take the first since it's not a page element so, it's not a list // todo is it real?
+                clickedElement = gui.getGuiDetails()
+                        .getElements()
+                        .get(clickedChar).stream()
+                        .findFirst()
+                        .orElse(null);
+
+            }
+
+            if(clickedElement == null) return;
+
+            String internalValue = clickedElement.getInternalValue().toUpperCase();
+            boolean hasAction = gui
+                    .getGuiDetails()
+                    .getClickActions()
+                    .containsKey(internalValue);
+
+            if(hasAction) {
+                gui
+                        .getGuiDetails()
+                        .getClickActions()
+                        .get(internalValue)
+                        .accept(event);
+            }
 
         }
 

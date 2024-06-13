@@ -16,18 +16,29 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
-@RequiredArgsConstructor
 public class PageSystem {
 
+    // Not using guiFactory to get a customGui instance may result in a
+    // old instance being used, which may cause issues with the inventory
     private final GuiFactory guiFactory;
     private final JavaPlugin instance;
     private final int id;
-    private final String internalValue;
     private final List<GuiElement> elements;
+
+    private final Character character;
 
     private int page = 1; // Start at page 1
 
     private int elementsPerPage = -1;
+
+    public PageSystem(GuiFactory guiFactory, JavaPlugin instance, int id, Character character, List<GuiElement> elements) {
+        this.guiFactory = guiFactory;
+        this.instance = instance;
+        this.id = id;
+        this.character = character;
+        this.elements = elements;
+    }
+
 
     public boolean hasNext() {
         return page < getMaxPages();
@@ -65,10 +76,11 @@ public class PageSystem {
             return 0;
         }
 
-        this.elementsPerPage = StringUtil.getOrDefaultContains(
-                customGui.getInternalValuesSlots(),
-                internalValue.toUpperCase()
-        ).size();
+        this.elementsPerPage = customGui
+                .getGuiDetails()
+                .getElements()
+                .get(character)
+                .size();
 
         return this.elementsPerPage;
     }
@@ -110,8 +122,8 @@ public class PageSystem {
         }
 
         // Populate the internals of the custom gui with the specified internal value
-        customGui.populateInternals(
-                internalValue,
+        customGui.populatePage(
+                character,
                 calculateSubList()
         );
 

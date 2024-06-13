@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.inventory.pojo;
 
+import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.Inventory;
@@ -13,13 +14,10 @@ import java.util.Map;
  */
 @Getter
 @RequiredArgsConstructor
-public class RowPopulationContext {
+public class InventoryPopulationContext {
 
-    private final Map<Character, GuiElement> elements;
+    private final Multimap<Character, GuiElement> elements;
     private final Map<Character, ItemStack> cachedItems;
-    private final String rowLayout;
-    private final int row;
-    private final int perRowLength;
     private final Inventory inventory;
 
 }

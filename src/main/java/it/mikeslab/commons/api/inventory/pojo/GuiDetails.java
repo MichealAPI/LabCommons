@@ -1,20 +1,25 @@
 package it.mikeslab.commons.api.inventory.pojo;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import it.mikeslab.commons.api.inventory.GuiType;
 import lombok.Data;
 import net.kyori.adventure.text.Component;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Data
 public class GuiDetails {
 
     private final String[] inventoryLayout;
     private final GuiType guiType;
-    private Map<Character, GuiElement> elements;
+    private Multimap<Character, GuiElement> elements;
     private Map<Integer, GuiElement> tempPageElements;
 
     // Optional
@@ -22,6 +27,8 @@ public class GuiDetails {
     private Component inventoryName = Component.empty();
     private int inventorySize; // calculated or fixed, in case of a chest
     private Map<String, String> placeholders;
+
+    private Map<String, Consumer<InventoryClickEvent>> clickActions;
 
     private boolean closeable;
 
@@ -36,12 +43,14 @@ public class GuiDetails {
         this.guiType = guiType;
         this.inventoryLayout = inventoryLayout;
 
-        this.elements = new HashMap<>();
+        this.elements = ArrayListMultimap.create();
         this.tempPageElements = new HashMap<>();
 
         this.placeholders = new HashMap<>();
 
         this.closeable = true;
+
+        this.clickActions = new HashMap<>();
 
     }
 
@@ -54,7 +63,7 @@ public class GuiDetails {
     }
 
     public void removeElement(Character key) {
-        this.elements.remove(key);
+        this.elements.removeAll(key);
     }
 
     public GuiDetails clone() {
@@ -69,7 +78,7 @@ public class GuiDetails {
 
         clone.setCloseable(closeable);
 
-        for (Map.Entry<Character, GuiElement> entry : elements.entrySet()) {
+        for (Map.Entry<Character, GuiElement> entry : elements.entries()) {
             clone.addElement(entry.getKey(), entry.getValue().clone());
         }
 

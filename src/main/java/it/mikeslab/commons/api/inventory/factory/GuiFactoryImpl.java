@@ -4,10 +4,12 @@ import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.commons.api.inventory.util.PageSystem;
 import it.mikeslab.commons.api.logger.LoggerUtil;
 import lombok.Getter;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,10 +20,14 @@ import java.util.logging.Level;
 public class GuiFactoryImpl implements GuiFactory {
 
     @Getter private final Map<Integer, CustomGui> cachedGuis;
+
+    private final JavaPlugin instance;
+
     private int idCounter = 0;
 
-    public GuiFactoryImpl() {
+    public GuiFactoryImpl(final JavaPlugin instance) {
         this.cachedGuis = new HashMap<>();
+        this.instance = instance;
     }
 
 
@@ -30,8 +36,13 @@ public class GuiFactoryImpl implements GuiFactory {
     @Override
     public int create(GuiDetails guiDetails) {
 
-        CustomGui customGui = new CustomGui(guiDetails);
         int id = getAndIncrementId();
+        CustomGui customGui = new CustomGui(
+                guiDetails,
+                this,
+                instance,
+                id
+        );
 
         this.cachedGuis.put(id, customGui);
 
@@ -57,6 +68,11 @@ public class GuiFactoryImpl implements GuiFactory {
         customGui.generateInventory();
 
         player.openInventory(customGui.getInventory());
+
+        // Update default page systems
+        // to allow them to appear in the inventory
+        customGui.getPageSystemMap().values().forEach(PageSystem::updateInventory);
+
 
     }
 
@@ -97,7 +113,13 @@ public class GuiFactoryImpl implements GuiFactory {
             return;
         }
 
-        CustomGui customGui = new CustomGui(newGuiDetails);
+        CustomGui customGui = new CustomGui(
+                newGuiDetails,
+                this,
+                instance,
+                id
+        );
+
         cachedGuis.put(id, customGui);
 
     }
