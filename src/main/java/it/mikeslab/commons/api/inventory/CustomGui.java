@@ -114,38 +114,63 @@ public class CustomGui implements InventoryHolder {
     }
 
     private void populate(InventoryPopulationContext context) {
+        // Iterate over each character and its corresponding slots
         for (Map.Entry<Character, List<Integer>> mappedSlots : characterListMap.entrySet()) {
             char targetChar = mappedSlots.getKey();
             List<Integer> slots = mappedSlots.getValue();
 
-            boolean isGroupElement = context.getElements().get(targetChar).iterator().next().isGroupElement();
-            if (isGroupElement && context.getElements().get(targetChar).size() > slots.size()) {
-                this.pageSystemMap.put(targetChar, new PageSystem(guiFactory, instance, id, targetChar, new ArrayList<>(context.getElements().get(targetChar))));
-                continue;
-            }
+            this.handleGroupElement(context, targetChar, slots);
+            this.handleSingleElement(context, targetChar, slots);
+        }
+    }
 
-            GuiElement element = context.getElements().get(targetChar).iterator().next();
-            if (element == null) continue;
+    private void handleGroupElement(InventoryPopulationContext context, char targetChar, List<Integer> slots) {
+        // Check if the current character is a group element
+        boolean isGroupElement = context.getElements().get(targetChar).iterator().next().isGroupElement();
+        // If it is a group element and there are more elements than slots, create a new PageSystem
+        if (isGroupElement && context.getElements().get(targetChar).size() > slots.size()) {
+            this.pageSystemMap.put(
+                    targetChar,
+                    new PageSystem(
+                            guiFactory,
+                            instance,
+                            id,
+                            targetChar,
+                            new ArrayList<>(context.getElements().get(targetChar))
+                    ));
+        }
+    }
 
-            ItemStack item = context.getCachedItems().get(targetChar);
-            if (item == null) {
-                item = element.create(guiDetails.getPlaceholders());
-                context.getCachedItems().put(targetChar, item);
-            }
+    private void handleSingleElement(InventoryPopulationContext context, char targetChar, List<Integer> slots) {
+        // Get the GuiElement for the current character
+        GuiElement element = context.getElements().get(targetChar).iterator().next();
+        if (element == null) return;
 
-            int slotCounter = 0;
-            for (String row : guiDetails.getInventoryLayout()) {
-                for (int i = 0; i < row.length(); i++) {
-                    char c = row.charAt(i);
-                    if (c == targetChar) {
-                        if (slotCounter >= slots.size()) {
-                            break;
-                        }
+        // Get the ItemStack for the current character, or create a new one if it doesn't exist
+        ItemStack item = context.getCachedItems().get(targetChar);
+        if (item == null) {
+            item = element.create(guiDetails.getPlaceholders());
+            context.getCachedItems().put(targetChar, item);
+        }
 
-                        int slot = slots.get(slotCounter);
-                        context.getInventory().setItem(slot, item);
-                        slotCounter++;
+        // Counter for the number of slots filled
+        int slotCounter = 0;
+        // Iterate over each row in the inventory layout
+        for (String row : guiDetails.getInventoryLayout()) {
+            // Iterate over each character in the row
+            for (int i = 0; i < row.length(); i++) {
+                char c = row.charAt(i);
+                // If the character matches the target character, set the item in the corresponding slot
+                if (c == targetChar) {
+                    // If all slots for this character have been filled, break the loop
+                    if (slotCounter >= slots.size()) {
+                        break;
                     }
+
+                    // Get the slot for the current item and set the item in the inventory
+                    int slot = slots.get(slotCounter);
+                    context.getInventory().setItem(slot, item);
+                    slotCounter++;
                 }
             }
         }
