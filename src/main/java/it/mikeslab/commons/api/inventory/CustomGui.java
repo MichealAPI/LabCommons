@@ -83,7 +83,10 @@ public class CustomGui implements InventoryHolder {
         this.inventory = inventory;
     }
 
-
+    /**
+     * Populate the inventory with the elements
+     * @param inventory The inventory to populate
+     */
     public void populateInventory(Inventory inventory) {
         // Get the elements and layout from the GuiDetails
         Multimap<Character, GuiElement> elements = guiDetails.getElements();
@@ -111,6 +114,10 @@ public class CustomGui implements InventoryHolder {
 
     }
 
+    /**
+     * Populate the inventory
+     * @param context The context of the population
+     */
     private void populate(InventoryPopulationContext context) {
         // Iterate over each character and its corresponding slots
         for (Map.Entry<Character, List<Integer>> mappedSlots : characterListMap.entrySet()) {
@@ -122,6 +129,12 @@ public class CustomGui implements InventoryHolder {
         }
     }
 
+    /**
+     * Handle groups of element, if present
+     * @param context The context of the population
+     * @param targetChar The target character
+     * @param slots The slots
+     */
     private void handleGroupElement(InventoryPopulationContext context, char targetChar, List<Integer> slots) {
         // Check if the current character is a group element
         boolean isGroupElement = context.getElements().get(targetChar).iterator().next().isGroupElement();
@@ -139,6 +152,12 @@ public class CustomGui implements InventoryHolder {
         }
     }
 
+    /**
+     * Handle a single/static element
+     * @param context The context of the population
+     * @param targetChar The target character
+     * @param slots The slots
+     */
     private void handleSingleElement(InventoryPopulationContext context, char targetChar, List<Integer> slots) {
         GuiElement element = getGuiElement(context, targetChar);
         if (element == null) return;
@@ -147,11 +166,24 @@ public class CustomGui implements InventoryHolder {
         populateSlots(context, targetChar, slots, item);
     }
 
+    /**
+     * Get the GuiElement
+     * @param context The context of the population
+     * @param targetChar The target character to get the element for
+     * @return The GuiElement
+     */
     private GuiElement getGuiElement(InventoryPopulationContext context, char targetChar) {
         Iterator<GuiElement> iterator = context.getElements().get(targetChar).iterator();
         return iterator.hasNext() ? iterator.next() : null;
     }
 
+    /**
+     * Get the item
+     * @param context The context of the population
+     * @param targetChar The target character
+     * @param element The element
+     * @return The built item
+     */
     private ItemStack getItem(InventoryPopulationContext context, char targetChar, GuiElement element) {
         ItemStack item = context.getCachedItems().get(targetChar);
         if (item == null) {
@@ -161,6 +193,13 @@ public class CustomGui implements InventoryHolder {
         return item;
     }
 
+    /**
+     * Populate the slots
+     * @param context The context of the population
+     * @param targetChar The target character
+     * @param slots The slots
+     * @param item The item to populate
+     */
     private void populateSlots(InventoryPopulationContext context, char targetChar, List<Integer> slots, ItemStack item) {
         int slotCounter = 0;
         for (String row : guiDetails.getInventoryLayout()) {
@@ -181,6 +220,11 @@ public class CustomGui implements InventoryHolder {
         }
     }
 
+    /**
+     * Populate a row
+     * @param context The context of the population
+     * @return The slot counter
+     */
     private int populateRow(PopulateRowContext context) {
         for (int i = 0; i < context.getRow().length(); i++) {
             if (context.getRow().charAt(i) == context.getTargetChar()) {
@@ -191,12 +235,21 @@ public class CustomGui implements InventoryHolder {
         return context.getSlotCounter();
     }
 
+    /**
+     * Map the characters to slots
+     * @param layout The layout
+     */
     private void mapCharToSlot(String[] layout) {
         for (int i = 0; i < layout.length; i++) {
             mapRowToSlots(layout[i], i);
         }
     }
 
+    /**
+     * Map a row of chars to slots
+     * @param row The row
+     * @param rowIndex The row index
+     */
     private void mapRowToSlots(String row, int rowIndex) {
         for (int j = 0; j < row.length(); j++) {
             char c = row.charAt(j);
@@ -206,6 +259,11 @@ public class CustomGui implements InventoryHolder {
         }
     }
 
+    /**
+     * Add a character to the map
+     * @param c The character
+     * @param slot The slot
+     */
     private void addCharToMap(char c, int slot) {
         if (!characterListMap.containsKey(c)) {
             characterListMap.put(c, new ArrayList<>());
@@ -213,7 +271,10 @@ public class CustomGui implements InventoryHolder {
         characterListMap.get(c).add(slot);
     }
 
-
+    /**
+     * Populate the page
+     * @param context The context of the population
+     */
     public void populatePage(PopulatePageContext context) {
 
         boolean isTargetValid = this.getCharacterListMap().containsKey(context.getTargetChar());

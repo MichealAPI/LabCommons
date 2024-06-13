@@ -3,6 +3,7 @@ package it.mikeslab.commons.api.inventory.util;
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
+import it.mikeslab.commons.api.inventory.pojo.PopulatePageContext;
 import it.mikeslab.commons.api.various.StringUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -126,8 +127,10 @@ public class PageSystem {
 
         // Populate the internals of the custom gui with the specified internal value
         customGui.populatePage(
+                new PopulatePageContext(
                 character,
                 calculateSubList()
+                )
         );
 
         // Update the inventory for all viewers
