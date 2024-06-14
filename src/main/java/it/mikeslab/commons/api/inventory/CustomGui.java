@@ -18,6 +18,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -137,7 +138,14 @@ public class CustomGui implements InventoryHolder {
      */
     private void handleGroupElement(InventoryPopulationContext context, char targetChar, List<Integer> slots) {
         // Check if the current character is a group element
-        boolean isGroupElement = context.getElements().get(targetChar).iterator().next().isGroupElement();
+
+        Iterator<GuiElement> elementIterator = context
+                .getElements()
+                .get(targetChar)
+                .iterator();
+
+        boolean isGroupElement = elementIterator.hasNext() && elementIterator.next().isGroupElement();
+
         // If it is a group element and there are more elements than slots, create a new PageSystem
         if (isGroupElement && context.getElements().get(targetChar).size() > slots.size()) {
             this.pageSystemMap.put(
@@ -240,6 +248,12 @@ public class CustomGui implements InventoryHolder {
      * @param layout The layout
      */
     private void mapCharToSlot(String[] layout) {
+
+        // If the map is not empty, return early
+        if(!characterListMap.isEmpty()) {
+            return;
+        }
+
         for (int i = 0; i < layout.length; i++) {
             mapRowToSlots(layout[i], i);
         }
@@ -277,15 +291,18 @@ public class CustomGui implements InventoryHolder {
      */
     public void populatePage(PopulatePageContext context) {
 
+        int i;
+
         boolean isTargetValid = this.getCharacterListMap().containsKey(context.getTargetChar());
         if(!isTargetValid) return;
 
         List<Integer> slots = this.getCharacterListMap().get(context.getTargetChar());
         Map<Integer, GuiElement> tempSlots = new HashMap<>();
 
-        for(int i = 0; i < slots.size(); i++) {
+        for(i = 0; i < slots.size(); i++) {
 
             int slot = slots.get(i);
+
             if(context.getSubList().size() <= i) {
                 this.getInventory().setItem(slot, null);
                 continue;
@@ -301,6 +318,8 @@ public class CustomGui implements InventoryHolder {
             tempSlots.put(slot, element);
 
         }
+
+        i = 0;
 
         // Register by this way to enable click events for each page element
         guiDetails

@@ -51,13 +51,19 @@ public class PageSystem {
 
     public void nextPage() {
         if (hasNext()) {
-            page++;
+            page++;  // We cannot extract this to a method because of the condition
+                     // we surely want to avoid refreshing the inventory unnecessarily
+
+            this.updateInventory();
         }
     }
 
     public void previousPage() {
         if (hasPrevious()) {
             page--;
+
+            this.updateInventory(); // We cannot extract this to a method because of the condition
+                                    // we surely want to avoid refreshing the inventory unnecessarily
         }
     }
 

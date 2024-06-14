@@ -31,7 +31,7 @@ public class GuiDetails {
 
     private Map<String, Consumer<GuiInteractEvent>> clickActions;
 
-    private boolean closeable;
+    // private boolean closeable;
 
     @ApiStatus.Experimental
     private String text; // valid only for anvil menus
@@ -49,7 +49,7 @@ public class GuiDetails {
 
         this.placeholders = new HashMap<>();
 
-        this.closeable = true;
+        // this.closeable = true;
 
         this.clickActions = new HashMap<>();
 
@@ -77,7 +77,7 @@ public class GuiDetails {
         clone.setPlaceholders(new HashMap<>(placeholders));
         clone.setText(text);
 
-        clone.setCloseable(closeable);
+        // clone.setCloseable(closeable);
 
         for (Map.Entry<Character, GuiElement> entry : elements.entries()) {
             clone.addElement(entry.getKey(), entry.getValue().clone());

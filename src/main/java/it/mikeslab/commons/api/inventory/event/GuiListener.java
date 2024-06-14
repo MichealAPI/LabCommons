@@ -19,6 +19,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 public class GuiListener implements Listener {
@@ -101,18 +102,22 @@ public class GuiListener implements Listener {
 
             if(customGui == null) return;
 
-            // todo transform in spigot
-            // if(event.getReason() == InventoryCloseEvent.Reason.PLUGIN || event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
-            //if(customGui.getGuiDetails().isCloseable()) return;
+            // if(customGui.getGuiDetails().isCloseable()) return;
 
             Player player = (Player) event.getPlayer();
 
-            // Inventory needs to be reopened after 1 tick, otherwise it will fire up the OPEN_NEW reason when closed again
-            // by the player
-            Bukkit.getServer().getScheduler().runTaskLater(instance, () -> {
-                player.openInventory(customGui.getInventory());
-            }, 1L);
+            GuiCloseEvent guiCloseEvent = new GuiCloseEvent(
+                    event,
+                    customGui
+            );
 
+            Bukkit.getPluginManager().callEvent(guiCloseEvent);
+
+            if(guiCloseEvent.isCancelled()) {
+                Bukkit.getScheduler().runTask(instance, () -> {
+                    player.openInventory(customGui.getInventory());
+                });
+            }
 
         }
 

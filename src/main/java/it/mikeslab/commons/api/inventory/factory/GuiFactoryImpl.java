@@ -79,7 +79,17 @@ public class GuiFactoryImpl implements GuiFactory {
 
         // Update default page systems
         // to allow them to appear in the inventory
-        customGui.getPageSystemMap().values().forEach(PageSystem::updateInventory);
+        customGui.getPageSystemMap().values().forEach(pageSystem -> {
+
+            instance
+                    .getServer()
+                    .getScheduler()
+                    .runTask(
+                            instance,
+                            pageSystem::updateInventory
+                    );
+
+        });
 
 
     }
@@ -176,7 +186,6 @@ public class GuiFactoryImpl implements GuiFactory {
                             nextActionIdentifier,
                             event -> {
                                 pageSystem.nextPage();
-                                pageSystem.updateInventory();
                             }
                     );
 
@@ -184,7 +193,6 @@ public class GuiFactoryImpl implements GuiFactory {
                             previousActionIdentifier,
                             event -> {
                                 pageSystem.previousPage();
-                                pageSystem.updateInventory();
                             }
                     );
                 }

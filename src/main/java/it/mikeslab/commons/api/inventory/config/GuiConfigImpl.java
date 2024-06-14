@@ -158,12 +158,6 @@ public class GuiConfigImpl implements GuiConfig {
 
             String internalValue = element.getString(ConfigField.INTERNAL_VALUE.getField(), null);
 
-            boolean isInternalValuePresent = internalValue != null;
-
-            if(isInternalValuePresent) {
-                internalValue = internalValue.toUpperCase(); // to avoid case sensitivity
-            }
-
             boolean isGroupElement = element.getBoolean(ConfigField.IS_GROUP_ELEMENT.getField(), false);
 
             // int order = isGrouped ? Integer.parseInt(charKey.split("-")[1]) : -1;
