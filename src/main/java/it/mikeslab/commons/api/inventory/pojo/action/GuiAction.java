@@ -18,6 +18,6 @@ public class GuiAction {
      * The action that will be performed
      * String - The arguments that will be used for the action
      */
-    BiConsumer<GuiInteractEvent, String> action;
+    private final BiConsumer<GuiInteractEvent, String> action;
 
 }
