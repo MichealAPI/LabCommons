@@ -22,6 +22,6 @@ public class GuiAction<T> {
      */
     BiConsumer<Object, String> action;
 
-    Class<T> requiredClass;
+    Class<?> requiredClass;
 
 }
