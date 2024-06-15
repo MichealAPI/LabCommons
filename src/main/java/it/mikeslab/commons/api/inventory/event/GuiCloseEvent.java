@@ -28,6 +28,11 @@ public class GuiCloseEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
+    // Quick fix for the missing method in latest versions of Spigot
+    public HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
 
 
 }

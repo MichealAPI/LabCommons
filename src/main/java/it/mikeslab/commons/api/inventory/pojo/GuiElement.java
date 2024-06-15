@@ -30,6 +30,8 @@ public class GuiElement {
 
     private Map<String, String> replacements;
 
+    private List<String> actions;
+
     private int customModelData = -1;
 
     private boolean isGroupElement;
@@ -121,6 +123,7 @@ public class GuiElement {
                 .lore(lore != null ? new ArrayList<>(lore) : null)
                 .amount(amount)
                 .glow(glow)
+                .actions(actions != null ? new ArrayList<>(actions) : null)
                 .customModelData(customModelData)
                 .internalValue(internalValue)
                 .onClick(onClick)

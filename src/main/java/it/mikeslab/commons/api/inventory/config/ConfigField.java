@@ -17,7 +17,7 @@ public enum ConfigField {
     TYPE("type"),
     SIZE("size"),
     MATERIAL("material"),
-    @Deprecated ACTION("action"),
+    ACTIONS("actions"),
     CUSTOM_MODEL_DATA("data"),
     INTERNAL_VALUE("internalValue"),
     IS_GROUP_ELEMENT("is-group-element");

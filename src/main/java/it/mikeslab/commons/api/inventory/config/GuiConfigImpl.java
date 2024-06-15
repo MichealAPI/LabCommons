@@ -158,6 +158,8 @@ public class GuiConfigImpl implements GuiConfig {
 
             String internalValue = element.getString(ConfigField.INTERNAL_VALUE.getField(), null);
 
+            List<String> actions = element.getStringList(ConfigField.ACTIONS.getField());
+
             boolean isGroupElement = element.getBoolean(ConfigField.IS_GROUP_ELEMENT.getField(), false);
 
             // int order = isGrouped ? Integer.parseInt(charKey.split("-")[1]) : -1;
@@ -170,6 +172,7 @@ public class GuiConfigImpl implements GuiConfig {
                     .amount(amount)
                     .glow(glowing)
                     .internalValue(internalValue)
+                    .actions(actions)
                     .isGroupElement(isGroupElement)
                     //.isGrouped(isGrouped)
                     //.order(order)
