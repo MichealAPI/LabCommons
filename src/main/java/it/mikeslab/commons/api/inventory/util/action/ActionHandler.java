@@ -2,16 +2,17 @@ package it.mikeslab.commons.api.inventory.util.action;
 
 import com.google.common.collect.Multimap;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
-import it.mikeslab.commons.api.inventory.pojo.action.GuiUser;
+import it.mikeslab.commons.api.inventory.pojo.action.GuiActionArg;
 
 public interface ActionHandler {
 
     /**
      * Handle the action with the given arguments
+     * @param inventoryId The id of the inventory
      * @param actionWithArgs The action with the arguments
      * @param user The user that is performing the action
      */
-    void handleAction(String actionWithArgs, GuiUser user);
+    void handleAction(int inventoryId, String actionWithArgs, GuiActionArg user);
 
     /**
      * Register an action with the given prefix
@@ -25,5 +26,13 @@ public interface ActionHandler {
      * @param actionsMap The map of actions to register
      */
     void registerActions(Multimap<String, GuiAction> actionsMap);
+
+    /**
+     * Inject an action into the map
+     * @param inventoryId The id of the inventory to inject the action into
+     * @param prefix The prefix of the action
+     * @param action The action to inject
+     */
+    void injectAction(int inventoryId, String prefix, GuiAction action);
 
 }

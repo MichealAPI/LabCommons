@@ -5,12 +5,12 @@ import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
-import it.mikeslab.commons.api.inventory.util.PageSystem;
+import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import it.mikeslab.commons.api.logger.LoggerUtil;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,13 +28,13 @@ public class GuiFactoryImpl implements GuiFactory {
 
     private int idCounter = 0;
 
+    @Setter @Getter
+    private ActionHandler actionHandler;
+
     public GuiFactoryImpl(final JavaPlugin instance) {
         this.cachedGuis = new HashMap<>();
         this.instance = instance;
     }
-
-
-
 
     @Override
     public int create(GuiDetails guiDetails) {

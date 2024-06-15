@@ -1,6 +1,7 @@
 package it.mikeslab.commons.api.inventory;
 
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,5 +52,11 @@ public interface GuiFactory {
      */
     @Nullable
     CustomGui getCustomGui(int id);
+
+    /**
+     * Sets the action handler for the custom inventories
+     * @param actionHandler The action handler
+     */
+    void setActionHandler(ActionHandler actionHandler);
 
 }

@@ -1,23 +1,26 @@
 package it.mikeslab.commons.api.inventory.util.action;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
-import it.mikeslab.commons.api.inventory.pojo.action.GuiUser;
+import it.mikeslab.commons.api.inventory.pojo.action.GuiActionArg;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 public class ActionHandlerImpl implements ActionHandler {
 
-    private final Multimap<String, GuiAction> actionsMap;
+    private final Multimap<String, GuiAction> globalActionsMap;
+    private final Map<Integer, Map<String, GuiAction>> injectedActions;
 
-    public ActionHandlerImpl(Multimap<String, GuiAction> actionsMap) {
-        this.actionsMap = actionsMap;
+    public ActionHandlerImpl(Multimap<String, GuiAction> globalActionsMap) {
+        this.globalActionsMap = globalActionsMap;
+        this.injectedActions = new HashMap<>();
     }
 
     @Override
-    public void handleAction(String actionWithArgs, GuiUser user) {
+    public void handleAction(int inventoryId, String actionWithArgs, GuiActionArg user) {
 
         // If it doesn't contain a colon, it's not a valid action
         if (!actionWithArgs.contains(":")) {
@@ -29,15 +32,15 @@ public class ActionHandlerImpl implements ActionHandler {
         String args = action[1];
 
         // If the prefix is not registered, return
-        if (!this.actionsMap.containsKey(prefix)) {
+        if (!this.globalActionsMap.containsKey(prefix)) {
             return;
         }
 
         // Get the action from the map
-        Collection<GuiAction> actions = this.actionsMap.get(prefix);
+        Collection<GuiAction> globalActions = this.globalActionsMap.get(prefix);
 
-        // Iterate over the actions
-        for (GuiAction guiAction : actions) {
+        // Iterate over the globalActions
+        for (GuiAction guiAction : globalActions) {
 
             Optional<Object> optionalPassedValue = getPassedValue(guiAction, user);
 
@@ -46,23 +49,48 @@ public class ActionHandlerImpl implements ActionHandler {
                     guiAction.getAction().accept(passedValue, args)
             );
         }
+
+        // Custom inventory injected actions, are more specific than globals
+        Map<String, GuiAction> injectedActions = this.injectedActions.getOrDefault(inventoryId, null);
+
+        if(injectedActions != null && injectedActions.containsKey(prefix)) {
+
+            GuiAction guiAction = injectedActions.get(prefix);
+
+            Optional<Object> optionalPassedValue = getPassedValue(guiAction, user);
+
+            optionalPassedValue.ifPresent(passedValue ->
+                    guiAction.getAction().accept(passedValue, args)
+            );
+        }
+
     }
 
     @Override
     public void registerAction(String prefix, GuiAction action) {
-        this.actionsMap.put(prefix, action);
+        this.globalActionsMap.put(prefix, action);
     }
 
     @Override
     public void registerActions(Multimap<String, GuiAction> actionsMap) {
-        this.actionsMap.putAll(actionsMap);
+        this.globalActionsMap.putAll(actionsMap);
     }
 
-    private Optional<Object> getPassedValue(GuiAction guiAction, GuiUser user) {
+    @Override
+    public void injectAction(int inventoryId, String prefix, GuiAction action) {
+
+        Map<String, GuiAction> actions = this.injectedActions.getOrDefault(inventoryId, new HashMap<>());
+
+        actions.put(prefix, action);
+
+        this.injectedActions.put(inventoryId, actions);
+    }
+
+    private Optional<Object> getPassedValue(GuiAction guiAction, GuiActionArg user) {
         if(isTargetPlayer(guiAction)) {
             return Optional.ofNullable(user.getTargetPlayer());
-        } else if(isTargetCommandSender(guiAction)) {
-            return Optional.ofNullable(user.getTargetSender());
+        } else if(isTargetConsole(guiAction)) {
+            return Optional.ofNullable(user.getConsole());
         } else {
             // Log or handle unexpected situation
             return Optional.empty();
@@ -83,8 +111,8 @@ public class ActionHandlerImpl implements ActionHandler {
      * @param action The action to check
      * @return True if the action requires a CommandSender, false otherwise
      */
-    boolean isTargetCommandSender(GuiAction action) {
-        return action.getRequiredClass().equals(Player.class);
+    boolean isTargetConsole(GuiAction action) {
+        return action.getRequiredClass().equals(ConsoleCommandSender.class);
     }
 
 }
