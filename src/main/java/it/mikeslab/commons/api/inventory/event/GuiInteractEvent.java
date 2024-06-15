@@ -30,4 +30,9 @@ public class GuiInteractEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
+    // Quick fix for the missing method in latest versions of Spigot
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
 }

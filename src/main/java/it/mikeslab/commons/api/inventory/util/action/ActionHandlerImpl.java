@@ -31,16 +31,16 @@ public class ActionHandlerImpl implements ActionHandler {
         String args = action[1];
 
         // If the prefix is not registered, return
-        if (!this.globalActionsMap.containsKey(prefix)) {
-            return;
-        }
+        if (this.globalActionsMap.containsKey(prefix)) {
 
-        // Get the action from the map
-        Collection<GuiAction> globalActions = this.globalActionsMap.get(prefix);
+            // Get the action from the map
+            Collection<GuiAction> globalActions = this.globalActionsMap.get(prefix);
 
-        // Iterate over the globalActions
-        for (GuiAction guiAction : globalActions) {
-            guiAction.getAction().accept(event, args);
+            // Iterate over the globalActions
+            for (GuiAction guiAction : globalActions) {
+                guiAction.getAction().accept(event, args);
+            }
+
         }
 
         // Custom inventory injected actions, are more specific than globals
