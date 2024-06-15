@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.inventory.pojo.action;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.function.BiConsumer;
@@ -10,6 +11,7 @@ import java.util.function.BiConsumer;
  * @param <T> Any object that can be useful for the requested action
  */
 @Getter
+@Builder
 public class GuiAction<T> {
 
     /**
