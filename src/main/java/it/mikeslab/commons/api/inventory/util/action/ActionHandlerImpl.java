@@ -1,13 +1,12 @@
 package it.mikeslab.commons.api.inventory.util.action;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
-import it.mikeslab.commons.api.inventory.pojo.action.GuiActionArg;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActionHandlerImpl implements ActionHandler {
 
@@ -20,7 +19,7 @@ public class ActionHandlerImpl implements ActionHandler {
     }
 
     @Override
-    public void handleAction(int inventoryId, String actionWithArgs, GuiActionArg user) {
+    public void handleAction(int inventoryId, String actionWithArgs, GuiInteractEvent event) {
 
         // If it doesn't contain a colon, it's not a valid action
         if (!actionWithArgs.contains(":")) {
@@ -41,13 +40,7 @@ public class ActionHandlerImpl implements ActionHandler {
 
         // Iterate over the globalActions
         for (GuiAction guiAction : globalActions) {
-
-            Optional<Object> optionalPassedValue = getPassedValue(guiAction, user);
-
-            // Perform the action if a valid passedValue is present
-            optionalPassedValue.ifPresent(passedValue ->
-                    guiAction.getAction().accept(passedValue, args)
-            );
+            guiAction.getAction().accept(event, args);
         }
 
         // Custom inventory injected actions, are more specific than globals
@@ -57,11 +50,8 @@ public class ActionHandlerImpl implements ActionHandler {
 
             GuiAction guiAction = injectedActions.get(prefix);
 
-            Optional<Object> optionalPassedValue = getPassedValue(guiAction, user);
+            guiAction.getAction().accept(event, args);
 
-            optionalPassedValue.ifPresent(passedValue ->
-                    guiAction.getAction().accept(passedValue, args)
-            );
         }
 
     }
@@ -86,33 +76,5 @@ public class ActionHandlerImpl implements ActionHandler {
         this.injectedActions.put(inventoryId, actions);
     }
 
-    private Optional<Object> getPassedValue(GuiAction guiAction, GuiActionArg user) {
-        if(isTargetPlayer(guiAction)) {
-            return Optional.ofNullable(user.getTargetPlayer());
-        } else if(isTargetConsole(guiAction)) {
-            return Optional.ofNullable(user.getConsole());
-        } else {
-            // Log or handle unexpected situation
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Check if the action requires a player
-     * @param action The action to check
-     * @return True if the action requires a player, false otherwise
-     */
-    boolean isTargetPlayer(GuiAction action) {
-        return action.getRequiredClass().equals(Player.class);
-    }
-
-    /**
-     * Check if the action requires a CommandSender
-     * @param action The action to check
-     * @return True if the action requires a CommandSender, false otherwise
-     */
-    boolean isTargetConsole(GuiAction action) {
-        return action.getRequiredClass().equals(ConsoleCommandSender.class);
-    }
 
 }

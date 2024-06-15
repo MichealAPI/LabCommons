@@ -1,7 +1,8 @@
 package it.mikeslab.commons.api.inventory.pojo.action;
 
-import lombok.Builder;
+import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.function.BiConsumer;
 
@@ -10,17 +11,13 @@ import java.util.function.BiConsumer;
  * or by the plugin itself
  */
 @Getter
-@Builder
+@RequiredArgsConstructor
 public class GuiAction {
 
     /**
      * The action that will be performed
-     * <T> - The object that will be used for the action
-     *           (e.g. a player, a string, a number, etc.)
      * String - The arguments that will be used for the action
      */
-    BiConsumer<Object, String> action;
-
-    Class<?> requiredClass;
+    BiConsumer<GuiInteractEvent, String> action;
 
 }

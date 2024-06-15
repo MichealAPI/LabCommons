@@ -1,8 +1,8 @@
 package it.mikeslab.commons.api.inventory.util.action;
 
 import com.google.common.collect.Multimap;
+import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
-import it.mikeslab.commons.api.inventory.pojo.action.GuiActionArg;
 
 public interface ActionHandler {
 
@@ -10,9 +10,8 @@ public interface ActionHandler {
      * Handle the action with the given arguments
      * @param inventoryId The id of the inventory
      * @param actionWithArgs The action with the arguments
-     * @param user The user that is performing the action
      */
-    void handleAction(int inventoryId, String actionWithArgs, GuiActionArg user);
+    void handleAction(int inventoryId, String actionWithArgs, GuiInteractEvent event);
 
     /**
      * Register an action with the given prefix

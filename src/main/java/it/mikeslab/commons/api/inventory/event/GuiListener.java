@@ -5,7 +5,6 @@ import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.factory.GuiFactoryImpl;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
-import it.mikeslab.commons.api.inventory.pojo.action.GuiActionArg;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -19,8 +18,6 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.AbstractMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 public class GuiListener implements Listener {
@@ -189,10 +186,8 @@ public class GuiListener implements Listener {
                             guiFactoryImpl.getActionHandler().handleAction(
                                     gui.getId(),
                                     action,
-                                    GuiActionArg.builder()
-                                            .targetPlayer((Player) event.getWhoClicked())
-                                            .console(instance.getServer().getConsoleSender())
-                                            .build());
+                                    guiInteractEvent
+                            );
                         }
                 );
 
