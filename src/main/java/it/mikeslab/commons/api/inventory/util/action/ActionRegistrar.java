@@ -8,6 +8,6 @@ public interface ActionRegistrar {
     /**
      * Load all the actions
      */
-    Multimap<String, GuiAction<?>> loadActions();
+    Multimap<String, GuiAction> loadActions();
 
 }

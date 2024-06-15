@@ -8,11 +8,10 @@ import java.util.function.BiConsumer;
 /**
  * Represents an action that can be performed by the user
  * or by the plugin itself
- * @param <T> Any object that can be useful for the requested action
  */
 @Getter
 @Builder
-public class GuiAction<T> {
+public class GuiAction {
 
     /**
      * The action that will be performed

@@ -18,12 +18,12 @@ public interface ActionHandler {
      * @param prefix The prefix of the action
      * @param action The action to register
      */
-    void registerAction(String prefix, GuiAction<?> action);
+    void registerAction(String prefix, GuiAction action);
 
     /**
      * Register all the actions
      * @param actionsMap The map of actions to register
      */
-    void registerActions(Multimap<String, GuiAction<?>> actionsMap);
+    void registerActions(Multimap<String, GuiAction> actionsMap);
 
 }

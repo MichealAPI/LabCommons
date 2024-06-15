@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public class ActionHandlerImpl implements ActionHandler {
 
-    private final Multimap<String, GuiAction<?>> actionsMap;
+    private final Multimap<String, GuiAction> actionsMap;
 
-    public ActionHandlerImpl(Multimap<String, GuiAction<?>> actionsMap) {
+    public ActionHandlerImpl(Multimap<String, GuiAction> actionsMap) {
         this.actionsMap = actionsMap;
     }
 
@@ -34,10 +34,10 @@ public class ActionHandlerImpl implements ActionHandler {
         }
 
         // Get the action from the map
-        Collection<GuiAction<?>> actions = this.actionsMap.get(prefix);
+        Collection<GuiAction> actions = this.actionsMap.get(prefix);
 
         // Iterate over the actions
-        for (GuiAction<?> guiAction : actions) {
+        for (GuiAction guiAction : actions) {
 
             Optional<Object> optionalPassedValue = getPassedValue(guiAction, user);
 
@@ -49,16 +49,16 @@ public class ActionHandlerImpl implements ActionHandler {
     }
 
     @Override
-    public void registerAction(String prefix, GuiAction<?> action) {
+    public void registerAction(String prefix, GuiAction action) {
         this.actionsMap.put(prefix, action);
     }
 
     @Override
-    public void registerActions(Multimap<String, GuiAction<?>> actionsMap) {
+    public void registerActions(Multimap<String, GuiAction> actionsMap) {
         this.actionsMap.putAll(actionsMap);
     }
 
-    private Optional<Object> getPassedValue(GuiAction<?> guiAction, GuiUser user) {
+    private Optional<Object> getPassedValue(GuiAction guiAction, GuiUser user) {
         if(isTargetPlayer(guiAction)) {
             return Optional.ofNullable(user.getTargetPlayer());
         } else if(isTargetCommandSender(guiAction)) {
@@ -74,7 +74,7 @@ public class ActionHandlerImpl implements ActionHandler {
      * @param action The action to check
      * @return True if the action requires a player, false otherwise
      */
-    boolean isTargetPlayer(GuiAction<?> action) {
+    boolean isTargetPlayer(GuiAction action) {
         return action.getRequiredClass().equals(Player.class);
     }
 
@@ -83,7 +83,7 @@ public class ActionHandlerImpl implements ActionHandler {
      * @param action The action to check
      * @return True if the action requires a CommandSender, false otherwise
      */
-    boolean isTargetCommandSender(GuiAction<?> action) {
+    boolean isTargetCommandSender(GuiAction action) {
         return action.getRequiredClass().equals(Player.class);
     }
 
