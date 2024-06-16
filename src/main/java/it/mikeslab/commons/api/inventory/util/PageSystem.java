@@ -7,6 +7,7 @@ import it.mikeslab.commons.api.inventory.pojo.PopulatePageContext;
 import it.mikeslab.commons.api.various.StringUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,6 +29,7 @@ public class PageSystem {
 
     private final Character character;
 
+    @Setter
     private int page = 1; // Start at page 1
 
     private int elementsPerPage = -1;
@@ -130,8 +132,8 @@ public class PageSystem {
         // Populate the internals of the custom gui with the specified internal value
         customGui.populatePage(
                 new PopulatePageContext(
-                character,
-                calculateSubList()
+                    character,
+                    calculateSubList()
                 )
         );
 

@@ -11,14 +11,12 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -38,6 +36,7 @@ public class CustomGui implements InventoryHolder {
     private Map<Character, List<Integer>> characterListMap = new HashMap<>(); // A mapping of slots to characters
 
     private Map<Character, PageSystem> pageSystemMap = new HashMap<>();
+
 
     public void generateInventory() {
 
@@ -148,6 +147,11 @@ public class CustomGui implements InventoryHolder {
 
         // If it is a group element and there are more elements than slots, create a new PageSystem
         if (isGroupElement && context.getElements().get(targetChar).size() > slots.size()) {
+
+            if(this.pageSystemMap.containsKey(targetChar)) {
+                return;
+            }
+
             this.pageSystemMap.put(
                     targetChar,
                     new PageSystem(
@@ -156,7 +160,8 @@ public class CustomGui implements InventoryHolder {
                             id,
                             targetChar,
                             new ArrayList<>(context.getElements().get(targetChar))
-                    ));
+                    )
+            );
         }
     }
 
@@ -234,7 +239,9 @@ public class CustomGui implements InventoryHolder {
      * @return The slot counter
      */
     private int populateRow(PopulateRowContext context) {
+
         for (int i = 0; i < context.getRow().length(); i++) {
+
             if (context.getRow().charAt(i) == context.getTargetChar()) {
                 context.getContext().getInventory().setItem(context.getSlots().get(context.getSlotCounter()), context.getItem());
                 context.setSlotCounter(context.getSlotCounter() + 1);
@@ -268,7 +275,7 @@ public class CustomGui implements InventoryHolder {
         for (int j = 0; j < row.length(); j++) {
             char c = row.charAt(j);
             if (c != ' ') {
-                addCharToMap(c, rowIndex * 9 + j);
+                addCharToMap(c, rowIndex * row.length() + j);
             }
         }
     }
@@ -291,15 +298,13 @@ public class CustomGui implements InventoryHolder {
      */
     public void populatePage(PopulatePageContext context) {
 
-        int i;
-
         boolean isTargetValid = this.getCharacterListMap().containsKey(context.getTargetChar());
         if(!isTargetValid) return;
 
         List<Integer> slots = this.getCharacterListMap().get(context.getTargetChar());
         Map<Integer, GuiElement> tempSlots = new HashMap<>();
 
-        for(i = 0; i < slots.size(); i++) {
+        for(int i = 0; i < slots.size(); i++) {
 
             int slot = slots.get(i);
 
@@ -318,8 +323,6 @@ public class CustomGui implements InventoryHolder {
             tempSlots.put(slot, element);
 
         }
-
-        i = 0;
 
         // Register by this way to enable click events for each page element
         guiDetails

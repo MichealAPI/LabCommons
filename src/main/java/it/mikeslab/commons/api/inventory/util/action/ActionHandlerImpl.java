@@ -22,13 +22,13 @@ public class ActionHandlerImpl implements ActionHandler {
     public void handleAction(int inventoryId, String actionWithArgs, GuiInteractEvent event) {
 
         // If it doesn't contain a colon, it's not a valid action
-        if (!actionWithArgs.contains(":")) {
-            return;
-        }
+        // if (!actionWithArgs.contains(":")) {
+        //    return;
+        //}
 
         String[] action = actionWithArgs.split(":");
         String prefix = action[0];
-        String args = action[1];
+        String args = action.length > 1 ? action[1] : "";
 
         // If the prefix is not registered, return
         if (this.globalActionsMap.containsKey(prefix)) {

@@ -5,6 +5,7 @@ import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.commons.api.inventory.util.PageSystem;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import it.mikeslab.commons.api.logger.LoggerUtil;
 import lombok.Getter;
@@ -86,7 +87,8 @@ public class GuiFactoryImpl implements GuiFactory {
                     .getScheduler()
                     .runTask(
                             instance,
-                            pageSystem::updateInventory
+                            pageSystem::updateInventory // ignore with -1
+
                     );
 
         });

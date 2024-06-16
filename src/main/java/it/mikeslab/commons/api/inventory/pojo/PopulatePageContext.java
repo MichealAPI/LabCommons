@@ -8,6 +8,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class PopulatePageContext {
+
     private char targetChar;
     private List<GuiElement> subList;
+
 }

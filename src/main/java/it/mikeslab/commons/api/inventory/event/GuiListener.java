@@ -5,6 +5,7 @@ import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.factory.GuiFactoryImpl;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
+import it.mikeslab.commons.api.inventory.util.PageSystem;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -99,8 +100,6 @@ public class GuiListener implements Listener {
             CustomGui customGui = guiEntry.getValue();
 
             if(customGui == null) return;
-
-            // if(customGui.getGuiDetails().isCloseable()) return;
 
             Player player = (Player) event.getPlayer();
 
