@@ -3,6 +3,7 @@ package it.mikeslab.commons.api.inventory.config;
 
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -30,5 +31,12 @@ public interface GuiConfig {
      * @param section The section of the config
      */
     void parseDetails(ConfigurationSection section, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers);
+
+    /**
+     * Load an element from the config
+     * @param section The section of the config
+     * @return The element
+     */
+    GuiElement loadElement(ConfigurationSection section);
 
 }

@@ -141,51 +141,58 @@ public class GuiConfigImpl implements GuiConfig {
 
         for(String charKey : elements.getKeys(false)) {
 
-            ConfigurationSection element = elements.getConfigurationSection(charKey);
+            ConfigurationSection elementSection = elements.getConfigurationSection(charKey);
 
-            Component displayName = ComponentsUtil.getComponent(element, ConfigField.DISPLAYNAME.getField());
-            List<Component> lore = ComponentsUtil.getComponentList(element, ConfigField.LORE.getField());
-
-            Material material = Material.getMaterial(
-                    element.getString(ConfigField.MATERIAL.getField(), "AIR")
-            );
-
-            int amount = element.getInt(ConfigField.AMOUNT.getField(), 1);
-
-            boolean glowing = element.getBoolean(ConfigField.GLOWING.getField(), false);
-
-            int customModelData = element.getInt(ConfigField.CUSTOM_MODEL_DATA.getField(), -1);
-
-            String internalValue = element.getString(ConfigField.INTERNAL_VALUE.getField(), null);
-
-            List<String> actions = element.getStringList(ConfigField.ACTIONS.getField());
-
-            boolean isGroupElement = element.getBoolean(ConfigField.IS_GROUP_ELEMENT.getField(), false);
-
-            // int order = isGrouped ? Integer.parseInt(charKey.split("-")[1]) : -1;
-
-            GuiElement guiElement = GuiElement.builder()
-                    .customModelData(customModelData)
-                    .displayName(displayName)
-                    .lore(lore)
-                    .material(material)
-                    .amount(amount)
-                    .glow(glowing)
-                    .internalValue(internalValue)
-                    .actions(actions)
-                    .isGroupElement(isGroupElement)
-                    //.isGrouped(isGrouped)
-                    //.order(order)
-                    .build();
+            GuiElement guiElement = this.loadElement(elementSection);
 
             if(areActionConsumersEnabled) {
-                this.parseConsumers(element, consumers, guiElement);
+                this.parseConsumers(elementSection, consumers, guiElement);
             }
 
             guiDetails.addElement(charKey.charAt(0), guiElement);
         }
 
     }
+
+    @Override
+    public GuiElement loadElement(ConfigurationSection section) {
+
+        Component displayName = ComponentsUtil.getComponent(section, ConfigField.DISPLAYNAME.getField());
+        List<Component> lore = ComponentsUtil.getComponentList(section, ConfigField.LORE.getField());
+
+        Material material = Material.getMaterial(
+                section.getString(ConfigField.MATERIAL.getField(), "AIR")
+        );
+
+        int amount = section.getInt(ConfigField.AMOUNT.getField(), 1);
+
+        boolean glowing = section.getBoolean(ConfigField.GLOWING.getField(), false);
+
+        int customModelData = section.getInt(ConfigField.CUSTOM_MODEL_DATA.getField(), -1);
+
+        String internalValue = section.getString(ConfigField.INTERNAL_VALUE.getField(), null);
+
+        List<String> actions = section.getStringList(ConfigField.ACTIONS.getField());
+
+        boolean isGroupElement = section.getBoolean(ConfigField.IS_GROUP_ELEMENT.getField(), false);
+
+        // int order = isGrouped ? Integer.parseInt(charKey.split("-")[1]) : -1;
+
+        return GuiElement.builder()
+                .customModelData(customModelData)
+                .displayName(displayName)
+                .lore(lore)
+                .material(material)
+                .amount(amount)
+                .glow(glowing)
+                .internalValue(internalValue)
+                .actions(actions)
+                .isGroupElement(isGroupElement)
+                //.isGrouped(isGrouped)
+                //.order(order)
+                .build();
+    }
+
 
     private void parseConsumers(ConfigurationSection section, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers, GuiElement guiElement) {
 
