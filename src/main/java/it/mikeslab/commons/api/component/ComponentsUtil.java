@@ -32,8 +32,11 @@ public class ComponentsUtil {
         return getComponentList(section.getStringList(key), placeholders);
     }
 
-    @NotNull
+    @Nullable
     public Component getComponent(String key, TagResolver.Single... placeholders) {
+
+        if(key == null) return null;
+
         return MiniMessage.miniMessage().deserialize(key, placeholders);
     }
 
@@ -42,20 +45,30 @@ public class ComponentsUtil {
 
         return keys.stream()
                 .filter(s -> s != null && !s.isEmpty())
-                .map(s -> MiniMessage.miniMessage().deserialize(s, placeholders))
+                .map(s -> getComponent(s, placeholders))
                 .collect(Collectors.toList());
     }
 
     @NotNull
     public List<String> serialize(List<Component> components) {
         return components.stream()
-                .map(MiniMessage.miniMessage()::serialize)
+                .map(ComponentsUtil::serialize)
                 .collect(Collectors.toList());
     }
 
-    @NotNull
+    @Nullable
     public String serialize(Component component) {
+
+        if(component == null) return null;
+
         return MiniMessage.miniMessage().serialize(component);
     }
+
+
+    @Nullable
+    public String getSerializedComponent(String val, TagResolver.Single... placeholders) {
+        return serialize(getComponent(val, placeholders));
+    }
+
 
 }

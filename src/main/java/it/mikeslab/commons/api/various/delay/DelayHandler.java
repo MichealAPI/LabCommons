@@ -53,7 +53,7 @@ public interface DelayHandler<T extends DelayedAction> {
      * @param delayActive the delay active message
      * @param action the action to perform
      */
-    void performDelayed(Player player, T delayType, Component delayActive, Consumer<Void> action);
+    void performDelayed(Player player, T delayType, Component delayActive, Runnable action);
 
 
 }

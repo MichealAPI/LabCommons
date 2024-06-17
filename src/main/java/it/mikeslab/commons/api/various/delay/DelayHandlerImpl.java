@@ -84,7 +84,7 @@ public class DelayHandlerImpl<T extends DelayedAction> implements DelayHandler<T
     }
 
     @Override
-    public void performDelayed(Player player, T delayType, Component delayActive, Consumer<Void> action) {
+    public void performDelayed(Player player, T delayType, Component delayActive, Runnable action) {
         long remainingTime = this.getRemainingTime(player, delayType);
 
         if(remainingTime > 0) {
@@ -100,7 +100,7 @@ public class DelayHandlerImpl<T extends DelayedAction> implements DelayHandler<T
             return;
         }
 
-        action.accept(null);
+        action.run();
 
         this.registerDelay(player, delayType);
     }
