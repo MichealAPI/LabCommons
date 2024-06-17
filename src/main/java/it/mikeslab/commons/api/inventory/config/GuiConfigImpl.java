@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +35,15 @@ public class GuiConfigImpl implements GuiConfig {
     private FileConfiguration config;
 
     @Override
-    public void loadConfig(String fileName, boolean isResource) {
+    public void loadConfig(Path relativePath, boolean isResource) {
 
         // Check if the file exists, if not, save it
-        File file = new File(instance.getDataFolder(), fileName);
+        String relativePathAsString = relativePath.toString();
+        File file = new File(instance.getDataFolder(), relativePathAsString);
+        String fileName = relativePath.getFileName().toString();
+
         if(!file.exists() && isResource) {
-            instance.saveResource(fileName, false);
+            instance.saveResource(relativePathAsString, false);
         }
 
         Optional<FileConfiguration> config = new FileUtil(instance).getConfig(fileName);

@@ -7,6 +7,7 @@ import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -15,9 +16,9 @@ public interface GuiConfig {
 
     /**
      * Load the config file
-     * @param fileName The name of the file
+     * @param relativePath The relative path of the config file
      */
-    void loadConfig(String fileName, boolean isResource);
+    void loadConfig(Path relativePath, boolean isResource);
 
     /**
      * Get the details of the gui
