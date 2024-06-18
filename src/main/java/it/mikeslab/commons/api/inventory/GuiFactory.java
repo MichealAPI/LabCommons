@@ -55,11 +55,21 @@ public interface GuiFactory {
     CustomGui getCustomGui(int id);
 
     /**
+     * Sets the action handler
+     * @param handler The handler
+     */
+    void setActionHandler(ActionHandler handler);
+
+    /**
      * Sets the condition parser
      * @param parser The parser
      */
     void setConditionParser(ConditionParser parser);
 
+    /**
+     * Gets the action handler
+     * @return The action handler
+     */
     ConditionParser getConditionParser();
 
 }
