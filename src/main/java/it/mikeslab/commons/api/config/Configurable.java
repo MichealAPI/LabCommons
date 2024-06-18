@@ -135,6 +135,18 @@ public interface Configurable {
         );
     }
 
+    default String getSerializedString(ConfigurableEnum configurableEnum, TagResolver.Single... placeholders) {
+        Object defaultValue = configurableEnum.getDefaultValue();
+
+        if(!validateConfig()) {
+            return (String) defaultValue;
+        }
+
+        return MiniMessage.miniMessage().serialize(
+                this.getComponent(configurableEnum, placeholders)
+        );
+    }
+
     /**
      * Get a component list from the configuration
      */
