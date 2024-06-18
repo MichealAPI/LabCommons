@@ -74,6 +74,8 @@ public class GuiFactoryImpl implements GuiFactory {
         }
 
         CustomGui customGui = cachedGuis.get(id);
+        customGui.setOwnerUUID(player.getUniqueId());
+
         customGui.generateInventory();
 
         // Inject page system consumers

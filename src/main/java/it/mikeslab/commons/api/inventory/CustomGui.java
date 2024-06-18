@@ -29,6 +29,8 @@ public class CustomGui implements InventoryHolder {
     private final JavaPlugin instance;
     private final int id;
 
+    private UUID ownerUUID;
+
     private GuiDetails guiDetails;
 
     // Note: the holder will also use this
@@ -181,6 +183,7 @@ public class CustomGui implements InventoryHolder {
 
             boolean isValid = guiFactory.getConditionParser()
                     .parse(
+                            Bukkit.getPlayer(ownerUUID),
                             element.getCondition().get(),
                             guiDetails.getInjectedConditionPlaceholders()
                     );
@@ -340,6 +343,7 @@ public class CustomGui implements InventoryHolder {
 
                 boolean isValid = guiFactory.getConditionParser()
                         .parse(
+                                Bukkit.getPlayer(ownerUUID),
                                 element.getCondition().get(),
                                 guiDetails.getInjectedConditionPlaceholders()
                         );
