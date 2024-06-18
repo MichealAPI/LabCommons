@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.inventory;
 
+import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import org.bukkit.entity.Player;
@@ -54,9 +55,11 @@ public interface GuiFactory {
     CustomGui getCustomGui(int id);
 
     /**
-     * Sets the action handler for the custom inventories
-     * @param actionHandler The action handler
+     * Sets the condition parser
+     * @param parser The parser
      */
-    void setActionHandler(ActionHandler actionHandler);
+    void setConditionParser(ConditionParser parser);
+
+    ConditionParser getConditionParser();
 
 }

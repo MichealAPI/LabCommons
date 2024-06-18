@@ -180,6 +180,8 @@ public class GuiConfigImpl implements GuiConfig {
 
         boolean isGroupElement = section.getBoolean(ConfigField.IS_GROUP_ELEMENT.getField(), false);
 
+        Optional<String> condition = Optional.ofNullable(section.getString(ConfigField.CONDITION.getField(), null));
+
         // int order = isGrouped ? Integer.parseInt(charKey.split("-")[1]) : -1;
 
         return GuiElement.builder()
@@ -189,6 +191,7 @@ public class GuiConfigImpl implements GuiConfig {
                 .material(material)
                 .amount(amount)
                 .glow(glowing)
+                .condition(condition)
                 .internalValue(internalValue)
                 .actions(actions)
                 .isGroupElement(isGroupElement)

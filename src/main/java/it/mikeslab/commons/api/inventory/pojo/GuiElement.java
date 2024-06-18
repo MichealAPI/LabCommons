@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @Data
@@ -36,6 +37,8 @@ public class GuiElement {
 
     private boolean isGroupElement;
     // private int order;
+
+    private Optional<String> condition;
 
     // Consumers
     private Consumer<GuiInteractEvent> onClick;
@@ -127,6 +130,7 @@ public class GuiElement {
                 .customModelData(customModelData)
                 .internalValue(internalValue)
                 .onClick(onClick)
+                .condition(condition)
                 .isGroupElement(isGroupElement)
                 .build();
     }

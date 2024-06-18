@@ -32,6 +32,8 @@ public class GuiDetails {
 
     private Map<String, Consumer<GuiInteractEvent>> clickActions;
 
+    private Map<String, String> injectedConditionPlaceholders;
+
     // private boolean closeable;
 
     @ApiStatus.Experimental
@@ -53,6 +55,8 @@ public class GuiDetails {
         // this.closeable = true;
 
         this.clickActions = new HashMap<>();
+
+        this.injectedConditionPlaceholders = new HashMap<>();
 
     }
 
@@ -78,10 +82,20 @@ public class GuiDetails {
         clone.setPlaceholders(new HashMap<>(placeholders));
         clone.setText(text);
 
+        clone.setInjectedConditionPlaceholders(new HashMap<>(injectedConditionPlaceholders));
+
         // clone.setCloseable(closeable);
 
         for (Map.Entry<Character, GuiElement> entry : elements.entries()) {
             clone.addElement(entry.getKey(), entry.getValue().clone());
+        }
+
+        for (Map.Entry<Character, Map<Integer, GuiElement>> entry : tempPageElements.entrySet()) {
+            Map<Integer, GuiElement> pageElements = new HashMap<>();
+            for (Map.Entry<Integer, GuiElement> pageEntry : entry.getValue().entrySet()) {
+                pageElements.put(pageEntry.getKey(), pageEntry.getValue().clone());
+            }
+            clone.tempPageElements.put(entry.getKey(), pageElements);
         }
 
         return clone;

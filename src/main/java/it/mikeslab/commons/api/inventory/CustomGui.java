@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -33,9 +34,9 @@ public class CustomGui implements InventoryHolder {
     // Note: the holder will also use this
     private Inventory inventory;
 
-    private Map<Character, List<Integer>> characterListMap = new HashMap<>(); // A mapping of slots to characters
+    private final Map<Character, List<Integer>> characterListMap = new HashMap<>(); // A mapping of slots to characters
 
-    private Map<Character, PageSystem> pageSystemMap = new HashMap<>();
+    private final Map<Character, PageSystem> pageSystemMap = new HashMap<>();
 
 
     public void generateInventory() {
@@ -60,18 +61,20 @@ public class CustomGui implements InventoryHolder {
         // Optional details
         Component title = guiDetails.getInventoryName();
 
+        // guiDetails.setTempPageElements(new HashMap<>()); // reset temp
+
         // Generating inventory
 
-        Inventory inventory;
+        if(inventory == null) {
+            if (type != InventoryType.CHEST) {
+                inventory = Bukkit.createInventory(this, type, ComponentsUtil.serialize(title));
+            } else {
 
-        if (type != InventoryType.CHEST) {
-            inventory = Bukkit.createInventory(this, type, ComponentsUtil.serialize(title));
-        } else {
+                // We cannot extract to specify
+                // the size of the inventory
 
-            // We cannot extract to specify
-            // the size of the inventory
-
-            inventory = Bukkit.createInventory(this, size, ComponentsUtil.serialize(title));
+                inventory = Bukkit.createInventory(this, size, ComponentsUtil.serialize(title));
+            }
         }
 
 
@@ -80,7 +83,6 @@ public class CustomGui implements InventoryHolder {
                 inventory
         );
 
-        this.inventory = inventory;
     }
 
     /**
@@ -175,6 +177,19 @@ public class CustomGui implements InventoryHolder {
         GuiElement element = getGuiElement(context, targetChar);
         if (element == null) return;
 
+        if(guiFactory.getConditionParser() != null && element.getCondition().isPresent()) {
+
+            boolean isValid = guiFactory.getConditionParser()
+                    .parse(
+                            element.getCondition().get(),
+                            guiDetails.getInjectedConditionPlaceholders()
+                    );
+
+            if(!isValid) {
+                return;
+            }
+        }
+
         ItemStack item = getItem(context, targetChar, element);
         populateSlots(context, targetChar, slots, item);
     }
@@ -199,10 +214,16 @@ public class CustomGui implements InventoryHolder {
      */
     private ItemStack getItem(InventoryPopulationContext context, char targetChar, GuiElement element) {
         ItemStack item = context.getCachedItems().get(targetChar);
+
+        if(element.isGroupElement() && pageSystemMap.containsKey(targetChar)) {
+            return new ItemStack(Material.AIR);
+        }
+
         if (item == null) {
             item = element.create(guiDetails.getPlaceholders());
             context.getCachedItems().put(targetChar, item);
         }
+
         return item;
     }
 
@@ -315,10 +336,24 @@ public class CustomGui implements InventoryHolder {
 
             GuiElement element = context.getSubList().get(i);
 
+            if(guiFactory.getConditionParser() != null && element.getCondition().isPresent()) {
+
+                boolean isValid = guiFactory.getConditionParser()
+                        .parse(
+                                element.getCondition().get(),
+                                guiDetails.getInjectedConditionPlaceholders()
+                        );
+
+                if(!isValid) {
+                    continue;
+                }
+            }
+
             ItemStack item = element.create(
                     guiDetails.getPlaceholders()
             );
 
+            System.out.println(item.getType());
             this.getInventory().setItem(slot, item);
             tempSlots.put(slot, element);
 

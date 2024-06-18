@@ -3,6 +3,7 @@ package it.mikeslab.commons.api.inventory.factory;
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiFactory;
+import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
@@ -31,6 +32,9 @@ public class GuiFactoryImpl implements GuiFactory {
 
     @Setter @Getter
     private ActionHandler actionHandler;
+
+    @Getter @Setter
+    private ConditionParser conditionParser;
 
     public GuiFactoryImpl(final JavaPlugin instance) {
         this.cachedGuis = new HashMap<>();
@@ -74,6 +78,8 @@ public class GuiFactoryImpl implements GuiFactory {
 
         // Inject page system consumers
         GuiDetails guiDetails = injectPageSystemConsumers(customGui);
+        //guiDetails.setTempPageElements(new HashMap<>());
+
         customGui.setGuiDetails(guiDetails);
 
         player.openInventory(customGui.getInventory());
@@ -133,11 +139,7 @@ public class GuiFactoryImpl implements GuiFactory {
             return;
         }
 
-        CustomGui customGui = new CustomGui(
-                this,
-                instance,
-                id
-        );
+        CustomGui customGui = cachedGuis.get(id);
 
         customGui.setGuiDetails(newGuiDetails);
 

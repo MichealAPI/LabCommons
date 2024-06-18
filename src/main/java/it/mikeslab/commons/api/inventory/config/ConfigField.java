@@ -20,7 +20,8 @@ public enum ConfigField {
     ACTIONS("actions"),
     CUSTOM_MODEL_DATA("data"),
     INTERNAL_VALUE("internalValue"),
-    IS_GROUP_ELEMENT("is-group-element");
+    IS_GROUP_ELEMENT("is-group-element"),
+    CONDITION("condition");
 
     private final String field;
 
