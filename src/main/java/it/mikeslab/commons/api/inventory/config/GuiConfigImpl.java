@@ -46,7 +46,7 @@ public class GuiConfigImpl implements GuiConfig {
             instance.saveResource(relativePathAsString, false);
         }
 
-        Optional<FileConfiguration> config = new FileUtil(instance).getConfig(fileName);
+        Optional<FileConfiguration> config = new FileUtil(instance).getConfig(relativePath);
         if(!config.isPresent()) {
             LoggerUtil.log(
                     LabCommons.PLUGIN_NAME,

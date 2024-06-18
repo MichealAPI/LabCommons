@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -13,9 +14,9 @@ public class FileUtil {
 
     private final JavaPlugin instance;
 
-    public Optional<FileConfiguration> getConfig(String fileName) {
+    public Optional<FileConfiguration> getConfig(Path relativePath) {
 
-        File file = new File(instance.getDataFolder(), fileName);
+        File file = new File(instance.getDataFolder(), relativePath.toString());
 
         return Optional.of(
                 YamlConfiguration.loadConfiguration(file)
