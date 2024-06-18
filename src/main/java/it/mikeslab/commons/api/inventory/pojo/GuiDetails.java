@@ -15,6 +15,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Data
 public class GuiDetails {
@@ -32,7 +33,7 @@ public class GuiDetails {
 
     private Map<String, Consumer<GuiInteractEvent>> clickActions;
 
-    private Map<String, String> injectedConditionPlaceholders;
+    private Map<String, Supplier<String>> injectedConditionPlaceholders;
 
     // private boolean closeable;
 
