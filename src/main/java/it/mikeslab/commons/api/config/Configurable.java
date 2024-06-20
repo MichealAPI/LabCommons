@@ -35,7 +35,7 @@ public interface Configurable {
         String path = configurableEnum.getPath();
         Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig()) {
+        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
             return ComponentsUtil.getComponent(
                     String.valueOf(defaultValue)
             );
@@ -52,7 +52,7 @@ public interface Configurable {
         String path = configurableEnum.getPath();
         Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig()) {
+        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
             return ComponentsUtil.getComponent(
                     String.valueOf(defaultValue),
                     placeholders
@@ -72,7 +72,7 @@ public interface Configurable {
         String path = configurableEnum.getPath();
         Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig()) {
+        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
             return String.valueOf(defaultValue);
         }
 
@@ -94,7 +94,7 @@ public interface Configurable {
         String path = configurableEnum.getPath();
         Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig()) {
+        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
             return (int) defaultValue;
         }
 
@@ -105,7 +105,7 @@ public interface Configurable {
         String path = configurableEnum.getPath();
         Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig()) {
+        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
             return (boolean) defaultValue;
         }
 
@@ -116,7 +116,7 @@ public interface Configurable {
         String path = configurableEnum.getPath();
         Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig()) {
+        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
             return (double) defaultValue;
         }
 
@@ -126,7 +126,7 @@ public interface Configurable {
     default String getSerializedString(ConfigurableEnum configurableEnum) {
         Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig()) {
+        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
             return (String) defaultValue;
         }
 
@@ -138,7 +138,7 @@ public interface Configurable {
     default String getSerializedString(ConfigurableEnum configurableEnum, TagResolver.Single... placeholders) {
         Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig()) {
+        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
             return (String) defaultValue;
         }
 
@@ -155,7 +155,7 @@ public interface Configurable {
         String path = configurableEnum.getPath();
         Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig()) {
+        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
             return ComponentsUtil.getComponentList(
 
                     // todo unchecked
@@ -191,6 +191,27 @@ public interface Configurable {
 
         // return true if the configuration is not null
         return !isNull;
+    }
+
+
+    default boolean contains(ConfigurableEnum configurableEnum) {
+        return getConfiguration().contains(configurableEnum.getPath());
+    }
+
+    default boolean checkEntry(ConfigurableEnum configurableEnum) {
+
+        boolean contains = this.contains(configurableEnum);
+
+        if(!contains) {
+            LoggerUtil.log(
+                    LabCommons.PLUGIN_NAME,
+                    Level.WARNING,
+                    LoggerUtil.LogSource.CONFIG,
+                    String.format("Entry '%s' not found in the configuration, using the default value", configurableEnum.getPath())
+            );
+        }
+
+        return contains;
     }
 
     /**

@@ -10,6 +10,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,7 +52,7 @@ public final class LabCommons extends JavaPlugin implements Listener {
             Inventory inventory = player.getOpenInventory().getTopInventory();
             InventoryHolder holder = inventory.getHolder();
 
-            if(holder instanceof CustomGui) {
+            if(holder instanceof CustomGui || inventory.getType() == InventoryType.ANVIL) {
                 player.closeInventory();
             }
 
