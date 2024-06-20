@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 public interface Configurable {
@@ -26,44 +27,6 @@ public interface Configurable {
      * Get the YAML configuration file
      */
     YamlConfiguration getConfiguration();
-
-    /**
-     * Get component from the configuration
-     */
-    default Component getComponent(ConfigurableEnum configurableEnum) {
-
-        String path = configurableEnum.getPath();
-        Object defaultValue = configurableEnum.getDefaultValue();
-
-        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
-            return ComponentsUtil.getComponent(
-                    String.valueOf(defaultValue)
-            );
-        }
-
-        return ComponentsUtil.getComponent(
-                getConfiguration(),
-                path
-        );
-    }
-
-    default Component getComponent(ConfigurableEnum configurableEnum, TagResolver.Single... placeholders) {
-
-        String path = configurableEnum.getPath();
-        Object defaultValue = configurableEnum.getDefaultValue();
-
-        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
-            return ComponentsUtil.getComponent(
-                    String.valueOf(defaultValue),
-                    placeholders
-            );
-        }
-
-        return ComponentsUtil.getComponent(
-                getConfiguration().getString(path),
-                placeholders
-        );
-    }
 
     /**
      * Get a string from the configuration
@@ -147,31 +110,28 @@ public interface Configurable {
         );
     }
 
-    /**
-     * Get a component list from the configuration
-     */
-    default List<Component> getComponentList(ConfigurableEnum configurableEnum, TagResolver.Single... placeholders) {
-
+    default <T> T getConfigValue(ConfigurableEnum configurableEnum, Function<String, T> transformer, T defaultValue) {
         String path = configurableEnum.getPath();
-        Object defaultValue = configurableEnum.getDefaultValue();
 
-        if(!validateConfig() || !this.checkEntry(configurableEnum)) {
-            return ComponentsUtil.getComponentList(
-
-                    // todo unchecked
-                    (List<String>) defaultValue,
-                    placeholders
-            );
+        if (!validateConfig() || !this.checkEntry(configurableEnum)) {
+            return defaultValue;
         }
 
-        return ComponentsUtil.getComponentList(
-                getConfiguration(),
-                path,
-                placeholders
-        );
+        String configValue = getConfiguration().getString(path);
+        return transformer.apply(configValue);
     }
 
+    default Component getComponent(ConfigurableEnum configurableEnum, TagResolver.Single... placeholders) {
+        return getConfigValue(configurableEnum, value -> ComponentsUtil.getComponent(value, placeholders), ComponentsUtil.getComponent(String.valueOf(configurableEnum.getDefaultValue()), placeholders));
+    }
 
+    default Component getComponent(ConfigurableEnum configurableEnum) {
+        return getConfigValue(configurableEnum, ComponentsUtil::getComponent, ComponentsUtil.getComponent(String.valueOf(configurableEnum.getDefaultValue())));
+    }
+
+    default List<Component> getComponentList(ConfigurableEnum configurableEnum, TagResolver.Single... placeholders) {
+        return getConfigValue(configurableEnum, value -> ComponentsUtil.getComponentList(getConfiguration(), value, placeholders), ComponentsUtil.getComponentList((List<String>) configurableEnum.getDefaultValue(), placeholders));
+    }
 
     /**
      * Validate the configuration
