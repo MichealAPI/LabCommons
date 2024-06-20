@@ -15,11 +15,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public final class LabCommons {
 
-    public static final String PLUGIN_NAME = "LabCommons";
+    public static String PLUGIN_NAME = "LabCommons"; // default value if not initialized
 
     private ChatMessagingHandler chatMessagingHandler;
 
     public void initialize(JavaPlugin instance) {
+        PLUGIN_NAME = instance
+                .getDescription()
+                .getName();
+
         this.chatMessagingHandler = new ChatMessagingListener(instance);
     }
 
