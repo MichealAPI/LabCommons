@@ -390,7 +390,6 @@ public class CustomGui implements InventoryHolder {
                     guiDetails.getPlaceholders()
             );
 
-            System.out.println(item.getType());
             this.getInventory().setItem(slot, item);
             tempSlots.put(slot, element);
 

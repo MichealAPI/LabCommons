@@ -127,101 +127,97 @@ public class GuiListener implements Listener {
      * @param event The event
      */
     private void performClickAction(CustomGui gui, InventoryClickEvent event) {
-
         int clickedSlot = event.getSlot();
-
         String[] layout = gui.getGuiDetails().getInventoryLayout();
         GuiType guiType = gui.getGuiDetails().getGuiType();
         int rowLength = guiType.getRowLength();
-
         int clickedRow = clickedSlot / rowLength;
-
         char clickedChar = layout[clickedRow].charAt(clickedSlot % rowLength);
 
         if(gui.getGuiDetails().getElements().containsKey(clickedChar)) {
-
-            GuiElement clickedElement;
-
-            boolean isPageElement = gui
-                    .getGuiDetails()
-                    .getTempPageElements()
-                    .containsKey(clickedChar);
-
-            if(isPageElement) {
-                clickedElement = gui.getGuiDetails()
-                        .getTempPageElements()
-                        .get(clickedChar)
-                        .get(clickedSlot);
-
-            } else {
-
-                // We can directly take the first since it's not a page element so, it's not a list // todo is it real?
-                clickedElement = gui.getGuiDetails()
-                        .getElements()
-                        .get(clickedChar).stream()
-                        .findFirst()
-                        .orElse(null);
-
-            }
-
+            GuiElement clickedElement = getClickedElement(gui, clickedChar, clickedSlot);
             if(clickedElement == null) return;
 
-            // Fire the click event
-            GuiInteractEvent guiInteractEvent = new GuiInteractEvent(
-                    (Player) event.getWhoClicked(),
-                    clickedElement
-            );
-
-            Bukkit.getPluginManager().callEvent(guiInteractEvent);
-
+            GuiInteractEvent guiInteractEvent = fireClickEvent(event, clickedElement);
             if(guiInteractEvent.isCancelled()) return;
-            // End of fire the click event
 
-            // Run default action handler
-            if(guiFactoryImpl.getActionHandler() != null) {
-
-                clickedElement.getActions().forEach(
-                        action -> {
-                            guiFactoryImpl.getActionHandler().handleAction(
-                                    gui.getId(),
-                                    action,
-                                    guiInteractEvent
-                            );
-                        }
-                );
-
-            }
-
-            String internalValue = clickedElement.getInternalValue();
-            if(internalValue == null) return;
-
-            internalValue = internalValue.toUpperCase();
-
-            boolean hasAction = gui
-                    .getGuiDetails()
-                    .getClickActions()
-                    .containsKey(internalValue);
-
-            if(hasAction) {
-                gui
-                        .getGuiDetails()
-                        .getClickActions()
-                        .get(internalValue)
-                        .accept(guiInteractEvent);
-            }
-
-            // Global action
-            if(gui.getGuiDetails().getClickActions().containsKey(ConsumerFilter.ANY.getFilter())) {
-                gui.getGuiDetails()
-                        .getClickActions()
-                        .get(ConsumerFilter.ANY.getFilter())
-                        .accept(guiInteractEvent);
-            }
-
+            runDefaultActionHandler(gui, clickedElement, guiInteractEvent);
+            handleClickActions(gui, clickedElement, guiInteractEvent);
         }
-
     }
 
+    /**
+     * Get the clicked element, either from the page elements or the main elements
+     * @param gui The gui
+     * @param clickedChar The clicked char
+     * @param clickedSlot The clicked slot
+     * @return The clicked element
+     */
+    private GuiElement getClickedElement(CustomGui gui, char clickedChar, int clickedSlot) {
+        GuiElement clickedElement;
+        boolean isPageElement = gui.getGuiDetails().getTempPageElements().containsKey(clickedChar);
+
+        if(isPageElement) {
+            clickedElement = gui.getGuiDetails().getTempPageElements().get(clickedChar).get(clickedSlot);
+        } else {
+            clickedElement = gui.getGuiDetails().getElements().get(clickedChar).stream().findFirst().orElse(null);
+        }
+        return clickedElement;
+    }
+
+    /**
+     * Fire the Bukkit custom click event
+     * @param event The original click event
+     * @param clickedElement The clicked element
+     * @return The custom click event, already fired
+     */
+    private GuiInteractEvent fireClickEvent(InventoryClickEvent event, GuiElement clickedElement) {
+        GuiInteractEvent guiInteractEvent = new GuiInteractEvent((Player) event.getWhoClicked(), clickedElement);
+        Bukkit.getPluginManager().callEvent(guiInteractEvent);
+        return guiInteractEvent;
+    }
+
+    /**
+     * Run the default action handler
+     * @param gui The gui
+     * @param clickedElement The clicked element
+     * @param guiInteractEvent The custom click event
+     */
+    private void runDefaultActionHandler(CustomGui gui, GuiElement clickedElement, GuiInteractEvent guiInteractEvent) {
+        if(guiFactoryImpl.getActionHandler() != null) {
+            clickedElement.getActions().forEach(action -> {
+                guiFactoryImpl.getActionHandler().handleAction(gui.getId(), action, guiInteractEvent);
+            });
+        }
+    }
+
+    /**
+     * Handle the click actions
+     * @param gui The gui
+     * @param clickedElement The clicked element
+     * @param guiInteractEvent The custom click event
+     */
+    private void handleClickActions(CustomGui gui, GuiElement clickedElement, GuiInteractEvent guiInteractEvent) {
+        String internalValue = clickedElement.getInternalValue();
+        if(internalValue == null) return;
+
+        internalValue = internalValue.toUpperCase();
+        boolean hasAction = gui.getGuiDetails().getClickActions().containsKey(internalValue);
+
+        if(hasAction) {
+            gui.getGuiDetails().getClickActions().get(internalValue).accept(guiInteractEvent);
+        }
+
+        if(gui.getGuiDetails().getClickActions().containsKey(ConsumerFilter.ANY.getFilter())) {
+            gui.getGuiDetails().getClickActions().get(ConsumerFilter.ANY.getFilter()).accept(guiInteractEvent);
+        }
+    }
+
+    /**
+     * Find the custom gui
+     * @param inventory The inventory
+     * @return The custom gui
+     */
     private Map.Entry<Integer, CustomGui> findCustomGui(Inventory inventory) {
 
         if(!isCustomGui(inventory)) {
