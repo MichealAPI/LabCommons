@@ -64,7 +64,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return true;
         } catch (Exception e) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -87,7 +86,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return true;
         } catch (Exception e) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -120,7 +118,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -150,7 +147,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -207,7 +203,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             }
         } catch (Exception e) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -267,7 +262,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e
@@ -346,7 +340,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             pst.executeUpdate();
         } catch (Exception e) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.SEVERE,
                     LoggerUtil.LogSource.DATABASE,
                     e

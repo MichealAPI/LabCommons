@@ -47,7 +47,6 @@ public class GuiConfigImpl implements GuiConfig {
         Optional<FileConfiguration> config = new FileUtil(instance).getConfig(relativePath);
         if(!config.isPresent()) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     String.format("Config '%s' not found", fileName)
@@ -68,7 +67,6 @@ public class GuiConfigImpl implements GuiConfig {
 
         if(config == null) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     "Config not loaded, load it first"
@@ -94,7 +92,6 @@ public class GuiConfigImpl implements GuiConfig {
         // all checks are done in the GuiConfig#getGuiDetails method
         if(section == null) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     String.format("Invalid section '%s'", section.getName())

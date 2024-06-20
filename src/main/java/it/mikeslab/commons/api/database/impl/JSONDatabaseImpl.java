@@ -93,12 +93,12 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
 
     @Override
     public Document findDocument(Document document) {
-        return null; // todo
+        return null; // todo not implemented
     }
 
     @Override
     public List<Document> findDocuments(Document document) {
-        return Collections.emptyList(); // todo
+        return Collections.emptyList(); // todo not implemented
     }
 
     private boolean createSourceFile(File file) {
@@ -107,7 +107,6 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
         } catch (IOException e) {
 
             LoggerUtil.log(
-                    "WidenCommons",
                     Level.WARNING,
                     LoggerUtil.LogSource.DATABASE,
                     "Error during createSourceFile: " + e
@@ -124,7 +123,6 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
             return objects != null ? objects : new ArrayList<>();
         } catch (IOException e) {
             LoggerUtil.log(
-                    "WidenCommons",
                     Level.WARNING,
                     LoggerUtil.LogSource.DATABASE,
                     "Error during readFromFile: " + e
@@ -139,7 +137,6 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
             return true;
         } catch (IOException e) {
             LoggerUtil.log(
-                    "WidenCommons",
                     Level.WARNING,
                     LoggerUtil.LogSource.DATABASE,
                     "Error during writeToFile: " + e

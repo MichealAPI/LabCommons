@@ -142,7 +142,6 @@ public interface Configurable {
 
         if(isNull) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     "Configuration is null"
@@ -164,7 +163,6 @@ public interface Configurable {
 
         if(!contains) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     String.format("Entry '%s' not found in the configuration, using the default value", configurableEnum.getPath())

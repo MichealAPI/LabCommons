@@ -100,7 +100,6 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         } catch (Exception e) {
 
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.DATABASE,
                     "Error during upsert: " + e
@@ -179,7 +178,6 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         } catch (Exception e) {
 
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.DATABASE,
                     "Error during delete: " + e);

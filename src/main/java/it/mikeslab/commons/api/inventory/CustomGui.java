@@ -45,7 +45,6 @@ public class CustomGui implements InventoryHolder {
 
         if (!GuiChecker.isValid(guiDetails)) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.CONFIG,
                     "Invalid gui details"

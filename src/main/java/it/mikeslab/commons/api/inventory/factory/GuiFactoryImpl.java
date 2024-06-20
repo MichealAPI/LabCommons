@@ -65,7 +65,6 @@ public class GuiFactoryImpl implements GuiFactory {
 
         if(!cachedGuis.containsKey(id)) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "(OPEN) Gui with id " + id + " not found"
@@ -133,7 +132,6 @@ public class GuiFactoryImpl implements GuiFactory {
 
         if(!cachedGuis.containsKey(id)) {
             LoggerUtil.log(
-                    LabCommons.PLUGIN_NAME,
                     Level.WARNING,
                     LoggerUtil.LogSource.API,
                     "(UPDATE) Gui with id " + id + " not found"
