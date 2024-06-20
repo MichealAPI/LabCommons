@@ -1,4 +1,0 @@
-
-mongo-info-logging: false # Toggle logging of MongoDB connection information
-                          # Logging min-level would be set to WARNING if this is set to false.
-                          # Errors will still be logged.
