@@ -1,6 +1,5 @@
 package it.mikeslab.commons;
 
-import io.sentry.Sentry;
 import it.mikeslab.commons.api.chat.ChatMessagingHandler;
 import it.mikeslab.commons.api.chat.ChatMessagingListener;
 import it.mikeslab.commons.api.formatter.FormatUtil;
@@ -34,10 +33,6 @@ public final class LabCommons extends JavaPlugin implements Listener {
 
         FormatUtil.printStartupInfos(this, audiences, "00FF72");
 
-        if(this.getConfig().getBoolean("sentry.enabled", false)) {
-            this.initSentry();
-        }
-
         if(!this.getConfig().getBoolean("mongo-info-logging", false)) {
             this.disableMongoInfoLogging();
         }
@@ -69,24 +64,6 @@ public final class LabCommons extends JavaPlugin implements Listener {
         // Register Chat Messaging listener
         this.chatMessagingHandler = new ChatMessagingListener(this);
 
-    }
-
-    /**
-     * Initialize Sentry
-     */
-    private void initSentry() {
-
-        String version = this.getDescription().getVersion();
-        String pluginName = this.getDescription().getName();
-
-        Sentry.init(options -> {
-            options.setDsn(this.getConfig().getString("sentry.dsn"));
-            options.setRelease(pluginName + "@" + version);
-            options.setEnvironment("development");
-
-            options.setTracesSampleRate(1.0);
-
-        });
     }
 
 

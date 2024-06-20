@@ -64,24 +64,6 @@
               </execution>
           </executions>
       </plugin>
-
-      <plugin>
-          <groupId>io.sentry</groupId>
-          <artifactId>sentry-maven-plugin</artifactId>
-          <version>0.0.7</version>
-          <extensions>true</extensions>
-          <configuration>
-              <!-- for showing output of sentry-cli -->
-              <debugSentryCli>true</debugSentryCli>
-
-              <org>mikeslaboratory</org>
-
-              <project>labcommons</project>
-
-              <!-- provide your auth token via SENTRY_AUTH_TOKEN environment variable -->
-              <authToken>${env.SENTRY_AUTH_TOKEN}</authToken>
-          </configuration>
-      </plugin>
     </plugins>
     <resources>
       <resource>

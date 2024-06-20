@@ -134,7 +134,7 @@ public class CustomGui implements InventoryHolder {
     }
 
     /**
-     * Handle groups of element, if present
+     * Handle groups of elements, if present
      * @param context The context of the population
      * @param targetChar The target character
      * @param slots The slots
@@ -176,25 +176,33 @@ public class CustomGui implements InventoryHolder {
      * @param slots The slots
      */
     private void handleSingleElement(InventoryPopulationContext context, char targetChar, List<Integer> slots) {
-        GuiElement element = getGuiElement(context, targetChar);
+        List<GuiElement> element = getGuiElement(context, targetChar);
+
         if (element == null) return;
 
-        if(guiFactory.getConditionParser() != null && element.getCondition().isPresent()) {
+        for(GuiElement guiElement : element) {
 
-            boolean isValid = guiFactory.getConditionParser()
-                    .parse(
-                            Bukkit.getPlayer(ownerUUID),
-                            element.getCondition().get(),
-                            guiDetails.getInjectedConditionPlaceholders()
-                    );
 
-            if(!isValid) {
-                return;
+            if (guiFactory.getConditionParser() != null && guiElement.getCondition().isPresent()) {
+
+                boolean isValid = guiFactory.getConditionParser()
+                        .parse(
+                                Bukkit.getPlayer(ownerUUID),
+                                guiElement.getCondition().get(),
+                                guiDetails.getInjectedConditionPlaceholders()
+                        );
+
+                if (!isValid) {
+                    continue;
+                }
+
             }
-        }
 
-        ItemStack item = getItem(context, targetChar, element);
-        populateSlots(context, targetChar, slots, item);
+            // todo loading problem, redstone gets loaded before and by doing so, goes over the condition
+
+            ItemStack item = getItem(context, targetChar, guiElement);
+            populateSlots(context, targetChar, slots, item);
+        }
     }
 
     /**
@@ -203,9 +211,12 @@ public class CustomGui implements InventoryHolder {
      * @param targetChar The target character to get the element for
      * @return The GuiElement
      */
-    private GuiElement getGuiElement(InventoryPopulationContext context, char targetChar) {
-        Iterator<GuiElement> iterator = context.getElements().get(targetChar).iterator();
-        return iterator.hasNext() ? iterator.next() : null;
+    private List<GuiElement> getGuiElement(InventoryPopulationContext context, char targetChar) {
+
+        List<GuiElement> elements = new ArrayList<>(context.getElements().get(targetChar));
+        Iterator<GuiElement> iterator = elements.iterator();
+
+        return iterator.hasNext() && iterator.next().isGroupElement() ? null : elements;
     }
 
     /**
@@ -224,7 +235,18 @@ public class CustomGui implements InventoryHolder {
 
         if (item == null) {
             item = element.create(guiDetails.getPlaceholders());
-            context.getCachedItems().put(targetChar, item);
+
+            // Getting the size of the individual element.
+            // If there is more than one, and
+            // it isn't a grouped element, then it shall not be cached
+            Multimap<Character, GuiElement> elements = context.getElements();
+
+            Collection<GuiElement> elementList = elements.get(targetChar);
+
+            if(!containsCondition(elementList)) {
+                context.getCachedItems().put(targetChar, item);
+            }
+
         }
 
         return item;
@@ -267,9 +289,20 @@ public class CustomGui implements InventoryHolder {
         for (int i = 0; i < context.getRow().length(); i++) {
 
             if (context.getRow().charAt(i) == context.getTargetChar()) {
-                context.getContext().getInventory().setItem(context.getSlots().get(context.getSlotCounter()), context.getItem());
-                context.setSlotCounter(context.getSlotCounter() + 1);
-            }
+                context
+                        .getContext()
+                        .getInventory()
+                        .setItem(
+                                context.getSlots().get(
+                                        context.getSlotCounter()
+                                ),
+                                context.getItem()
+                        );
+
+
+                context.setSlotCounter(context.getSlotCounter() + 1); // todo there may be a problem here
+
+            } // todo isnt cached anymore
         }
         return context.getSlotCounter();
     }
@@ -370,6 +403,17 @@ public class CustomGui implements InventoryHolder {
 
     }
 
+
+    private boolean containsCondition(Collection<GuiElement> elements) {
+
+        for(GuiElement element : elements) {
+            if(element.getCondition().isPresent()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }
 
