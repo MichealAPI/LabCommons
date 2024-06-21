@@ -201,6 +201,7 @@ public class CustomGui implements InventoryHolder {
             }
 
             if(guiElement.getFrames().isPresent()) {
+                System.out.println("animation is present!!");
                 this.runAnimation(guiElement, context, targetChar, slots);
                 continue;
             }
@@ -423,11 +424,16 @@ public class CustomGui implements InventoryHolder {
     private void runAnimation(GuiElement guiElement, InventoryPopulationContext context, char targetChar, List<Integer> slots) {
         // item is animated!
 
+        System.out.println("animation has been requested!!");
+
         BukkitRunnable runnable = new BukkitRunnable() {
             int frame = 0;
 
             @Override
             public void run() {
+
+                System.out.println("Running animation");
+                System.out.println("frame: " + frame);
 
                 ItemStack item = guiElement.getFrames().get()[frame]; // runs only if present
 

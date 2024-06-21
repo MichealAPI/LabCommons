@@ -64,6 +64,7 @@ public class FrameColorUtil {
 
             // Add the modified GuiElement to the array
             guiElements[i] = defaultClone;
+
         }
 
         // Convert the array of GuiElements to an array of ItemStacks
