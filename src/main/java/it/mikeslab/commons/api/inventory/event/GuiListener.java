@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.AbstractMap;
@@ -100,6 +101,9 @@ public class GuiListener implements Listener {
             CustomGui customGui = guiEntry.getValue();
 
             if(customGui == null) return;
+
+            // Cancel running animations
+            customGui.getAnimationRunnable().forEach(BukkitRunnable::cancel);
 
             Player player = (Player) event.getPlayer();
 
