@@ -159,8 +159,8 @@ public class GuiConfigImpl implements GuiConfig {
     @Override
     public GuiElement loadElement(ConfigurationSection section) {
 
-        Component displayName = ComponentsUtil.getComponent(section, ConfigField.DISPLAYNAME.getField());
-        List<Component> lore = ComponentsUtil.getComponentList(section, ConfigField.LORE.getField());
+        String displayName = section.getString(ConfigField.DISPLAYNAME.getField());
+        List<String> lore = section.getStringList(ConfigField.LORE.getField());
 
         Material material = Material.getMaterial(
                 section.getString(ConfigField.MATERIAL.getField(), "AIR")

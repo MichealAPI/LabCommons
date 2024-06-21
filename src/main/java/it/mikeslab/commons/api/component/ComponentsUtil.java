@@ -71,5 +71,9 @@ public class ComponentsUtil {
         return serialize(getComponent(val, placeholders));
     }
 
+    public @NotNull List<String> getSerializedComponents(List<String> val, TagResolver.Single... placeholders) {
+        return serialize(getComponentList(val, placeholders));
+    }
+
 
 }

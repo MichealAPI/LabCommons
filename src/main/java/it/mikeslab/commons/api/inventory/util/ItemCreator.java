@@ -19,8 +19,8 @@ public class ItemCreator {
 
     public ItemStack create(GuiElement element) {
 
-        Component displayName = element.getDisplayName();
-        List<Component> lore = element.getLore();
+        String displayName = element.getDisplayName();
+        List<String> lore = element.getLore();
         Boolean glow = element.getGlow();
 
         int amount = element.getAmount();
@@ -35,11 +35,11 @@ public class ItemCreator {
         }
 
         if(displayName != null) {
-            meta.setDisplayName(ComponentsUtil.serialize(displayName));
+            meta.setDisplayName(ComponentsUtil.getSerializedComponent(displayName));
         }
 
         if(lore != null) {
-            meta.setLore(ComponentsUtil.serialize(lore));
+            meta.setLore(ComponentsUtil.getSerializedComponents(lore));
         }
 
         if(glow != null && glow) {

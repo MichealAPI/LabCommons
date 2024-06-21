@@ -7,7 +7,6 @@ import lombok.Data;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -23,8 +22,8 @@ public class GuiElement {
     private Material material;
 
     // Optionals
-    private Component displayName;
-    private List<Component> lore;
+    private String displayName;
+    private List<String> lore;
     private Integer amount;
     private Boolean glow;
     private String internalValue; // If the plugin should build that element in a specific way, internally
@@ -33,7 +32,7 @@ public class GuiElement {
 
     private List<String> actions;
 
-    private int customModelData = -1;
+    private int customModelData;
 
     private boolean isGroupElement;
     // private int order;
@@ -78,50 +77,36 @@ public class GuiElement {
         }
 
         if (displayName != null) {
-            this.replaceDisplayName(placeholders);
+            displayName = this.replace(displayName, placeholders);
         }
 
         if(lore != null) {
-            this.replaceLore(placeholders);
+            lore = this.replaceMany(lore, placeholders);
         }
 
         return new ItemCreator().create(this);
     }
 
-    private void replaceDisplayName(Map<String, String> placeholders) {
+    private String replace(String text, Map<String, String> placeholders) {
+
         for(Map.Entry<String, String> entry : placeholders.entrySet()) {
-            displayName = replace(displayName, entry.getKey(), entry.getValue());
+            text = text.replace(entry.getKey(), entry.getValue());
         }
+
+        return text;
     }
 
-    private void replaceLore(Map<String, String> placeholders) {
-        for(int i = 0; i < lore.size(); i++) {
-            Component component = lore.get(i);
+    private List<String> replaceMany(List<String> lore, Map<String, String> placeholders) {
 
-            for(Map.Entry<String, String> entry : placeholders.entrySet()) {
-                component = replace(component, entry.getKey(), entry.getValue());
-            }
+        List<String> replacedLore = new ArrayList<>();
 
-            lore.set(i, component);
-
+        for(String line : lore) {
+            replacedLore.add(replace(line, placeholders));
         }
+
+        return replacedLore;
     }
 
-    private Component replace(Component component, String firstValue, String secondValue) {
-        return component.replaceText(
-                this.generateReplacement(
-                        firstValue,
-                        secondValue
-                )
-        );
-    }
-
-    private TextReplacementConfig generateReplacement(String firstValue, String secondValue) {
-        return TextReplacementConfig.builder()
-                .matchLiteral(firstValue)
-                .replacement(secondValue)
-                .build();
-    }
 
     public GuiElement clone() {
         return GuiElement.builder()

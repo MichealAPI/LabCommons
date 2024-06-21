@@ -21,14 +21,11 @@ public class FrameColorUtil {
 
     public static final int MAX_FRAMES = 40;
 
-    public boolean isAnimated(Component displayName, List<Component> lore) {
+    public boolean isAnimated(String displayName, List<String> lore) {
 
         Pattern pattern = Pattern.compile(TAG_REGEX);
 
-        String displayNameAsString = ComponentsUtil.serialize(displayName) + " ";
-        List<String> loreAsStringList = ComponentsUtil.serialize(lore);
-
-        return pattern.matcher(displayNameAsString).find() || loreAsStringList.stream().anyMatch(pattern.asPredicate());
+        return pattern.matcher(displayName).find() || lore.stream().anyMatch(pattern.asPredicate());
     }
 
     /**
@@ -45,19 +42,14 @@ public class FrameColorUtil {
         for (int i = 0; i < MAX_FRAMES; i++) {
             double phase = (i * 0.05) - 1; // range from -1 to 1
 
-            // Get and serialize the displayName and lore from the GuiElement
-            String serializedDisplayName = ComponentsUtil.serialize(guiElement.getDisplayName());
-            List<String> serializedLore = ComponentsUtil.serialize(guiElement.getLore());
+            String displayName = guiElement.getDisplayName();
+            List<String> lore = guiElement.getLore();
 
             // Replace the animate tag in the displayName and lore
-            serializedDisplayName = replaceTag(serializedDisplayName, phase);
-            serializedLore = serializedLore.stream()
+            displayName = replaceTag(displayName, phase);
+            lore = lore.stream()
                     .map(line -> replaceTag(line, phase))
                     .collect(Collectors.toList());
-
-            // Deserialize the displayName and lore
-            Component displayName = ComponentsUtil.getComponent(serializedDisplayName);
-            List<Component> lore = ComponentsUtil.getComponentList(serializedLore);
 
             // Clone the GuiElement and set the new displayName and lore
             GuiElement defaultClone = guiElement.clone();
