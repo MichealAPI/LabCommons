@@ -10,7 +10,8 @@ public enum GuiType {
 
     CHEST(9),
     DISPENSER(3),
-    DROPPER(3);
+    DROPPER(3),
+    HOPPER(5),;
     //ANVIL(3);
 
     private final int rowLength;
@@ -25,6 +26,9 @@ public enum GuiType {
                 break;
             case DROPPER:
                 result = InventoryType.DROPPER;
+                break;
+            case HOPPER:
+                result = InventoryType.HOPPER;
                 break;
             //case ANVIL -> InventoryType.ANVIL;
             default:

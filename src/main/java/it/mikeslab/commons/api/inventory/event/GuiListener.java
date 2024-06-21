@@ -18,8 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.AbstractMap;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class GuiListener implements Listener {
@@ -119,7 +118,7 @@ public class GuiListener implements Listener {
         char clickedChar = layout[clickedRow].charAt(clickedSlot % rowLength);
 
         if(gui.getGuiDetails().getElements().containsKey(clickedChar)) {
-            GuiElement clickedElement = getClickedElement(gui, clickedChar, clickedSlot);
+            Collection<GuiElement> clickedElement = getClickedElement(gui, clickedChar, clickedSlot);
             if(clickedElement == null) return;
 
             GuiInteractEvent guiInteractEvent = fireClickEvent(event, clickedElement);
@@ -135,16 +134,18 @@ public class GuiListener implements Listener {
      * @param gui The gui
      * @param clickedChar The clicked char
      * @param clickedSlot The clicked slot
-     * @return The clicked element
+     * @return The clicked elements
      */
-    private GuiElement getClickedElement(CustomGui gui, char clickedChar, int clickedSlot) {
-        GuiElement clickedElement;
+    private Collection<GuiElement> getClickedElement(CustomGui gui, char clickedChar, int clickedSlot) {
+        Collection<GuiElement> clickedElement;
         boolean isPageElement = gui.getGuiDetails().getTempPageElements().containsKey(clickedChar);
 
         if(isPageElement) {
-            clickedElement = gui.getGuiDetails().getTempPageElements().get(clickedChar).get(clickedSlot);
+            clickedElement = Collections.singletonList(
+                    gui.getGuiDetails().getTempPageElements().get(clickedChar).get(clickedSlot)
+            );
         } else {
-            clickedElement = gui.getGuiDetails().getElements().get(clickedChar).stream().findFirst().orElse(null);
+            clickedElement = gui.getGuiDetails().getElements().get(clickedChar);
         }
         return clickedElement;
     }
@@ -155,7 +156,7 @@ public class GuiListener implements Listener {
      * @param clickedElement The clicked element
      * @return The custom click event, already fired
      */
-    private GuiInteractEvent fireClickEvent(InventoryClickEvent event, GuiElement clickedElement) {
+    private GuiInteractEvent fireClickEvent(InventoryClickEvent event, Collection<GuiElement> clickedElement) {
         GuiInteractEvent guiInteractEvent = new GuiInteractEvent((Player) event.getWhoClicked(), clickedElement);
         Bukkit.getPluginManager().callEvent(guiInteractEvent);
         return guiInteractEvent;
@@ -167,11 +168,26 @@ public class GuiListener implements Listener {
      * @param clickedElement The clicked element
      * @param guiInteractEvent The custom click event
      */
-    private void runDefaultActionHandler(CustomGui gui, GuiElement clickedElement, GuiInteractEvent guiInteractEvent) {
+    private void runDefaultActionHandler(CustomGui gui, Collection<GuiElement> clickedElement, GuiInteractEvent guiInteractEvent) {
         if(guiFactoryImpl.getActionHandler() != null) {
-            clickedElement.getActions().forEach(action -> {
-                guiFactoryImpl.getActionHandler().handleAction(gui.getId(), action, guiInteractEvent);
-            });
+
+            for(GuiElement element : clickedElement) {
+
+                if(element.getCondition().isPresent() && guiFactoryImpl.getConditionParser() != null) {
+                    boolean can = guiFactoryImpl.getConditionParser().parse(
+                            guiInteractEvent.getWhoClicked(),
+                            element.getCondition().get()
+                    );
+
+                    if(!can) {
+                        continue;
+                    }
+                }
+
+                element.getActions().forEach(action -> {
+                    guiFactoryImpl.getActionHandler().handleAction(gui.getId(), action, guiInteractEvent);
+                });
+            }
         }
     }
 
@@ -181,8 +197,11 @@ public class GuiListener implements Listener {
      * @param clickedElement The clicked element
      * @param guiInteractEvent The custom click event
      */
-    private void handleClickActions(CustomGui gui, GuiElement clickedElement, GuiInteractEvent guiInteractEvent) {
-        String internalValue = clickedElement.getInternalValue();
+    private void handleClickActions(CustomGui gui, Collection<GuiElement> clickedElement, GuiInteractEvent guiInteractEvent) {
+
+        GuiElement firstElement = clickedElement.iterator().next();
+
+        String internalValue = firstElement.getInternalValue();
         if(internalValue == null) return;
 
         internalValue = internalValue.toUpperCase();

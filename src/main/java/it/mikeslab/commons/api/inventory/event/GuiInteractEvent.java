@@ -10,6 +10,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 /**
  * Event that is called when a player interacts with a GUI
  */
@@ -21,7 +23,7 @@ public class GuiInteractEvent extends Event implements Cancellable {
     private final static HandlerList HANDLERS = new HandlerList();
 
     private final Player whoClicked;
-    private final GuiElement clickedElement;
+    private final Collection<GuiElement> clickedElements;
     private boolean cancelled;
 
     @NotNull

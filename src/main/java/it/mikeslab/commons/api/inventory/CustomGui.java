@@ -212,7 +212,7 @@ public class CustomGui implements InventoryHolder {
             }
 
             ItemStack item = getItem(targetChar, guiElement);
-            populateSlots(targetChar, slots, item, true);
+            populateSlots(targetChar, slots, item, false);
         }
     }
 
