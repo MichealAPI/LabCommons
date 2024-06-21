@@ -27,7 +27,7 @@ public class GuiElement {
     private List<Component> lore;
     private Integer amount;
     private Boolean glow;
-    private String internalValue; // If that element should be built in a specific way by the plugin, internally
+    private String internalValue; // If the plugin should build that element in a specific way, internally
 
     private Map<String, String> replacements;
 
@@ -42,6 +42,10 @@ public class GuiElement {
 
     // Consumers
     private Consumer<GuiInteractEvent> onClick;
+
+    // Animation
+    private Optional<ItemStack[]> frames; // if present, the element will be animated
+
 
     /**
      * Quick method to create the itemStack

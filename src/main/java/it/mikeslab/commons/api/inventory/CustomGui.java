@@ -1,7 +1,6 @@
 package it.mikeslab.commons.api.inventory;
 
 import com.google.common.collect.Multimap;
-import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.pojo.*;
 import it.mikeslab.commons.api.inventory.util.GuiChecker;
@@ -17,6 +16,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -39,6 +40,8 @@ public class CustomGui implements InventoryHolder {
     private final Map<Character, List<Integer>> characterListMap = new HashMap<>(); // A mapping of slots to characters
 
     private final Map<Character, PageSystem> pageSystemMap = new HashMap<>();
+
+    private final List<BukkitRunnable> animationRunnable = new ArrayList<>();
 
 
     public void generateInventory() {
@@ -197,7 +200,10 @@ public class CustomGui implements InventoryHolder {
 
             }
 
-            // todo loading problem, redstone gets loaded before and by doing so, goes over the condition
+            if(guiElement.getFrames().isPresent()) {
+                this.runAnimation(guiElement, context, targetChar, slots);
+                continue;
+            }
 
             ItemStack item = getItem(context, targetChar, guiElement);
             populateSlots(context, targetChar, slots, item);
@@ -411,6 +417,32 @@ public class CustomGui implements InventoryHolder {
         }
 
         return false;
+    }
+
+
+    private void runAnimation(GuiElement guiElement, InventoryPopulationContext context, char targetChar, List<Integer> slots) {
+        // item is animated!
+
+        BukkitRunnable runnable = new BukkitRunnable() {
+            int frame = 0;
+
+            @Override
+            public void run() {
+
+                ItemStack item = guiElement.getFrames().get()[frame]; // runs only if present
+
+                populateSlots(context, targetChar, slots, item);
+                frame++;
+
+                if(frame >= guiElement.getFrames().get().length) {
+                    frame = 0;
+                }
+            }
+        };
+
+        runnable.runTaskTimer(instance, 0, 5); // todo configurable
+
+        animationRunnable.add(runnable);
     }
 
 }

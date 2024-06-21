@@ -8,6 +8,7 @@ import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.util.config.FileUtil;
+import it.mikeslab.commons.api.inventory.util.frame.FrameColorUtil;
 import it.mikeslab.commons.api.logger.LoggerUtil;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -15,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -143,6 +145,7 @@ public class GuiConfigImpl implements GuiConfig {
             ConfigurationSection elementSection = elements.getConfigurationSection(charKey);
 
             GuiElement guiElement = this.loadElement(elementSection);
+            this.postProcessElement(guiElement);
 
             if(areActionConsumersEnabled) {
                 this.parseConsumers(elementSection, consumers, guiElement);
@@ -216,7 +219,15 @@ public class GuiConfigImpl implements GuiConfig {
 
     }
 
+    private void postProcessElement(GuiElement guiElement) {
+        Optional<ItemStack[]> frames = Optional.empty();
 
+        if(FrameColorUtil.isAnimated(guiElement.getDisplayName(), guiElement.getLore())) {
+            frames = Optional.of(FrameColorUtil.getFrameColors(guiElement));
+        }
+
+        guiElement.setFrames(frames);
+    }
 
 
 
