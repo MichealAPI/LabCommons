@@ -2,13 +2,10 @@ package it.mikeslab.commons.api.inventory.pojo;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
-import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import lombok.Data;
 import net.kyori.adventure.text.Component;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus;
 

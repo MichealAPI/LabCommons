@@ -181,7 +181,7 @@ public class GuiListener implements Listener {
                     String replacedCondition = ConditionUtil.replace(
                             player,
                             element.getCondition().get(),
-                            gui.getConditionReplacements()
+                            gui.getGuiDetails().getInjectedConditionPlaceholders()
                     );
 
                     boolean can = guiFactoryImpl.getConditionParser().parse(
