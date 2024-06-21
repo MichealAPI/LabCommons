@@ -30,6 +30,10 @@ public class ActionHandlerImpl implements ActionHandler {
         String prefix = action[0];
         String args = action.length > 1 ? action[1] : "";
 
+        if(args.startsWith(" ")) {
+            args = args.substring(1);
+        }
+
         // If the prefix is not registered, return
         if (this.globalActionsMap.containsKey(prefix)) {
 
