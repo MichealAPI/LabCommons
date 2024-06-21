@@ -13,7 +13,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
-public final class LabCommons extends JavaPlugin {
+public final class LabCommons {
 
     public static String PLUGIN_NAME = "LabCommons"; // default value if not initialized
 
@@ -56,13 +56,4 @@ public final class LabCommons extends JavaPlugin {
 
     }
 
-    @Override
-    public void onDisable() {
-
-    }
-
-    @Override
-    public void onEnable() {
-        super.onEnable();
-    }
 }

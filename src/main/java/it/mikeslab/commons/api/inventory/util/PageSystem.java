@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -51,20 +53,20 @@ public class PageSystem {
         return page > 1;
     }
 
-    public void nextPage() {
+    public void nextPage(Player player) {
         if (hasNext()) {
             page++;  // We cannot extract this to a method because of the condition
                      // we surely want to avoid refreshing the inventory unnecessarily
 
-            this.updateInventory();
+            this.updateInventory(player);
         }
     }
 
-    public void previousPage() {
+    public void previousPage(Player player) {
         if (hasPrevious()) {
             page--;
 
-            this.updateInventory(); // We cannot extract this to a method because of the condition
+            this.updateInventory(player); // We cannot extract this to a method because of the condition
                                     // we surely want to avoid refreshing the inventory unnecessarily
         }
     }
@@ -121,7 +123,7 @@ public class PageSystem {
     /**
      * Update the inventory for the specified gui factory with the specified id and internal value.
      */
-    public void updateInventory() {
+    public void updateInventory(Player player) {
 
         // Get the custom gui with the specified id
         CustomGui customGui = guiFactory.getCustomGui(id);
@@ -132,19 +134,13 @@ public class PageSystem {
         // Populate the internals of the custom gui with the specified internal value
         customGui.populatePage(
                 new PopulatePageContext(
+                    player.getOpenInventory().getTopInventory(),
                     character,
                     calculateSubList()
                 )
         );
 
-        // Update the inventory for all viewers
-        customGui.getInventory().getViewers().forEach(
-                viewer -> {
-                    Bukkit.getScheduler().runTaskLater(instance, () -> {
-                        viewer.openInventory(customGui.getInventory());
-                    }, 1L);
-                }
-        );
+        player.updateInventory();
 
     }
 

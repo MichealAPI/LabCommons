@@ -35,6 +35,8 @@ public class GuiDetails {
 
     private Map<String, Supplier<String>> injectedConditionPlaceholders;
 
+    private int animationInterval = 2;
+
     // private boolean closeable;
 
     @ApiStatus.Experimental
@@ -82,6 +84,8 @@ public class GuiDetails {
         clone.setInventorySize(inventorySize);
         clone.setPlaceholders(new HashMap<>(placeholders));
         clone.setText(text);
+
+        clone.setAnimationInterval(animationInterval);
 
         clone.setInjectedConditionPlaceholders(new HashMap<>(injectedConditionPlaceholders));
 

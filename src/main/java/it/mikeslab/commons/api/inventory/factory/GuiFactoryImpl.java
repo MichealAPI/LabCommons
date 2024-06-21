@@ -14,6 +14,7 @@ import lombok.Setter;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,12 +95,22 @@ public class GuiFactoryImpl implements GuiFactory {
                     .getScheduler()
                     .runTask(
                             instance,
-                            pageSystem::updateInventory // ignore with -1
+                            () -> pageSystem.updateInventory(player)
 
                     );
 
         });
 
+        // If it has an animation saved, start it
+        if(customGui.isAnimated()) {
+            int taskId = customGui.getAnimationRunnable().runTaskTimer(
+                    instance,
+                    0,
+                    customGui.getGuiDetails().getAnimationInterval()
+            ).getTaskId();
+
+            customGui.setAnimationTaskId(taskId);
+        }
 
     }
 
@@ -188,16 +199,12 @@ public class GuiFactoryImpl implements GuiFactory {
 
                     result.put(
                             nextActionIdentifier,
-                            event -> {
-                                pageSystem.nextPage();
-                            }
+                            event -> pageSystem.nextPage(event.getWhoClicked())
                     );
 
                     result.put(
                             previousActionIdentifier,
-                            event -> {
-                                pageSystem.previousPage();
-                            }
+                            event -> pageSystem.previousPage(event.getWhoClicked())
                     );
                 }
         );

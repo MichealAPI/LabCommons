@@ -55,7 +55,7 @@ public class GuiElement {
 
         if(amount == null) amount = 1;
 
-        // If there are replacements, we need to create the itemStack with placeholders support
+        // If there are replacements, we need to create the itemStack with placeholder support
         if(replacements != null) {
             return this.create(replacements);
         }
@@ -136,6 +136,7 @@ public class GuiElement {
                 .onClick(onClick)
                 .condition(condition)
                 .isGroupElement(isGroupElement)
+                .frames(frames)
                 .build();
     }
 

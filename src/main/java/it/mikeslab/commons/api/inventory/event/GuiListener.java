@@ -27,29 +27,6 @@ public class GuiListener implements Listener {
     private final GuiFactoryImpl guiFactoryImpl;
     private final JavaPlugin instance;
 
-    // Since this is a separate event, we may need
-    // to get custom gui details after 1ms delay
-    // to ensure both events are fired
-    //@EventHandler
-    @ApiStatus.Experimental
-    public void onAnvilMenuPrepare(PrepareAnvilEvent event) {
-
-        AnvilInventory anvilInventory = event.getInventory();
-
-        Map.Entry<Integer, CustomGui> guiEntry = findCustomGui(anvilInventory);
-
-        if(guiEntry != null && guiEntry.getValue() != null) {
-
-            CustomGui customGui = guiEntry.getValue();
-
-            // Set the text of the anvil
-            customGui.getGuiDetails()
-                    .setText(anvilInventory.getRenameText());
-
-        }
-
-    }
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
@@ -87,6 +64,7 @@ public class GuiListener implements Listener {
 
     }
 
+
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
 
@@ -102,8 +80,10 @@ public class GuiListener implements Listener {
 
             if(customGui == null) return;
 
-            // Cancel running animations
-            customGui.getAnimationRunnable().forEach(BukkitRunnable::cancel);
+            // Cancel animation if present and scheduled
+            if(customGui.isAnimated() && customGui.getAnimationTaskId() != -1) {
+                Bukkit.getScheduler().cancelTask(customGui.getAnimationTaskId());
+            }
 
             Player player = (Player) event.getPlayer();
 

@@ -2,6 +2,7 @@ package it.mikeslab.commons.api.inventory.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.bukkit.inventory.Inventory;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PopulatePageContext {
 
+    private Inventory targetInventory;
     private char targetChar;
     private List<GuiElement> subList;
 

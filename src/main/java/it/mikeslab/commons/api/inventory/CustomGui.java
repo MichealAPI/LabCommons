@@ -5,19 +5,21 @@ import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.pojo.*;
 import it.mikeslab.commons.api.inventory.util.GuiChecker;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
+import it.mikeslab.commons.api.inventory.util.frame.FrameColorUtil;
 import it.mikeslab.commons.api.logger.LoggerUtil;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -41,7 +43,13 @@ public class CustomGui implements InventoryHolder {
 
     private final Map<Character, PageSystem> pageSystemMap = new HashMap<>();
 
-    private final List<BukkitRunnable> animationRunnable = new ArrayList<>();
+    private final Map<Character, Animation> animatedElements = new HashMap<>();
+
+    private boolean animated;
+
+    private int animationTaskId = -1;
+
+    private InventoryPopulationContext populationContext;
 
 
     public void generateInventory() {
@@ -110,41 +118,39 @@ public class CustomGui implements InventoryHolder {
         this.mapCharToSlot(layout);
 
         // Populate the inventory
-        this.populate(
-                new InventoryPopulationContext(
-                        elements,
-                        cachedItems,
-                        inventory
-                )
+        this.populationContext = new InventoryPopulationContext(
+                elements,
+                cachedItems,
+                inventory
         );
+
+        this.populate();
 
     }
 
     /**
      * Populate the inventory
-     * @param context The context of the population
      */
-    private void populate(InventoryPopulationContext context) {
+    private void populate() {
         // Iterate over each character and its corresponding slots
         for (Map.Entry<Character, List<Integer>> mappedSlots : characterListMap.entrySet()) {
             char targetChar = mappedSlots.getKey();
             List<Integer> slots = mappedSlots.getValue();
 
-            this.handleGroupElement(context, targetChar, slots);
-            this.handleSingleElement(context, targetChar, slots);
+            this.handleGroupElement(targetChar, slots);
+            this.handleSingleElement(targetChar, slots);
         }
     }
 
     /**
      * Handle groups of elements, if present
-     * @param context The context of the population
      * @param targetChar The target character
      * @param slots The slots
      */
-    private void handleGroupElement(InventoryPopulationContext context, char targetChar, List<Integer> slots) {
+    private void handleGroupElement(char targetChar, List<Integer> slots) {
         // Check if the current character is a group element
 
-        Iterator<GuiElement> elementIterator = context
+        Iterator<GuiElement> elementIterator = populationContext
                 .getElements()
                 .get(targetChar)
                 .iterator();
@@ -152,7 +158,7 @@ public class CustomGui implements InventoryHolder {
         boolean isGroupElement = elementIterator.hasNext() && elementIterator.next().isGroupElement();
 
         // If it is a group element and there are more elements than slots, create a new PageSystem
-        if (isGroupElement && context.getElements().get(targetChar).size() > slots.size()) {
+        if (isGroupElement && populationContext.getElements().get(targetChar).size() > slots.size()) {
 
             if(this.pageSystemMap.containsKey(targetChar)) {
                 return;
@@ -165,7 +171,7 @@ public class CustomGui implements InventoryHolder {
                             instance,
                             id,
                             targetChar,
-                            new ArrayList<>(context.getElements().get(targetChar))
+                            new ArrayList<>(populationContext.getElements().get(targetChar))
                     )
             );
         }
@@ -173,12 +179,11 @@ public class CustomGui implements InventoryHolder {
 
     /**
      * Handle a single/static element
-     * @param context The context of the population
      * @param targetChar The target character
      * @param slots The slots
      */
-    private void handleSingleElement(InventoryPopulationContext context, char targetChar, List<Integer> slots) {
-        List<GuiElement> element = getGuiElement(context, targetChar);
+    private void handleSingleElement(char targetChar, List<Integer> slots) {
+        List<GuiElement> element = getGuiElement(targetChar);
 
         if (element == null) return;
 
@@ -201,25 +206,24 @@ public class CustomGui implements InventoryHolder {
             }
 
             if(guiElement.getFrames().isPresent()) {
-                System.out.println("animation is present!!");
-                this.runAnimation(guiElement, context, targetChar, slots);
+                this.animatedElements.put(targetChar, new Animation(guiElement, slots));
+                this.animated = true;
                 continue;
             }
 
-            ItemStack item = getItem(context, targetChar, guiElement);
-            populateSlots(context, targetChar, slots, item);
+            ItemStack item = getItem(targetChar, guiElement);
+            populateSlots(targetChar, slots, item, true);
         }
     }
 
     /**
      * Get the GuiElement
-     * @param context The context of the population
      * @param targetChar The target character to get the element for
      * @return The GuiElement
      */
-    private List<GuiElement> getGuiElement(InventoryPopulationContext context, char targetChar) {
+    private List<GuiElement> getGuiElement(char targetChar) {
 
-        List<GuiElement> elements = new ArrayList<>(context.getElements().get(targetChar));
+        List<GuiElement> elements = new ArrayList<>(populationContext.getElements().get(targetChar));
         Iterator<GuiElement> iterator = elements.iterator();
 
         return iterator.hasNext() && iterator.next().isGroupElement() ? null : elements;
@@ -227,13 +231,12 @@ public class CustomGui implements InventoryHolder {
 
     /**
      * Get the item
-     * @param context The context of the population
      * @param targetChar The target character
      * @param element The element
      * @return The built item
      */
-    private ItemStack getItem(InventoryPopulationContext context, char targetChar, GuiElement element) {
-        ItemStack item = context.getCachedItems().get(targetChar);
+    private ItemStack getItem(char targetChar, GuiElement element) {
+        ItemStack item = populationContext.getCachedItems().get(targetChar);
 
         if(element.isGroupElement() && pageSystemMap.containsKey(targetChar)) {
             return new ItemStack(Material.AIR);
@@ -245,12 +248,12 @@ public class CustomGui implements InventoryHolder {
             // Getting the size of the individual element.
             // If there is more than one, and
             // it isn't a grouped element, then it shall not be cached
-            Multimap<Character, GuiElement> elements = context.getElements();
+            Multimap<Character, GuiElement> elements = populationContext.getElements();
 
             Collection<GuiElement> elementList = elements.get(targetChar);
 
             if(!containsCondition(elementList)) {
-                context.getCachedItems().put(targetChar, item);
+                populationContext.getCachedItems().put(targetChar, item);
             }
 
         }
@@ -260,22 +263,21 @@ public class CustomGui implements InventoryHolder {
 
     /**
      * Populate the slots
-     * @param context The context of the population
      * @param targetChar The target character
      * @param slots The slots
      * @param item The item to populate
      */
-    private void populateSlots(InventoryPopulationContext context, char targetChar, List<Integer> slots, ItemStack item) {
+    private void populateSlots(char targetChar, List<Integer> slots, ItemStack item, boolean metaReplaceOnly) {
         int slotCounter = 0;
         for (String row : guiDetails.getInventoryLayout()) {
             slotCounter = populateRow(
                     new PopulateRowContext(
-                            context,
                             targetChar,
                             slots,
                             item,
                             slotCounter,
-                            row
+                            row,
+                            metaReplaceOnly
                     )
             );
 
@@ -295,15 +297,27 @@ public class CustomGui implements InventoryHolder {
         for (int i = 0; i < context.getRow().length(); i++) {
 
             if (context.getRow().charAt(i) == context.getTargetChar()) {
-                context
-                        .getContext()
+
+                ItemStack itemAt = populationContext
                         .getInventory()
-                        .setItem(
-                                context.getSlots().get(
-                                        context.getSlotCounter()
-                                ),
-                                context.getItem()
-                        );
+                        .getItem(context.getSlots().get(context.getSlotCounter()));
+
+                if(!context.isMetaReplaceOnly() || itemAt == null) {
+                    populationContext
+                            .getInventory()
+                            .setItem(
+                                    context.getSlots().get(
+                                            context.getSlotCounter()
+                                    ),
+                                    context.getItem()
+                            );
+                } else {
+
+                    ItemMeta referenceMeta = context.getItem().getItemMeta();
+
+                    itemAt.setItemMeta(referenceMeta);
+
+                }
 
 
                 context.setSlotCounter(context.getSlotCounter() + 1); // todo there may be a problem here
@@ -372,7 +386,7 @@ public class CustomGui implements InventoryHolder {
             int slot = slots.get(i);
 
             if(context.getSubList().size() <= i) {
-                this.getInventory().setItem(slot, null);
+                context.getTargetInventory().setItem(slot, null);
                 continue;
             }
 
@@ -396,7 +410,7 @@ public class CustomGui implements InventoryHolder {
                     guiDetails.getPlaceholders()
             );
 
-            this.getInventory().setItem(slot, item);
+            context.getTargetInventory().setItem(slot, item);
             tempSlots.put(slot, element);
 
         }
@@ -421,34 +435,44 @@ public class CustomGui implements InventoryHolder {
     }
 
 
-    private void runAnimation(GuiElement guiElement, InventoryPopulationContext context, char targetChar, List<Integer> slots) {
-        // item is animated!
+    public BukkitRunnable getAnimationRunnable() {
 
-        System.out.println("animation has been requested!!");
+        if(!animated) {
+            throw new IllegalStateException("The gui is not animated");
+        }
 
-        BukkitRunnable runnable = new BukkitRunnable() {
+        return new BukkitRunnable() {
             int frame = 0;
+            final Player player = Bukkit.getPlayer(ownerUUID);
 
             @Override
             public void run() {
 
-                System.out.println("Running animation");
-                System.out.println("frame: " + frame);
+                for(Map.Entry<Character, Animation> animatedElement : animatedElements.entrySet()) {
 
-                ItemStack item = guiElement.getFrames().get()[frame]; // runs only if present
+                    ItemStack item = animatedElement
+                            .getValue()
+                            .getGuiElement()
+                            .getFrames()
+                            .get()[frame];
 
-                populateSlots(context, targetChar, slots, item);
+                    populateSlots(
+                            animatedElement.getKey(),
+                            animatedElement.getValue().getSlots(),
+                            item,
+                            true
+                    );
+
+                    player.updateInventory();
+                }
+
                 frame++;
 
-                if(frame >= guiElement.getFrames().get().length) {
+                if(frame >= FrameColorUtil.MAX_FRAMES) {
                     frame = 0;
                 }
             }
         };
-
-        runnable.runTaskTimer(instance, 0, 5); // todo configurable
-
-        animationRunnable.add(runnable);
     }
 
 }

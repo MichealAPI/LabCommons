@@ -19,6 +19,8 @@ public class FrameColorUtil {
     @Language("RegExp")
     public static final String TAG_REGEX = "<animate:(.*?):(.*?)>";
 
+    public static final int MAX_FRAMES = 40;
+
     public boolean isAnimated(Component displayName, List<Component> lore) {
 
         Pattern pattern = Pattern.compile(TAG_REGEX);
@@ -37,11 +39,11 @@ public class FrameColorUtil {
      */
     public ItemStack[] getFrameColors(GuiElement guiElement) {
 
-        GuiElement[] guiElements = new GuiElement[20];
+        GuiElement[] guiElements = new GuiElement[MAX_FRAMES];
 
         // Iterate over the phase range
-        for (int i = 0; i < 20; i++) {
-            double phase = (i - 10) / 10.0; // range from -1 to 1
+        for (int i = 0; i < MAX_FRAMES; i++) {
+            double phase = (i * 0.05) - 1; // range from -1 to 1
 
             // Get and serialize the displayName and lore from the GuiElement
             String serializedDisplayName = ComponentsUtil.serialize(guiElement.getDisplayName());
