@@ -5,6 +5,7 @@ import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.factory.GuiFactoryImpl;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
+import it.mikeslab.commons.api.inventory.util.ConditionUtil;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -171,12 +172,21 @@ public class GuiListener implements Listener {
     private void runDefaultActionHandler(CustomGui gui, Collection<GuiElement> clickedElement, GuiInteractEvent guiInteractEvent) {
         if(guiFactoryImpl.getActionHandler() != null) {
 
+            Player player = Bukkit.getPlayer(gui.getOwnerUUID());
+
             for(GuiElement element : clickedElement) {
 
                 if(element.getCondition().isPresent() && guiFactoryImpl.getConditionParser() != null) {
+
+                    String replacedCondition = ConditionUtil.replace(
+                            player,
+                            element.getCondition().get(),
+                            gui.getConditionReplacements()
+                    );
+
                     boolean can = guiFactoryImpl.getConditionParser().parse(
                             guiInteractEvent.getWhoClicked(),
-                            element.getCondition().get()
+                            replacedCondition
                     );
 
                     if(!can) {

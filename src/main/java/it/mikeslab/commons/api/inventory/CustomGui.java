@@ -22,6 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 @Data
@@ -50,6 +51,8 @@ public class CustomGui implements InventoryHolder {
     private int animationTaskId = -1;
 
     private InventoryPopulationContext populationContext;
+
+    private Map<String, Supplier<String>> conditionReplacements = new HashMap<>();
 
 
     public void generateInventory() {

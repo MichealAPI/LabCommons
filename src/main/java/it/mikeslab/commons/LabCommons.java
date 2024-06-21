@@ -17,6 +17,8 @@ public final class LabCommons {
 
     public static String PLUGIN_NAME = "LabCommons"; // default value if not initialized
 
+    public static boolean PLACEHOLDER_API_ENABLED = false;
+
     private ChatMessagingHandler chatMessagingHandler;
 
     public void initialize(JavaPlugin instance) {
@@ -25,6 +27,10 @@ public final class LabCommons {
                 .getName();
 
         this.chatMessagingHandler = new ChatMessagingListener(instance);
+
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            PLACEHOLDER_API_ENABLED = true;
+        }
     }
 
     public void disable() {
