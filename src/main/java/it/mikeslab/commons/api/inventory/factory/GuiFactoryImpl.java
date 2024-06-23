@@ -1,26 +1,26 @@
 package it.mikeslab.commons.api.inventory.factory;
 
-import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.commons.api.inventory.util.CustomInventory;
 import it.mikeslab.commons.api.inventory.util.InventoryMap;
-import it.mikeslab.commons.api.inventory.util.PageSystem;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import it.mikeslab.commons.api.logger.LoggerUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -168,6 +168,27 @@ public class GuiFactoryImpl implements GuiFactory {
         return cachedGuis.getOrDefault(id, null);
     }
 
+    @Override
+    public CustomInventory getCustomInventory(UUID referencePlayerUUID, Inventory inventory) {
+
+        if(inventoryMap == null) return null;
+
+        if(!inventoryMap.containsKey(referencePlayerUUID)) return null;
+
+        Map<String, CustomInventory> customInventoryMap = inventoryMap.get(referencePlayerUUID);
+
+        for(CustomInventory customInventory : customInventoryMap.values()) {
+
+            if(customInventory == null || customInventory.getInventory() == null) continue;
+
+            if(customInventory.getInventory().equals(inventory)) {
+                return customInventory;
+            }
+        }
+
+        return null;
+    }
+
 
     /**
      * Get and increment the ID counter
@@ -219,7 +240,5 @@ public class GuiFactoryImpl implements GuiFactory {
 
         return customGui.getGuiDetails();
     }
-
-
 
 }

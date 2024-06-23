@@ -5,7 +5,9 @@ import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -93,14 +95,6 @@ public interface CustomInventory {
     }
 
     /**
-     * Get the instance of the plugin
-     * @return The instance of the plugin
-     */
-    default JavaPlugin getInstance() {
-        return this.getCustomContext().getInstance();
-    }
-
-    /**
      * Set the id of the gui
      * @param id The id of the gui
      */
@@ -128,10 +122,6 @@ public interface CustomInventory {
         return this.getCustomContext().getInventoryContext();
     }
 
-    default void setInstance(JavaPlugin instance) {
-        this.getCustomContext().setInstance(instance);
-    }
-
     default void setInventoryContext(InventoryContext context) {
         this.getCustomContext().setInventoryContext(context);
     }
@@ -151,6 +141,23 @@ public interface CustomInventory {
      */
     void setCustomContext(CustomInventoryContext context);
 
+    @Nullable
+    default Inventory getInventory() {
+        CustomGui customGui = this.getCustomContext().getGuiFactory().getCustomGui(
+                this.getId()
+        );
+
+        if(customGui == null) return null;
+
+        return customGui.getInventory();
+    }
+
+    @Nullable
+    default CustomGui getCustomGui() {
+        return this.getCustomContext().getGuiFactory().getCustomGui(
+                this.getId()
+        );
+    }
 
 
 }

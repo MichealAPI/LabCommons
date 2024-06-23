@@ -2,10 +2,15 @@ package it.mikeslab.commons.api.inventory;
 
 import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.commons.api.inventory.util.CustomInventory;
+import it.mikeslab.commons.api.inventory.util.InventoryMap;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
 
 /**
  * This interface is used to create and manage custom inventories.
@@ -67,9 +72,24 @@ public interface GuiFactory {
     void setConditionParser(ConditionParser parser);
 
     /**
+     * Sets the inventory map
+     * @param inventoryMap The inventory map
+     */
+    void setInventoryMap(InventoryMap inventoryMap);
+
+    /**
      * Gets the action handler
      * @return The action handler
      */
     ConditionParser getConditionParser();
+
+    /**
+     * Gets the condition parser
+     * @param referencePlayerUUID The reference player UUID
+     * @param inventory The inventory
+     * @return The custom inventory
+     */
+    @Nullable
+    CustomInventory getCustomInventory(UUID referencePlayerUUID, Inventory inventory);
 
 }

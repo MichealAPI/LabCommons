@@ -6,6 +6,7 @@ import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.factory.GuiFactoryImpl;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.util.ConditionUtil;
+import it.mikeslab.commons.api.inventory.util.CustomInventory;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -36,20 +37,23 @@ public class GuiListener implements Listener {
 
         Inventory clickedInventory = event.getClickedInventory();
 
-        Map.Entry<Integer, CustomGui> guiEntry = findCustomGui(clickedInventory);
+        CustomInventory customInventory = guiFactoryImpl.getCustomInventory(
+                event.getWhoClicked().getUniqueId(),
+                clickedInventory
+        );
 
-        if (guiEntry != null && guiEntry.getValue() != null) {
+        if (customInventory == null) return;
 
-            CustomGui customGui = guiEntry.getValue();
+        CustomGui customGui = customInventory.getCustomGui();
 
-            event.setCancelled(true);
+        if(customGui == null) return;
 
-            this.performClickAction(
-                    customGui,
-                    event
-            );
+        event.setCancelled(true);
 
-        }
+        this.performClickAction(
+                customGui,
+                event
+        );
     }
 
 
@@ -57,8 +61,9 @@ public class GuiListener implements Listener {
     public void onInventoryDrag(InventoryDragEvent event) {
 
         Inventory draggedInventory = event.getView().getTopInventory();
+        UUID playerUUID = event.getWhoClicked().getUniqueId();
 
-        if(isCustomGui(draggedInventory)) {
+        if(isCustomInventory(playerUUID, draggedInventory)) {
             event.setCancelled(true);
         }
 
@@ -70,36 +75,35 @@ public class GuiListener implements Listener {
 
         Inventory inventory = event.getInventory();
 
-        if(isCustomGui(inventory)) {
+        CustomInventory customInventory = guiFactoryImpl.getCustomInventory(
+                event.getPlayer().getUniqueId(),
+                inventory
+        );
 
-            Map.Entry<Integer, CustomGui> guiEntry = findCustomGui(inventory);
+        if(customInventory == null) return;
 
-            if(guiEntry == null) return;
+        CustomGui customGui = customInventory.getCustomGui();
 
-            CustomGui customGui = guiEntry.getValue();
+        if(customGui == null) return;
 
-            if(customGui == null) return;
+        // Cancel animation if present and scheduled
+        if(customGui.isAnimated() && customGui.getAnimationTaskId() != -1) {
+            Bukkit.getScheduler().cancelTask(customGui.getAnimationTaskId());
+        }
 
-            // Cancel animation if present and scheduled
-            if(customGui.isAnimated() && customGui.getAnimationTaskId() != -1) {
-                Bukkit.getScheduler().cancelTask(customGui.getAnimationTaskId());
-            }
+        Player player = (Player) event.getPlayer();
 
-            Player player = (Player) event.getPlayer();
+        GuiCloseEvent guiCloseEvent = new GuiCloseEvent(
+                event,
+                customGui
+        );
 
-            GuiCloseEvent guiCloseEvent = new GuiCloseEvent(
-                    event,
-                    customGui
-            );
+        Bukkit.getPluginManager().callEvent(guiCloseEvent);
 
-            Bukkit.getPluginManager().callEvent(guiCloseEvent);
-
-            if(guiCloseEvent.isCancelled()) {
-                Bukkit.getScheduler().runTask(instance, () -> {
-                    player.openInventory(customGui.getInventory());
-                });
-            }
-
+        if(guiCloseEvent.isCancelled()) {
+            Bukkit.getScheduler().runTask(instance, () -> {
+                player.openInventory(customGui.getInventory());
+            });
         }
 
     }
@@ -227,37 +231,9 @@ public class GuiListener implements Listener {
         }
     }
 
-    /**
-     * Find the custom gui
-     * @param inventory The inventory
-     * @return The custom gui
-     */
-    private Map.Entry<Integer, CustomGui> findCustomGui(Inventory inventory) {
-
-        if(!isCustomGui(inventory)) {
-            return null;
-        }
-
-        for(int id : guiFactoryImpl.getCachedGuis().keySet()) {
-
-            CustomGui customGui = guiFactoryImpl.getCachedGuis().get(id);
-
-            CustomGui inventoryHolder = (CustomGui) inventory.getHolder();
-
-            if(customGui.equals(inventoryHolder)) {
-                return new AbstractMap.SimpleEntry<>(id, customGui);
-            }
-
-        }
-        return null;
+    boolean isCustomInventory(UUID referencePlayerUUID, Inventory inventory) {
+        return guiFactoryImpl.getCustomInventory(referencePlayerUUID, inventory) != null;
     }
-
-    private boolean isCustomGui(Inventory inventory) {
-        return inventory.getHolder() instanceof CustomGui;
-    }
-
-
-
 
 
 }
