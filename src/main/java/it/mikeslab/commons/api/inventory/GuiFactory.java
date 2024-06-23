@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * This interface is used to create and manage custom inventories.
@@ -73,9 +74,9 @@ public interface GuiFactory {
 
     /**
      * Sets the inventory map
-     * @param inventoryMap The inventory map
+     * @param inventoryMap The inventory map supplier
      */
-    void setInventoryMap(InventoryMap inventoryMap);
+    void setInventoryMap(Supplier<InventoryMap> inventoryMap);
 
     /**
      * Gets the action handler
