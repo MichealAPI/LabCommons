@@ -1,6 +1,5 @@
 package it.mikeslab.commons.api.inventory.util;
 
-import it.mikeslab.identity.inventory.InventoryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
