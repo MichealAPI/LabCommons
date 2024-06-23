@@ -6,6 +6,7 @@ import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.commons.api.inventory.util.InventoryMap;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import it.mikeslab.commons.api.logger.LoggerUtil;
@@ -36,6 +37,9 @@ public class GuiFactoryImpl implements GuiFactory {
 
     @Getter @Setter
     private ConditionParser conditionParser;
+
+    @Getter @Setter
+    private InventoryMap inventoryMap;
 
     public GuiFactoryImpl(final JavaPlugin instance) {
         this.cachedGuis = new HashMap<>();
