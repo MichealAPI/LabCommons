@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.inventory.config;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.google.common.collect.Multiset;
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
@@ -162,9 +163,15 @@ public class GuiConfigImpl implements GuiConfig {
         String displayName = section.getString(ConfigField.DISPLAYNAME.getField());
         List<String> lore = section.getStringList(ConfigField.LORE.getField());
 
-        Material material = Material.getMaterial(
-                section.getString(ConfigField.MATERIAL.getField(), "AIR")
+        Optional<XMaterial> matchXMaterial = XMaterial.matchXMaterial(
+                section.getString(ConfigField.MATERIAL.getField())
         );
+
+        if(!matchXMaterial.isPresent()) {
+            throw new IllegalArgumentException("Invalid material for the element '" + section.getName() + "'");
+        }
+
+        Material material = matchXMaterial.get().parseMaterial();
 
         int amount = section.getInt(ConfigField.AMOUNT.getField(), 1);
 

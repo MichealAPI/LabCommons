@@ -178,22 +178,17 @@ public class GuiListener implements Listener {
 
                 if(element.getCondition().isPresent() && guiFactoryImpl.getConditionParser() != null) {
 
-                    System.out.println("Condition: " + element.getCondition().get());
-
                     String replacedCondition = ConditionUtil.replace(
                             player,
                             element.getCondition().get(),
                             gui.getGuiDetails().getInjectedConditionPlaceholders()
                     );
 
-                    System.out.println("Replaced condition: " + replacedCondition);
 
                     boolean can = guiFactoryImpl.getConditionParser().parse(
                             guiInteractEvent.getWhoClicked(),
                             replacedCondition
                     );
-
-                    System.out.println("Can: " + can);
 
                     if(!can) {
                         continue;
