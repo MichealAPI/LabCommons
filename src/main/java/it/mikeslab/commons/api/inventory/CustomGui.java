@@ -15,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,7 +25,7 @@ import java.util.logging.Level;
 
 @Data
 @RequiredArgsConstructor
-public class CustomGui implements InventoryHolder {
+public class CustomGui {
 
     private final GuiFactory guiFactory;
     private final JavaPlugin instance;
@@ -78,13 +77,13 @@ public class CustomGui implements InventoryHolder {
 
         if(inventory == null) {
             if (type != InventoryType.CHEST) {
-                inventory = Bukkit.createInventory(this, type, ComponentsUtil.serialize(title));
+                inventory = Bukkit.createInventory(null, type, ComponentsUtil.serialize(title));
             } else {
 
                 // We cannot extract to specify
                 // the size of the inventory
 
-                inventory = Bukkit.createInventory(this, size, ComponentsUtil.serialize(title));
+                inventory = Bukkit.createInventory(null, size, ComponentsUtil.serialize(title));
             }
         }
 

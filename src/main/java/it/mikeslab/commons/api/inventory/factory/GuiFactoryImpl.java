@@ -181,7 +181,7 @@ public class GuiFactoryImpl implements GuiFactory {
 
             if(customInventory == null || customInventory.getInventory() == null) continue;
 
-            if(customInventory.getInventory().equals(inventory)) {
+            if(customInventory.getInventory() == inventory) {
                 return customInventory;
             }
         }
