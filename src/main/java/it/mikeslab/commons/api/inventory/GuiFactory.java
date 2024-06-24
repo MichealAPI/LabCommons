@@ -100,6 +100,4 @@ public interface GuiFactory {
      */
     void updateCache(int id, CustomGui gui);
 
-    }
-
 }
