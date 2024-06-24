@@ -17,7 +17,6 @@ import java.util.Map;
 public class InventoryPopulationContext {
 
     private final Multimap<Character, GuiElement> elements;
-    private final Map<Character, ItemStack> cachedItems;
     private final Inventory inventory;
 
 }

@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.component;
 
+import it.mikeslab.commons.api.various.HexUtils;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -62,7 +63,18 @@ public class ComponentsUtil {
 
         if(component == null) return null;
 
-        return LegacyComponentSerializer.legacySection().serialize(component);
+        String serialized = LegacyComponentSerializer
+                .builder()
+                .hexColors()
+                .hexCharacter('#')
+                .build()
+                .serialize(component);
+
+        if(HexUtils.HEX_PATTERN.matcher(serialized).find()) {
+            serialized = HexUtils.translateHexCodes(serialized);
+        }
+
+        return serialized;
     }
 
 

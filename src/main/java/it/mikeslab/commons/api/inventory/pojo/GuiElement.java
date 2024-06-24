@@ -1,12 +1,16 @@
 package it.mikeslab.commons.api.inventory.pojo;
 
+import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.util.ItemCreator;
+import it.mikeslab.commons.api.inventory.util.frame.FrameColorUtil;
 import lombok.Builder;
 import lombok.Data;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -14,10 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
 public class GuiElement {
+
+    private final static Pattern PLACEHOLDER_REGEX_PATTERN = Pattern.compile("%[^%]+%");
 
     private Material material;
 
@@ -42,9 +50,132 @@ public class GuiElement {
     // Consumers
     private Consumer<GuiInteractEvent> onClick;
 
+    private String headValue; // If the element is a player head, this is the value to be used
+
     // Animation
     private Optional<ItemStack[]> frames; // if present, the element will be animated
 
+    private Boolean hasPlaceholders;
+
+    private Map<String, String> placeholders; // This is a cache for PlaceholderAPI.
+                                              // No need to create new items if the placeholder values are the same
+
+    private Boolean isAnimated;
+
+    /**
+     * Checks if the element is animated
+     * @return true if the element is animated
+     */
+    public boolean isAnimated() {
+
+        if(isAnimated != null) {
+            return isAnimated;
+        }
+
+        isAnimated = FrameColorUtil.isAnimated(
+                displayName,
+                lore
+        );
+
+        return isAnimated;
+    }
+
+    /**
+     * Checks if the displayName or lore contains placeholders
+     * @return true if the displayName or lore contains placeholders
+     */
+    public boolean containsPlaceholders() {
+        if (hasPlaceholders != null) {
+            return hasPlaceholders;
+        }
+
+        hasPlaceholders = PLACEHOLDER_REGEX_PATTERN.matcher(displayName).find() ||
+                lore.stream().anyMatch(PLACEHOLDER_REGEX_PATTERN.asPredicate());
+
+        return hasPlaceholders;
+    }
+
+    public boolean havePlaceholdersChanged(Player papiReference) {
+
+        if(!LabCommons.PLACEHOLDER_API_ENABLED) return false;
+
+        if(placeholders == null) return false;
+
+        for(Map.Entry<String, String> entry : placeholders.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            String newValue = PlaceholderAPI.setPlaceholders(papiReference, key);
+
+            if(!value.equals(newValue)) {
+                placeholders.put(key, newValue);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void loadPlaceholders(Player papiReference) {
+
+        if(!LabCommons.PLACEHOLDER_API_ENABLED) return;
+
+        if(this.displayName != null) {
+            this.loadPlaceholder(papiReference, this.displayName);
+        }
+
+        if(this.lore != null) {
+            for(String line : this.lore) {
+                this.loadPlaceholder(papiReference, line);
+            }
+        }
+
+    }
+
+    private void loadPlaceholder(Player papiReference, String line) {
+        int groupSize = PLACEHOLDER_REGEX_PATTERN.matcher(line).groupCount();
+
+        if(groupSize == 0) return; // No placeholders found in the line
+
+        String key, value;
+
+        for(int i = 0; i < groupSize; i++) {
+            key = PLACEHOLDER_REGEX_PATTERN.matcher(line).group(i);
+            value = PlaceholderAPI.setPlaceholders(papiReference, key);
+
+            this.placeholders.put(key, value);
+        }
+    }
+
+    public ItemStack create(Map<String, String> placeholders, Player papiReference) {
+        // Early exit if replacements are provided, avoiding unnecessary processing
+        if (replacements != null) {
+            return this.create(replacements);
+        }
+
+        // If Placeholder API is enabled, update displayName and lore accordingly
+        if (LabCommons.PLACEHOLDER_API_ENABLED) {
+            if (displayName != null) {
+                displayName = PlaceholderAPI.setPlaceholders(papiReference, displayName);
+            }
+            if (lore != null) {
+                lore = PlaceholderAPI.setPlaceholders(papiReference, lore);
+            }
+
+            this.loadPlaceholders(papiReference);
+        }
+
+        // Replace placeholders in displayName and lore with a provided map
+        if (displayName != null) {
+            displayName = this.replace(displayName, placeholders);
+        }
+        if (lore != null) {
+            lore = this.replaceMany(lore, placeholders);
+        }
+
+        // Use ItemCreator to generate and return the final ItemStack
+        return new ItemCreator().create(this);
+    }
 
     /**
      * Quick method to create the itemStack
@@ -120,6 +251,7 @@ public class GuiElement {
                 .internalValue(internalValue)
                 .onClick(onClick)
                 .condition(condition)
+                .headValue(headValue)
                 .isGroupElement(isGroupElement)
                 .frames(frames)
                 .build();

@@ -44,11 +44,16 @@ public class CustomGui {
 
     private final Map<Character, Animation> animatedElements = new HashMap<>();
 
+    private final Map<Character, ItemStack> cachedItems = new HashMap<>();
+
     private boolean animated;
 
     private int animationTaskId = -1;
 
     private InventoryPopulationContext populationContext;
+
+    private Player player; // This is not going to remain,
+                           // it is used just to initialize the inventory
 
     public void generateInventory() {
 
@@ -87,19 +92,21 @@ public class CustomGui {
             }
         }
 
+        this.player = Bukkit.getPlayer(ownerUUID);
 
         // Populating inventory
-        this.populateInventory(
-                inventory
-        );
+        this.populateInventory();
+
+
+        this.player = null;
 
     }
 
+
     /**
      * Populate the inventory with the elements
-     * @param inventory The inventory to populate
      */
-    public void populateInventory(Inventory inventory) {
+    public void populateInventory() {
         // Get the elements and layout from the GuiDetails
         Multimap<Character, GuiElement> elements = guiDetails.getElements();
         String[] layout = guiDetails.getInventoryLayout();
@@ -109,16 +116,12 @@ public class CustomGui {
             return;
         }
 
-        // Initialize a map to cache items
-        Map<Character, ItemStack> cachedItems = new HashMap<>();
-
         // Map characters to slots
         this.mapCharToSlot(layout);
 
         // Populate the inventory
         this.populationContext = new InventoryPopulationContext(
                 elements,
-                cachedItems,
                 inventory
         );
 
@@ -137,7 +140,18 @@ public class CustomGui {
 
             this.handleGroupElement(targetChar, slots);
             this.handleSingleElement(targetChar, slots);
+
+            this.handleAnimations();
         }
+    }
+
+    private void handleAnimations() {
+        this.animatedElements.forEach((targetChar, animation) -> {
+
+            this.processAnimation(animation.getGuiElement());
+
+
+        });
     }
 
     /**
@@ -234,29 +248,32 @@ public class CustomGui {
      * @return The built item
      */
     private ItemStack getItem(char targetChar, GuiElement element) {
-        ItemStack item = populationContext.getCachedItems().get(targetChar);
 
-        if(element.isGroupElement() && pageSystemMap.containsKey(targetChar)) {
+        // Directly return from cache if conditions are met
+
+        if (cachedItems.containsKey(targetChar)) {
+            boolean conditionAbsent = !element.getCondition().isPresent();
+            boolean placeholdersUnchanged = element.containsPlaceholders() && !element.havePlaceholdersChanged(player);
+
+            if (conditionAbsent || placeholdersUnchanged) {
+                return cachedItems.get(targetChar);
+            }
+        }
+
+        // Handle group elements with a direct return of a new ItemStack
+        if (element.isGroupElement() && pageSystemMap.containsKey(targetChar)) {
             return new ItemStack(Material.AIR);
         }
 
-        if (item == null) {
-            item = element.create(guiDetails.getPlaceholders());
+        // Create a new ItemStack based on the current context
+        ItemStack stack = element.create(guiDetails.getPlaceholders(), player);
 
-            // Getting the size of the individual element.
-            // If there is more than one, and
-            // it isn't a grouped element, then it shall not be cached
-            Multimap<Character, GuiElement> elements = populationContext.getElements();
-
-            Collection<GuiElement> elementList = elements.get(targetChar);
-
-            if(!containsCondition(elementList)) {
-                populationContext.getCachedItems().put(targetChar, item);
-            }
-
+        // Cache the ItemStack if no conditions are present
+        if (!element.getCondition().isPresent()) {
+            cachedItems.put(targetChar, stack);
         }
 
-        return item;
+        return stack;
     }
 
     /**
@@ -394,7 +411,7 @@ public class CustomGui {
 
                 boolean isValid = guiFactory.getConditionParser()
                         .parse(
-                                Bukkit.getPlayer(ownerUUID),
+                                player,
                                 element.getCondition().get(),
                                 guiDetails.getInjectedConditionPlaceholders()
                         );
@@ -405,7 +422,8 @@ public class CustomGui {
             }
 
             ItemStack item = element.create(
-                    guiDetails.getPlaceholders()
+                    guiDetails.getPlaceholders(),
+                    context.getPlayer()
             );
 
             context.getTargetInventory().setItem(slot, item);
@@ -418,18 +436,6 @@ public class CustomGui {
                 .getTempPageElements()
                 .put(context.getTargetChar(), tempSlots);
 
-    }
-
-
-    private boolean containsCondition(Collection<GuiElement> elements) {
-
-        for(GuiElement element : elements) {
-            if(element.getCondition().isPresent()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
 
@@ -472,6 +478,21 @@ public class CustomGui {
             }
         };
     }
+
+
+    private void processAnimation(GuiElement guiElement) {
+
+        boolean hasPlaceholdersChanged = guiElement.containsPlaceholders() && guiElement.havePlaceholdersChanged(player);
+
+        if(guiElement.getFrames().isPresent() && !hasPlaceholdersChanged) {
+            return;
+        }
+
+        Optional<ItemStack[]> frames = Optional.of(FrameColorUtil.getFrameColors(guiElement));
+        guiElement.setFrames(frames);
+
+    }
+
 
 }
 

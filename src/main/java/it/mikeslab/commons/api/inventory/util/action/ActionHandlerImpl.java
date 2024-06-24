@@ -1,17 +1,22 @@
 package it.mikeslab.commons.api.inventory.util.action;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
+import it.mikeslab.commons.api.inventory.event.GuiEvent;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
+import it.mikeslab.commons.api.inventory.event.GuiOpenEvent;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ActionHandlerImpl implements ActionHandler {
 
     private final Multimap<String, GuiAction> globalActionsMap;
-    private final Map<Integer, Map<String, GuiAction>> injectedActions;
+    private final Map<Integer, Multimap<String, GuiAction>> injectedActions;
 
     public ActionHandlerImpl(Multimap<String, GuiAction> globalActionsMap) {
         this.globalActionsMap = globalActionsMap;
@@ -47,18 +52,21 @@ public class ActionHandlerImpl implements ActionHandler {
 
         }
 
-        // Custom inventory injected actions, are more specific than globals
-        Map<String, GuiAction> injectedActions = this.injectedActions.getOrDefault(inventoryId, null);
+        // Custom inventory injected actions are more specific than globals
+        Multimap<String, GuiAction> injectedActions = this.injectedActions.getOrDefault(inventoryId, null);
 
         if(injectedActions != null && injectedActions.containsKey(prefix)) {
 
-            GuiAction guiAction = injectedActions.get(prefix);
+            Collection<GuiAction> guiActionCollection = injectedActions.get(prefix);
 
-            guiAction.getAction().accept(event, args);
+            for(GuiAction guiAction : guiActionCollection) {
+                guiAction.getAction().accept(event, args);
+            }
 
         }
 
     }
+
 
     @Override
     public void registerAction(String prefix, GuiAction action) {
@@ -73,7 +81,10 @@ public class ActionHandlerImpl implements ActionHandler {
     @Override
     public void injectAction(int inventoryId, String prefix, GuiAction action) {
 
-        Map<String, GuiAction> actions = this.injectedActions.getOrDefault(inventoryId, new HashMap<>());
+        Multimap<String, GuiAction> actions = this.injectedActions.getOrDefault(
+                inventoryId,
+                ArrayListMultimap.create()
+        );
 
         actions.put(prefix, action);
 

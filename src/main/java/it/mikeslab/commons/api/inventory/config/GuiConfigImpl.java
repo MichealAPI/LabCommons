@@ -1,6 +1,8 @@
 package it.mikeslab.commons.api.inventory.config;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
@@ -117,6 +119,9 @@ public class GuiConfigImpl implements GuiConfig {
                 ConfigField.SIZE.getField()
         );
 
+        // List<String> onOpenActions = section.getStringList(ConfigField.ON_OPEN_ACTIONS.getField());
+        // List<String> onCloseActions = section.getStringList(ConfigField.ON_CLOSE_ACTIONS.getField());
+
         this.guiDetails = new GuiDetails(
                 layout,
                 guiType
@@ -125,6 +130,8 @@ public class GuiConfigImpl implements GuiConfig {
         this.guiDetails.setInventoryName(guiTitle);
         this.guiDetails.setInventorySize(size);
         this.guiDetails.setClickActions(consumers.orElse(new HashMap<>())); // default empty map for consumers
+        // this.guiDetails.setOnCloseActions(onCloseActions);
+        // this.guiDetails.setOnOpenActions(onOpenActions);
 
         this.loadElements(section, consumers);
 
@@ -146,7 +153,7 @@ public class GuiConfigImpl implements GuiConfig {
             ConfigurationSection elementSection = elements.getConfigurationSection(charKey);
 
             GuiElement guiElement = this.loadElement(elementSection);
-            this.postProcessElement(guiElement);
+            // this.postProcessElement(guiElement); // todo moved to customgui
 
             if(areActionConsumersEnabled) {
                 this.parseConsumers(elementSection, consumers, guiElement);
@@ -162,6 +169,10 @@ public class GuiConfigImpl implements GuiConfig {
 
         String displayName = section.getString(ConfigField.DISPLAYNAME.getField());
         List<String> lore = section.getStringList(ConfigField.LORE.getField());
+
+        // Optional<XMaterial> matchXMaterial = XMaterial.matchXMaterial(
+        //        section.getString(ConfigField.MATERIAL.getField())
+        //);
 
         Optional<XMaterial> matchXMaterial = XMaterial.matchXMaterial(
                 section.getString(ConfigField.MATERIAL.getField())
@@ -185,7 +196,10 @@ public class GuiConfigImpl implements GuiConfig {
 
         boolean isGroupElement = section.getBoolean(ConfigField.IS_GROUP_ELEMENT.getField(), false);
 
+        String headValue = section.getString(ConfigField.HEAD_VALUE.getField(), null);
+
         Optional<String> condition = Optional.ofNullable(section.getString(ConfigField.CONDITION.getField(), null));
+
 
         // int order = isGrouped ? Integer.parseInt(charKey.split("-")[1]) : -1;
 
@@ -199,6 +213,7 @@ public class GuiConfigImpl implements GuiConfig {
                 .condition(condition)
                 .internalValue(internalValue)
                 .actions(actions)
+                .headValue(headValue)
                 .isGroupElement(isGroupElement)
                 //.isGrouped(isGrouped)
                 //.order(order)
@@ -226,15 +241,6 @@ public class GuiConfigImpl implements GuiConfig {
 
     }
 
-    private void postProcessElement(GuiElement guiElement) {
-        Optional<ItemStack[]> frames = Optional.empty();
-
-        if(FrameColorUtil.isAnimated(guiElement.getDisplayName(), guiElement.getLore())) {
-            frames = Optional.of(FrameColorUtil.getFrameColors(guiElement));
-        }
-
-        guiElement.setFrames(frames);
-    }
 
 
 

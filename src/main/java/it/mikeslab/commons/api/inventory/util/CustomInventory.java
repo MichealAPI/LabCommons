@@ -6,7 +6,6 @@ import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
@@ -143,6 +142,7 @@ public interface CustomInventory {
 
     @Nullable
     default Inventory getInventory() {
+
         CustomGui customGui = this.getCustomContext().getGuiFactory().getCustomGui(
                 this.getId()
         );

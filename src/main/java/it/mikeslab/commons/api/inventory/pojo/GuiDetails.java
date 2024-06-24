@@ -9,7 +9,9 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -52,6 +54,9 @@ public class GuiDetails {
 
         this.placeholders = new HashMap<>();
 
+        // this.onOpenActions = new ArrayList<>();
+        // this.onCloseActions = new ArrayList<>();
+
         // this.closeable = true;
 
         this.clickActions = new HashMap<>();
@@ -85,6 +90,9 @@ public class GuiDetails {
         clone.setAnimationInterval(animationInterval);
 
         clone.setInjectedConditionPlaceholders(new HashMap<>(injectedConditionPlaceholders));
+
+        // clone.setOnOpenActions(new ArrayList<>(onOpenActions));
+        // clone.setOnCloseActions(new ArrayList<>(onCloseActions));
 
         // clone.setCloseable(closeable);
 

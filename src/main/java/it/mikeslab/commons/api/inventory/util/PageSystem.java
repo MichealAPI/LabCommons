@@ -128,9 +128,10 @@ public class PageSystem {
         // Populate the internals of the custom gui with the specified internal value
         customGui.populatePage(
                 new PopulatePageContext(
-                    player.getOpenInventory().getTopInventory(),
-                    character,
-                    calculateSubList()
+                        player.getOpenInventory().getTopInventory(),
+                        character,
+                        calculateSubList(),
+                        player
                 )
         );
 

@@ -4,7 +4,9 @@ import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -26,7 +28,16 @@ public class ItemCreator {
         int amount = element.getAmount();
         Material material = element.getMaterial();
 
-        ItemStack item = new ItemStack(material, amount);
+        ItemStack item;
+
+        if(element.getHeadValue() != null) {
+            item = handleSkullCreation(element);
+
+        } else {
+            item = new ItemStack(material, amount);
+
+        }
+
         ItemMeta meta = item.getItemMeta();
 
         // If the item has no meta, return the item as is
@@ -55,7 +66,19 @@ public class ItemCreator {
         return item;
     }
 
+    public ItemStack handleSkullCreation(GuiElement element) {
 
+        String headValue = element.getHeadValue();
+
+        if(SkullUtil.isBase64(headValue)) {
+            return SkullUtil.getHead(headValue);
+        } else {
+            return SkullUtil.getHead(
+                    Bukkit.getOfflinePlayer(headValue)
+            );
+        }
+
+    }
 
 
     public ItemStack create(Material material, Component displayName, List<Component> lore, boolean glow) {

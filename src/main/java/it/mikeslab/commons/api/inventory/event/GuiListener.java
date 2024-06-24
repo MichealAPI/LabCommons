@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.inventory.event;
 
+import com.google.common.collect.Multimap;
 import it.mikeslab.commons.api.inventory.ConsumerFilter;
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiType;
@@ -105,6 +106,7 @@ public class GuiListener implements Listener {
                 player.openInventory(customGui.getInventory());
             });
         }
+
 
     }
 

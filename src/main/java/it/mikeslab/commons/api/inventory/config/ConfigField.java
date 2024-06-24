@@ -20,8 +20,11 @@ public enum ConfigField {
     ACTIONS("actions"),
     CUSTOM_MODEL_DATA("data"),
     INTERNAL_VALUE("internalValue"),
-    IS_GROUP_ELEMENT("is-group-element"),
-    CONDITION("condition");
+    IS_GROUP_ELEMENT("isGroupElement"),
+    CONDITION("condition"),
+    HEAD_VALUE("headValue");
+    // ON_OPEN_ACTIONS("on-open-actions"),
+    // ON_CLOSE_ACTIONS("on-close-actions"),;
 
     private final String field;
 

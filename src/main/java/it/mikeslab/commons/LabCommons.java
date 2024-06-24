@@ -38,12 +38,7 @@ public final class LabCommons extends JavaPlugin {
 
         for(Player player : Bukkit.getOnlinePlayers()) {
 
-            Inventory inventory = player.getOpenInventory().getTopInventory();
-            InventoryHolder holder = inventory.getHolder();
-
-            if(holder instanceof CustomGui || inventory.getType() == InventoryType.ANVIL) {
-                player.closeInventory();
-            }
+            player.closeInventory();
 
         }
     }

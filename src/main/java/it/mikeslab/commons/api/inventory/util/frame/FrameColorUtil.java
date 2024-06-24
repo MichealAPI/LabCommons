@@ -1,10 +1,13 @@
 package it.mikeslab.commons.api.inventory.util.frame;
 
+import com.cryptomorin.xseries.XMaterial;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
+import it.mikeslab.commons.api.inventory.util.SkullUtil;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.intellij.lang.annotations.Language;
 
 import java.util.Arrays;
@@ -36,11 +39,28 @@ public class FrameColorUtil {
      */
     public ItemStack[] getFrameColors(GuiElement guiElement) {
 
-        GuiElement[] guiElements = new GuiElement[MAX_FRAMES];
+        ItemStack[] frameStacks = new ItemStack[MAX_FRAMES];
+
+        GuiElement defaultElementClone = guiElement.clone();
+        ItemStack defaultItem;
+
+        // Due to the slowness of response by Mojang API, we need to check if the headValue is a base64 string
+        // and if it is, avoid animating to prevent too many requests to the Mojang servers
+        if(guiElement.getHeadValue() != null) {
+            defaultItem = XMaterial.PLAYER_HEAD.parseItem();
+        } else {
+            defaultItem = defaultElementClone.create();
+        }
+
+        ItemStack defaultItemClone;
+        ItemMeta defaultItemCloneMeta;
 
         // Iterate over the phase range
         for (int i = 0; i < MAX_FRAMES; i++) {
             double phase = (i * 0.05) - 1; // range from -1 to 1
+
+            defaultItemClone = defaultItem.clone();
+            defaultItemCloneMeta = defaultItemClone.getItemMeta();
 
             String displayName = guiElement.getDisplayName();
             List<String> lore = guiElement.getLore();
@@ -52,19 +72,18 @@ public class FrameColorUtil {
                     .collect(Collectors.toList());
 
             // Clone the GuiElement and set the new displayName and lore
-            GuiElement defaultClone = guiElement.clone();
-            defaultClone.setDisplayName(displayName);
-            defaultClone.setLore(lore);
+
+            defaultItemCloneMeta.setDisplayName(ComponentsUtil.getSerializedComponent(displayName));
+            defaultItemCloneMeta.setLore(ComponentsUtil.getSerializedComponents(lore));
+
+            defaultItemClone.setItemMeta(defaultItemCloneMeta);
 
             // Add the modified GuiElement to the array
-            guiElements[i] = defaultClone;
+            frameStacks[i] = defaultItemClone;
 
         }
 
-        // Convert the array of GuiElements to an array of ItemStacks
-        return Arrays.stream(guiElements)
-                .map(GuiElement::create)
-                .toArray(ItemStack[]::new);
+        return frameStacks;
     }
 
     /**
