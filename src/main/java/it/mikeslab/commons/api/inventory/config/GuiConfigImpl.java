@@ -153,7 +153,7 @@ public class GuiConfigImpl implements GuiConfig {
             ConfigurationSection elementSection = elements.getConfigurationSection(charKey);
 
             GuiElement guiElement = this.loadElement(elementSection);
-            // this.postProcessElement(guiElement); // todo moved to customgui
+            // this.postProcessElement(guiElement); // todo moved once again to CustomGui
 
             if(areActionConsumersEnabled) {
                 this.parseConsumers(elementSection, consumers, guiElement);
@@ -241,6 +241,10 @@ public class GuiConfigImpl implements GuiConfig {
         }
 
     }
+
+
+
+
 
 
 

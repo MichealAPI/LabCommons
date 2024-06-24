@@ -80,7 +80,7 @@ public class CustomGui {
 
         // Generating inventory
 
-        if(true) { // todo temp remove previous: inventory == null
+        if(inventory == null) { // todo temp remove previous: inventory == null
             if (type != InventoryType.CHEST) {
                 inventory = Bukkit.createInventory(null, type, ComponentsUtil.serialize(title));
             } else {
@@ -91,7 +91,6 @@ public class CustomGui {
                 inventory = Bukkit.createInventory(null, size, ComponentsUtil.serialize(title));
             }
         }
-
 
 
         // Populating inventory
@@ -127,6 +126,11 @@ public class CustomGui {
                 inventory
         );
 
+        // Post-process guiElement for animations
+        for(GuiElement guiElement : elements.values()) {
+            this.postProcessElement(guiElement);
+        }
+
         this.populate();
 
         this.player = null;
@@ -144,18 +148,7 @@ public class CustomGui {
 
             this.handleGroupElement(targetChar, slots);
             this.handleSingleElement(targetChar, slots);
-
-            this.handleAnimations();
         }
-    }
-
-    private void handleAnimations() {
-        this.animatedElements.forEach((targetChar, animation) -> {
-
-            this.processAnimation(animation.getGuiElement());
-
-
-        });
     }
 
     /**
@@ -205,14 +198,12 @@ public class CustomGui {
 
         for(GuiElement guiElement : element) {
 
-            GuiElement cloneElement = guiElement.clone();
-
-            if (guiFactory.getConditionParser() != null && cloneElement.getCondition().isPresent()) {
+            if (guiFactory.getConditionParser() != null && guiElement.getCondition().isPresent()) {
 
                 boolean isValid = guiFactory.getConditionParser()
                         .parse(
                                 Bukkit.getPlayer(ownerUUID),
-                                cloneElement.getCondition().get(),
+                                guiElement.getCondition().get(),
                                 guiDetails.getInjectedConditionPlaceholders()
                         );
 
@@ -222,13 +213,13 @@ public class CustomGui {
 
             }
 
-            if(cloneElement.isAnimated()) {
-                this.animatedElements.put(targetChar, new Animation(cloneElement, slots));
+            if(guiElement.isAnimated()) {
+                this.animatedElements.put(targetChar, new Animation(guiElement, slots));
                 this.animated = true;
                 continue;
             }
 
-            ItemStack item = getItem(targetChar, cloneElement);
+            ItemStack item = getItem(targetChar, guiElement);
             populateSlots(targetChar, slots, item, false);
         }
 
@@ -490,17 +481,15 @@ public class CustomGui {
     }
 
 
-    private void processAnimation(GuiElement guiElement) {
 
-        boolean hasPlaceholdersChanged = guiElement.containsPlaceholders() && guiElement.havePlaceholdersChanged(player);
+    private void postProcessElement(GuiElement guiElement) {
+        Optional<ItemStack[]> frames = Optional.empty();
 
-        if(guiElement.getFrames().isPresent() && !hasPlaceholdersChanged) {
-            return;
+        if(FrameColorUtil.isAnimated(guiElement.getDisplayName(), guiElement.getLore())) {
+            frames = Optional.of(FrameColorUtil.getFrameColors(guiElement));
         }
 
-        Optional<ItemStack[]> frames = Optional.of(FrameColorUtil.getFrameColors(guiElement));
         guiElement.setFrames(frames);
-
     }
 
 

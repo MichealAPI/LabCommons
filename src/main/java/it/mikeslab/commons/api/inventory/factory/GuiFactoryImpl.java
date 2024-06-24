@@ -81,9 +81,18 @@ public class GuiFactoryImpl implements GuiFactory {
 
         CustomGui customGui = cachedGuis.get(id);
 
-        if(customGui.getInventory() == null) { // first generation
-            this.generate(player.getUniqueId(), id);
-        }
+        UUID ownerUUID = player.getUniqueId();
+
+        customGui.setOwnerUUID(ownerUUID);
+
+        customGui.generateInventory();
+
+        // Inject page system consumers
+        GuiDetails guiDetails = injectPageSystemConsumers(customGui);
+        //guiDetails.setTempPageElements(new HashMap<>());
+
+        customGui.setGuiDetails(guiDetails);
+
 
         player.openInventory(customGui.getInventory());
 
@@ -240,20 +249,5 @@ public class GuiFactoryImpl implements GuiFactory {
         return customGui.getGuiDetails();
     }
 
-
-    @Override
-    public void generate(UUID ownerUUID, int id) {
-        CustomGui customGui = cachedGuis.get(id);
-        customGui.setOwnerUUID(ownerUUID);
-
-        customGui.generateInventory();
-
-        // Inject page system consumers
-        GuiDetails guiDetails = injectPageSystemConsumers(customGui);
-        //guiDetails.setTempPageElements(new HashMap<>());
-
-        customGui.setGuiDetails(guiDetails);
-
-    }
 
 }

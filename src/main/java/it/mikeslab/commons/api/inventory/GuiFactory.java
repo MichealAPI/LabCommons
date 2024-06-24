@@ -93,7 +93,4 @@ public interface GuiFactory {
     @Nullable
     CustomInventory getCustomInventory(UUID referencePlayerUUID, Inventory inventory);
 
-
-    void generate(UUID ownerUUID, int inventoryId);
-
 }
