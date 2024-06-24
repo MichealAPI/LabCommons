@@ -48,6 +48,11 @@ public class GuiFactoryImpl implements GuiFactory {
     }
 
     @Override
+    public void updateCache(int id, CustomGui customGui) {
+        this.cachedGuis.put(id, customGui);
+    }
+
+    @Override
     public int create(GuiDetails guiDetails) {
 
         int id = getAndIncrementId();
@@ -162,6 +167,8 @@ public class GuiFactoryImpl implements GuiFactory {
         cachedGuis.put(id, customGui);
 
     }
+
+
 
     @Override
     @Nullable

@@ -92,13 +92,12 @@ public class CustomGui {
             }
         }
 
-        this.player = Bukkit.getPlayer(ownerUUID);
+
 
         // Populating inventory
         this.populateInventory();
 
 
-        this.player = null;
 
     }
 
@@ -107,6 +106,9 @@ public class CustomGui {
      * Populate the inventory with the elements
      */
     public void populateInventory() {
+
+        this.player = Bukkit.getPlayer(ownerUUID);
+
         // Get the elements and layout from the GuiDetails
         Multimap<Character, GuiElement> elements = guiDetails.getElements();
         String[] layout = guiDetails.getInventoryLayout();
@@ -127,6 +129,7 @@ public class CustomGui {
 
         this.populate();
 
+        this.player = null;
     }
 
     /**
@@ -217,7 +220,7 @@ public class CustomGui {
 
             }
 
-            if(guiElement.getFrames().isPresent()) {
+            if(guiElement.isAnimated()) {
                 this.animatedElements.put(targetChar, new Animation(guiElement, slots));
                 this.animated = true;
                 continue;
@@ -250,9 +253,10 @@ public class CustomGui {
     private ItemStack getItem(char targetChar, GuiElement element) {
 
         // Directly return from cache if conditions are met
+        boolean conditionAbsent = !element.getCondition().isPresent();
 
         if (cachedItems.containsKey(targetChar)) {
-            boolean conditionAbsent = !element.getCondition().isPresent();
+
             boolean placeholdersUnchanged = element.containsPlaceholders() && !element.havePlaceholdersChanged(player);
 
             if (conditionAbsent || placeholdersUnchanged) {
@@ -269,7 +273,7 @@ public class CustomGui {
         ItemStack stack = element.create(guiDetails.getPlaceholders(), player);
 
         // Cache the ItemStack if no conditions are present
-        if (!element.getCondition().isPresent()) {
+        if (conditionAbsent) {
             cachedItems.put(targetChar, stack);
         }
 

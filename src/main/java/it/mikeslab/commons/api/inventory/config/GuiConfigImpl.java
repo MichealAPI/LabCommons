@@ -215,6 +215,7 @@ public class GuiConfigImpl implements GuiConfig {
                 .actions(actions)
                 .headValue(headValue)
                 .isGroupElement(isGroupElement)
+                .frames(Optional.empty())
                 //.isGrouped(isGrouped)
                 //.order(order)
                 .build();
