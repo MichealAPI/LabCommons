@@ -93,11 +93,7 @@ public interface GuiFactory {
     @Nullable
     CustomInventory getCustomInventory(UUID referencePlayerUUID, Inventory inventory);
 
-    /**
-     * Updates the cache
-     * @param id The id of the inventory
-     * @param gui The custom gui
-     */
-    void updateCache(int id, CustomGui gui);
+
+    void generate(UUID ownerUUID, int inventoryId);
 
 }

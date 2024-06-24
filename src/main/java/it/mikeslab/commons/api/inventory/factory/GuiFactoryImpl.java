@@ -47,10 +47,6 @@ public class GuiFactoryImpl implements GuiFactory {
         this.instance = instance;
     }
 
-    @Override
-    public void updateCache(int id, CustomGui customGui) {
-        this.cachedGuis.put(id, customGui);
-    }
 
     @Override
     public int create(GuiDetails guiDetails) {
@@ -84,15 +80,10 @@ public class GuiFactoryImpl implements GuiFactory {
         }
 
         CustomGui customGui = cachedGuis.get(id);
-        customGui.setOwnerUUID(player.getUniqueId());
 
-        customGui.generateInventory();
-
-        // Inject page system consumers
-        GuiDetails guiDetails = injectPageSystemConsumers(customGui);
-        //guiDetails.setTempPageElements(new HashMap<>());
-
-        customGui.setGuiDetails(guiDetails);
+        if(customGui.getInventory() == null) { // first generation
+            this.generate(player.getUniqueId(), id);
+        }
 
         player.openInventory(customGui.getInventory());
 
@@ -247,6 +238,22 @@ public class GuiFactoryImpl implements GuiFactory {
                 .putAll(result);
 
         return customGui.getGuiDetails();
+    }
+
+
+    @Override
+    public void generate(UUID ownerUUID, int id) {
+        CustomGui customGui = cachedGuis.get(id);
+        customGui.setOwnerUUID(ownerUUID);
+
+        customGui.generateInventory();
+
+        // Inject page system consumers
+        GuiDetails guiDetails = injectPageSystemConsumers(customGui);
+        //guiDetails.setTempPageElements(new HashMap<>());
+
+        customGui.setGuiDetails(guiDetails);
+
     }
 
 }

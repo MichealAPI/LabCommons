@@ -74,13 +74,13 @@ public class CustomGui {
                 .toInventoryType();
 
         // Optional details
-        Component title = guiDetails.getInventoryName();
+        Component title = guiDetails.getInventoryName(); // todo toString
 
         // guiDetails.setTempPageElements(new HashMap<>()); // reset temp
 
         // Generating inventory
 
-        if(inventory == null) {
+        if(true) { // todo temp remove previous: inventory == null
             if (type != InventoryType.CHEST) {
                 inventory = Bukkit.createInventory(null, type, ComponentsUtil.serialize(title));
             } else {
@@ -130,6 +130,7 @@ public class CustomGui {
         this.populate();
 
         this.player = null;
+
     }
 
     /**
@@ -204,13 +205,14 @@ public class CustomGui {
 
         for(GuiElement guiElement : element) {
 
+            GuiElement cloneElement = guiElement.clone();
 
-            if (guiFactory.getConditionParser() != null && guiElement.getCondition().isPresent()) {
+            if (guiFactory.getConditionParser() != null && cloneElement.getCondition().isPresent()) {
 
                 boolean isValid = guiFactory.getConditionParser()
                         .parse(
                                 Bukkit.getPlayer(ownerUUID),
-                                guiElement.getCondition().get(),
+                                cloneElement.getCondition().get(),
                                 guiDetails.getInjectedConditionPlaceholders()
                         );
 
@@ -220,15 +222,17 @@ public class CustomGui {
 
             }
 
-            if(guiElement.isAnimated()) {
-                this.animatedElements.put(targetChar, new Animation(guiElement, slots));
+            if(cloneElement.isAnimated()) {
+                this.animatedElements.put(targetChar, new Animation(cloneElement, slots));
                 this.animated = true;
                 continue;
             }
 
-            ItemStack item = getItem(targetChar, guiElement);
+            ItemStack item = getItem(targetChar, cloneElement);
             populateSlots(targetChar, slots, item, false);
         }
+
+
     }
 
     /**
@@ -259,7 +263,7 @@ public class CustomGui {
 
             boolean placeholdersUnchanged = element.containsPlaceholders() && !element.havePlaceholdersChanged(player);
 
-            if (conditionAbsent || placeholdersUnchanged) {
+            if (conditionAbsent && placeholdersUnchanged) {
                 return cachedItems.get(targetChar);
             }
         }
@@ -425,13 +429,15 @@ public class CustomGui {
                 }
             }
 
-            ItemStack item = element.create(
+            GuiElement cloneElement = element.clone();
+
+            ItemStack item = cloneElement.create(
                     guiDetails.getPlaceholders(),
                     context.getPlayer()
             );
 
             context.getTargetInventory().setItem(slot, item);
-            tempSlots.put(slot, element);
+            tempSlots.put(slot, cloneElement);
 
         }
 

@@ -148,6 +148,7 @@ public class GuiElement {
     }
 
     public ItemStack create(Map<String, String> placeholders, Player papiReference) {
+
         // Early exit if replacements are provided, avoiding unnecessary processing
         if (replacements != null) {
             return this.create(replacements);
@@ -155,11 +156,11 @@ public class GuiElement {
 
         // If Placeholder API is enabled, update displayName and lore accordingly
         if (LabCommons.PLACEHOLDER_API_ENABLED) {
-            if (displayName != null) {
-                displayName = PlaceholderAPI.setPlaceholders(papiReference, displayName);
+            if (getDisplayName() != null) {
+                this.setDisplayName(PlaceholderAPI.setPlaceholders(papiReference, getDisplayName()));
             }
-            if (lore != null) {
-                lore = PlaceholderAPI.setPlaceholders(papiReference, lore);
+            if (getLore() != null) {
+                this.setLore(PlaceholderAPI.setPlaceholders(papiReference, getLore()));
             }
 
             this.loadPlaceholders(papiReference);
