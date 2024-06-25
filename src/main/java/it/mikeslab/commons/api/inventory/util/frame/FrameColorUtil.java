@@ -51,7 +51,7 @@ public class FrameColorUtil {
             defaultItem = defaultElementClone.create();
         }
 
-        guiElement.parsePlaceholders(
+        GuiElement guiElementClone = guiElement.parsePlaceholders(
                 internalPlaceholders,
                 referencePlayer
         );
@@ -66,8 +66,8 @@ public class FrameColorUtil {
             defaultItemClone = defaultItem.clone();
             defaultItemCloneMeta = defaultItemClone.getItemMeta();
 
-            String displayName = guiElement.getDisplayName();
-            List<String> lore = guiElement.getLore();
+            String displayName = guiElementClone.getDisplayName();
+            List<String> lore = guiElementClone.getLore();
 
             // Replace the animate tag in the displayName and lore
             displayName = replaceTag(displayName, phase);
@@ -76,6 +76,8 @@ public class FrameColorUtil {
                     .collect(Collectors.toList());
 
             // Clone the GuiElement and set the new displayName and lore
+
+            System.out.println(displayName + " MY BANANANAANAN DISPLAY NAME");
 
             defaultItemCloneMeta.setDisplayName(ComponentsUtil.getSerializedComponent(displayName));
             defaultItemCloneMeta.setLore(ComponentsUtil.getSerializedComponents(lore));

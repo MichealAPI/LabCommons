@@ -7,17 +7,13 @@ import it.mikeslab.commons.api.inventory.util.frame.FrameColorUtil;
 import lombok.Builder;
 import lombok.Data;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -25,7 +21,8 @@ import java.util.stream.Collectors;
 @Builder
 public class GuiElement {
 
-    private final static Pattern PLACEHOLDER_REGEX_PATTERN = Pattern.compile("%[^%]+%");
+    // Regular expression pattern for the placeholders
+    private final static Pattern PLACEHOLDER_REGEX_PATTERN = Pattern.compile("(%.*?%)");
 
     private Material material;
 
@@ -84,13 +81,14 @@ public class GuiElement {
      * Checks if the displayName or lore contains placeholders
      * @return true if the displayName or lore contains placeholders
      */
-    public boolean containsPlaceholders() {
+    public boolean containsPlaceholders() { // if the reference is not null, placeholders will be loaded if they're not
         if (hasPlaceholders != null) {
             return hasPlaceholders;
         }
 
         hasPlaceholders = PLACEHOLDER_REGEX_PATTERN.matcher(displayName).find() ||
                 lore.stream().anyMatch(PLACEHOLDER_REGEX_PATTERN.asPredicate());
+
 
         return hasPlaceholders;
     }
@@ -99,7 +97,7 @@ public class GuiElement {
 
         if(!LabCommons.PLACEHOLDER_API_ENABLED) return false;
 
-        if(placeholders == null) return false;
+        if(placeholders == null) return false; // PLACEHOLDERS ARE NOT LOADED!!!
 
         for(Map.Entry<String, String> entry : placeholders.entrySet()) {
             String key = entry.getKey();
@@ -107,10 +105,37 @@ public class GuiElement {
 
             String newValue = PlaceholderAPI.setPlaceholders(papiReference, key);
 
-            if(!value.equals(newValue)) {
-                placeholders.put(key, newValue);
+            System.out.println("Key: " + key + " Value: " + value + " New Value: " + newValue);
+
+//            if(!value.equals(newValue)) {
+//                placeholders.put(key, newValue);
+//                return true;
+//            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean containsConditionPlaceholders(GuiDetails guiDetails) {
+
+        Set<String> placeholders = guiDetails.getInjectedConditionPlaceholders().keySet();
+
+        for(String placeholder : placeholders) {
+
+            if(displayName != null && displayName.contains(placeholder)) {
                 return true;
             }
+
+            if(lore != null) {
+                for(String line : lore) {
+                    if(line.contains(placeholder)) {
+                        return true;
+                    }
+                }
+            }
+
         }
 
         return false;
@@ -119,6 +144,10 @@ public class GuiElement {
     private void loadPlaceholders(Player papiReference) {
 
         if(!LabCommons.PLACEHOLDER_API_ENABLED) return;
+
+        if(this.placeholders != null) return; // Placeholders are already loaded
+
+        this.placeholders = new HashMap<>();
 
         if(this.displayName != null) {
             this.loadPlaceholder(papiReference, this.displayName);
@@ -133,31 +162,45 @@ public class GuiElement {
     }
 
     private void loadPlaceholder(Player papiReference, String line) {
-        int groupSize = PLACEHOLDER_REGEX_PATTERN.matcher(line).groupCount();
 
-        if(groupSize == 0) return; // No placeholders found in the line
+        Matcher matcher = PLACEHOLDER_REGEX_PATTERN.matcher(line);
+        int lastMatchPos = 0;
 
         String key, value;
 
-        for(int i = 0; i < groupSize; i++) {
-            key = PLACEHOLDER_REGEX_PATTERN.matcher(line).group(i);
+        while(matcher.find()) {
+            key = matcher.group(1);
             value = PlaceholderAPI.setPlaceholders(papiReference, key);
 
             this.placeholders.put(key, value);
+
+            // todo restore this debugger
+//            lastMatchPos = matcher.end();
         }
+
+//        if(lastMatchPos != line.length()) {
+//            LoggerUtil.log(
+//                    Level.WARNING,
+//                    LoggerUtil.LogSource.PLUGIN,
+//                    "Invalid string '" + line + "' for regex pattern '(%.*?%)'"
+//            );
+//        }
     }
 
     public ItemStack create(Map<String, String> placeholders, Player papiReference) {
 
-        // Early exit if replacements are provided, avoiding unnecessary processing
-        if (replacements != null) {
-            return this.create(replacements);
-        }
+        GuiElement clone = this.parsePlaceholders(placeholders, papiReference); // HERE AND
 
-        this.parsePlaceholders(placeholders, papiReference);
+
+        // Early exit if replacements are provided, avoiding unnecessary processing
+        //if (replacements != null) {
+        //    clone = clone.executeReplacements(replacements); // TODO WARNING! DOUBLE CLONING | HERE
+        // }
+
+        System.out.println(this.getDisplayName() + " MY FEVORITE DISAPLY NAMRE");
 
         // Use ItemCreator to generate and return the final ItemStack
-        return new ItemCreator().create(this);
+        return new ItemCreator().create(clone);
     }
 
     /**
@@ -166,14 +209,14 @@ public class GuiElement {
      */
     public ItemStack create() {
 
-        if(amount == null) amount = 1;
+        GuiElement clone = this;
 
         // If there are replacements, we need to create the itemStack with placeholder support
         if(replacements != null) {
-            return this.create(replacements);
+            clone = this.executeReplacements(replacements);
         }
 
-        return new ItemCreator().create(this);
+        return new ItemCreator().create(clone);
     }
 
 
@@ -182,23 +225,26 @@ public class GuiElement {
      * with Placeholders support
      * @return The itemStack
      */
-    public ItemStack create(Map<String, String> placeholders) {
+    public GuiElement executeReplacements(Map<String, String> placeholders) {
 
-        if (amount == null) amount = 1;
+        GuiElement clone = this.clone();
 
-        if(this.replacements != null) {
-            placeholders.putAll(this.replacements);
+        if (clone.amount == null) clone.amount = 1;
+
+        if(clone.replacements != null) {
+            placeholders.putAll(clone.replacements);
         }
 
-        if (displayName != null) {
-            displayName = this.replace(displayName, placeholders);
+        if (clone.displayName != null) {
+            clone.displayName = this.replace(clone.displayName, placeholders);
         }
 
-        if(lore != null) {
-            lore = this.replaceMany(lore, placeholders);
+        if(clone.lore != null) {
+            clone.lore = clone.replaceMany(clone.lore, placeholders);
         }
 
-        return new ItemCreator().create(this);
+        return clone;
+
     }
 
     private String replace(String text, Map<String, String> placeholders) {
@@ -222,24 +268,30 @@ public class GuiElement {
     }
 
 
-    public void parsePlaceholders(Map<String, String> internalPlaceholders, Player player) {
+    public GuiElement parsePlaceholders(Map<String, String> internalPlaceholders, Player player) {
 
-        if (displayName != null) {
-            displayName = replace(displayName, internalPlaceholders);
+        GuiElement element = this.clone(); // avoid removing the placeholders from the original element
+
+        this.loadPlaceholders(player);
+
+        if (element.displayName != null) {
+            element.displayName = replace(element.displayName, internalPlaceholders);
         }
 
-        if (lore != null) {
-            lore = replaceMany(lore, internalPlaceholders);
+        if (element.lore != null) {
+            element.lore = replaceMany(element.lore, internalPlaceholders);
         }
 
         if (LabCommons.PLACEHOLDER_API_ENABLED) {
-            if (displayName != null) {
-                displayName = PlaceholderAPI.setPlaceholders(player, displayName);
+            if (element.displayName != null) {
+                element.displayName = PlaceholderAPI.setPlaceholders(player, element.displayName);
             }
-            if (lore != null) {
-                lore = lore.stream().map(line -> PlaceholderAPI.setPlaceholders(player, line)).collect(Collectors.toList());
+            if (element.lore != null) {
+                element.lore = element.lore.stream().map(line -> PlaceholderAPI.setPlaceholders(player, line)).collect(Collectors.toList());
             }
         }
+
+        return element;
     }
 
 

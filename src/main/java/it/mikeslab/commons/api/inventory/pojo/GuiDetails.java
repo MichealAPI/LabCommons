@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import lombok.Data;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus;
@@ -110,4 +111,7 @@ public class GuiDetails {
 
         return clone;
     }
+
+
+
 }

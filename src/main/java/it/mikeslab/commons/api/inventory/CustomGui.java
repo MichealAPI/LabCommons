@@ -9,7 +9,6 @@ import it.mikeslab.commons.api.inventory.util.frame.FrameColorUtil;
 import it.mikeslab.commons.api.logger.LoggerUtil;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -22,9 +21,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
-@ToString
 @Getter
 @Setter
 public class CustomGui {
@@ -56,6 +55,8 @@ public class CustomGui {
     private InventoryPopulationContext populationContext;
 
     private Player player; // This is not going to remain,
+
+    private boolean populateRequiredOnly;
 
     public CustomGui(GuiFactory guiFactory, JavaPlugin instance, int id) {
         this.guiFactory = guiFactory;
@@ -117,7 +118,6 @@ public class CustomGui {
 
         // Populating inventory
         this.populateInventory();
-
 
     }
 
@@ -237,6 +237,7 @@ public class CustomGui {
             }
 
             if (guiElement.isAnimated()) {
+
                 this.animatedElements.put(targetChar, new Animation(guiElement, slots));
                 this.animated = true;
                 continue;
@@ -278,8 +279,9 @@ public class CustomGui {
         if (cachedItems.containsKey(targetChar)) {
 
             boolean placeholdersUnchanged = element.containsPlaceholders() && !element.havePlaceholdersChanged(player);
+            boolean containsConditionPlaceholders = element.containsConditionPlaceholders(guiDetails);
 
-            if (conditionAbsent && placeholdersUnchanged) {
+            if (conditionAbsent && placeholdersUnchanged && !containsConditionPlaceholders) {
                 return cachedItems.get(targetChar);
             }
         }
@@ -289,8 +291,14 @@ public class CustomGui {
             return new ItemStack(Material.AIR);
         }
 
+        Map<String, String> placeholders = this.getGuiDetails().getPlaceholders();
+
+        for(Map.Entry<String, Supplier<String>> entry : this.getGuiDetails().getInjectedConditionPlaceholders().entrySet()) {
+            placeholders.put(entry.getKey(), entry.getValue().get());
+        }
+
         // Create a new ItemStack based on the current context
-        ItemStack stack = element.create(this.getGuiDetails().getPlaceholders(), player);
+        ItemStack stack = element.create(placeholders, player);
 
         // Cache the ItemStack if no conditions are present
         if (conditionAbsent) {
@@ -521,15 +529,19 @@ public class CustomGui {
     private void postProcessElement(GuiElement guiElement, Player player) {
         Optional<ItemStack[]> frames = Optional.empty();
 
-        boolean hasChangedPlaceholders = guiElement.containsPlaceholders() && !guiElement.havePlaceholdersChanged(player);
+        if(populateRequiredOnly) return;
 
-        System.out.println("GUI Element customgui instance: " + this + " has frames: " + guiElement.getFrames().isPresent());
+        boolean hasChangedPlaceholders = guiElement.containsPlaceholders() && guiElement.havePlaceholdersChanged(player);
+        boolean containsConditionPlaceholders = guiElement.containsConditionPlaceholders(guiDetails);
 
-        if (guiElement.getFrames().isPresent() && !hasChangedPlaceholders) {
+        System.out.println("v1: " + guiElement.containsPlaceholders());
+        System.out.println("v2: " + hasChangedPlaceholders);
+
+        if (guiElement.getFrames().isPresent() && !hasChangedPlaceholders && !containsConditionPlaceholders) {
             return;
         }
 
-        if (FrameColorUtil.isAnimated(guiElement.getDisplayName(), guiElement.getLore())) {
+        if (guiElement.isAnimated()) {
             frames = Optional.of(FrameColorUtil.getFrameColors(
                     guiElement,
                     getGuiDetails().getPlaceholders(),
