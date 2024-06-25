@@ -59,10 +59,9 @@ public interface CustomInventory {
     /**
      * Set the placeholders of the gui, applied to each element
      * Default implementation actually updates the gui by calling the update method of the GuiFactory
-     * @param player The player
      * @param guiDetails The details of the gui
      */
-    default void setPlaceholders(Player player, GuiDetails guiDetails) {
+    default void setPlaceholders(GuiDetails guiDetails) {
         this.getCustomContext().getGuiFactory().update(
                 getId(),
                 guiDetails
