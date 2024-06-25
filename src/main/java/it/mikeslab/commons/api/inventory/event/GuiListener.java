@@ -200,6 +200,7 @@ public class GuiListener implements Listener {
                     }
                 }
 
+
                 element.getActions().forEach(action -> {
                     guiFactoryImpl.getActionHandler().handleAction(gui.getId(), action, guiInteractEvent);
                 });

@@ -85,7 +85,8 @@ public class GuiFactoryImpl implements GuiFactory {
 
         customGui.setOwnerUUID(ownerUUID);
 
-        customGui.generateInventory();
+        if(customGui.getInventory() == null)
+            customGui.generateInventory();
 
         // Inject page system consumers
         GuiDetails guiDetails = injectPageSystemConsumers(customGui);

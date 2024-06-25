@@ -3,15 +3,14 @@ package it.mikeslab.commons.api.inventory.util.frame;
 import com.cryptomorin.xseries.XMaterial;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
-import it.mikeslab.commons.api.inventory.util.SkullUtil;
 import lombok.experimental.UtilityClass;
-import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.intellij.lang.annotations.Language;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -37,7 +36,7 @@ public class FrameColorUtil {
      * @param guiElement the GuiElement to base the frame colors on
      * @return an array of ItemStacks with different gradient color phases
      */
-    public ItemStack[] getFrameColors(GuiElement guiElement) {
+    public ItemStack[] getFrameColors(GuiElement guiElement, Map<String, String> internalPlaceholders, Player referencePlayer) {
 
         ItemStack[] frameStacks = new ItemStack[MAX_FRAMES];
 
@@ -51,6 +50,11 @@ public class FrameColorUtil {
         } else {
             defaultItem = defaultElementClone.create();
         }
+
+        guiElement.parsePlaceholders(
+                internalPlaceholders,
+                referencePlayer
+        );
 
         ItemStack defaultItemClone;
         ItemMeta defaultItemCloneMeta;

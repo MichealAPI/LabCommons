@@ -154,25 +154,7 @@ public class GuiElement {
             return this.create(replacements);
         }
 
-        // If Placeholder API is enabled, update displayName and lore accordingly
-        if (LabCommons.PLACEHOLDER_API_ENABLED) {
-            if (getDisplayName() != null) {
-                this.setDisplayName(PlaceholderAPI.setPlaceholders(papiReference, getDisplayName()));
-            }
-            if (getLore() != null) {
-                this.setLore(PlaceholderAPI.setPlaceholders(papiReference, getLore()));
-            }
-
-            this.loadPlaceholders(papiReference);
-        }
-
-        // Replace placeholders in displayName and lore with a provided map
-        if (displayName != null) {
-            displayName = this.replace(displayName, placeholders);
-        }
-        if (lore != null) {
-            lore = this.replaceMany(lore, placeholders);
-        }
+        this.parsePlaceholders(placeholders, papiReference);
 
         // Use ItemCreator to generate and return the final ItemStack
         return new ItemCreator().create(this);
@@ -237,6 +219,27 @@ public class GuiElement {
         }
 
         return replacedLore;
+    }
+
+
+    public void parsePlaceholders(Map<String, String> internalPlaceholders, Player player) {
+
+        if (displayName != null) {
+            displayName = replace(displayName, internalPlaceholders);
+        }
+
+        if (lore != null) {
+            lore = replaceMany(lore, internalPlaceholders);
+        }
+
+        if (LabCommons.PLACEHOLDER_API_ENABLED) {
+            if (displayName != null) {
+                displayName = PlaceholderAPI.setPlaceholders(player, displayName);
+            }
+            if (lore != null) {
+                lore = lore.stream().map(line -> PlaceholderAPI.setPlaceholders(player, line)).collect(Collectors.toList());
+            }
+        }
     }
 
 
