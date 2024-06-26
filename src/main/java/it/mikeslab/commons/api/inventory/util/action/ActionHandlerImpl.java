@@ -4,8 +4,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,8 +32,10 @@ public class ActionHandlerImpl implements ActionHandler {
             args = args.substring(1);
         }
 
-        this.handleGlobalActions(prefix, event, args);
-        this.handleInjectedActions(inventoryId, prefix, event, args);
+        ActionContext context = new ActionContext(prefix, event, args);
+
+        this.handleGlobalActions(context);
+        this.handleInjectedActions(inventoryId, context);
     }
 
 
@@ -63,11 +66,13 @@ public class ActionHandlerImpl implements ActionHandler {
 
     /**
      * Handle the global actions
-     * @param prefix The action prefix
-     * @param event The event
-     * @param args The arguments
+     * @param context the action context
      */
-    private void handleGlobalActions(String prefix, GuiInteractEvent event, String args) {
+    private void handleGlobalActions(ActionContext context) {
+
+        String prefix = context.getPrefix();
+        String args = context.getArgs();
+        GuiInteractEvent event = context.getEvent();
 
         // Check if the action exists in the global actions map
         if (this.globalActionsMap.containsKey(prefix)) {
@@ -82,7 +87,11 @@ public class ActionHandlerImpl implements ActionHandler {
     }
 
 
-    private void handleInjectedActions(int inventoryId, String prefix, GuiInteractEvent event, String args) {
+    private void handleInjectedActions(int inventoryId, ActionContext context) {
+
+        GuiInteractEvent event = context.getEvent();
+        String prefix = context.getPrefix();
+        String args = context.getArgs();
 
         // Actions injected by specific inventory handling classes
         Multimap<String, GuiAction> injectedActions = this.injectedActions.get(inventoryId);
@@ -99,5 +108,15 @@ public class ActionHandlerImpl implements ActionHandler {
         }
     }
 
+
+    @Getter
+    @RequiredArgsConstructor
+    private static class ActionContext {
+
+        private final String prefix;
+        private final GuiInteractEvent event;
+        private final String args;
+
+    }
 
 }
