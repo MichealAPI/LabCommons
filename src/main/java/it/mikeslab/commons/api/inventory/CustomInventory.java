@@ -108,7 +108,7 @@ public interface CustomInventory {
      * Set the context of the custom inventory
      * @param context The context of the custom inventory
      */
-    void setCustomContext(GuiContext context);
+    void setGuiContext(GuiContext context);
 
     @Nullable
     default Inventory getInventory() {
