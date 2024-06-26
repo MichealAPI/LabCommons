@@ -1,9 +1,8 @@
 package it.mikeslab.commons.api.config;
 
-import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.config.impl.ConfigurableImpl;
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -141,9 +140,8 @@ public interface Configurable {
         boolean isNull = getConfiguration() == null;
 
         if(isNull) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
                     "Configuration is null"
             );
         }
@@ -162,9 +160,8 @@ public interface Configurable {
         boolean contains = this.contains(configurableEnum);
 
         if(!contains) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
                     String.format("Entry '%s' not found in the configuration, using the default value", configurableEnum.getPath())
             );
         }

@@ -1,8 +1,7 @@
-package it.mikeslab.commons.api.inventory.util;
+package it.mikeslab.commons.api.inventory;
 
-import it.mikeslab.commons.api.inventory.CustomGui;
-import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
+import it.mikeslab.commons.api.inventory.pojo.GuiContext;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -20,7 +19,7 @@ public interface CustomInventory {
      * @return The id of the gui
      */
     default int getId() {
-        return this.getCustomContext().getId();
+        return this.getGuiContext().getId();
     }
 
     /**
@@ -31,16 +30,20 @@ public interface CustomInventory {
 
         if(!isValid()) return;
 
-        this.getCustomContext().getGuiFactory().open(
+        this.getGuiContext().getGuiFactory().open(
                 player,
                 this.getId()
         );
 
     }
 
+    /**
+     * Checks if the factory actually contains the given inventory id
+     * @return True if the inventory is valid, false otherwise
+     */
     default boolean isValid() {
 
-        CustomGui customGui = this.getCustomContext().getGuiFactory().getCustomGui(
+        CustomGui customGui = this.getGuiContext().getGuiFactory().getCustomGui(
                 this.getId()
         );
 
@@ -62,18 +65,10 @@ public interface CustomInventory {
      * @param guiDetails The details of the gui
      */
     default void setPlaceholders(GuiDetails guiDetails) {
-        this.getCustomContext().getGuiFactory().update(
+        this.getGuiContext().getGuiFactory().update(
                 getId(),
                 guiDetails
         );
-    }
-
-    /**
-     * If the setup for the gui is completed
-     * @return If the setup for the gui is completed
-     */
-    default boolean isCompleted() {
-        return this.getCustomContext().isCompleted();
     }
 
     /**
@@ -81,7 +76,7 @@ public interface CustomInventory {
      * @return The inventory type of the gui
      */
     default InventoryType getInventoryType() {
-        return this.getCustomContext().getSettings().getInventoryType();
+        return this.getGuiContext().getInventoryType();
     }
 
     /**
@@ -89,7 +84,7 @@ public interface CustomInventory {
      * @return The file name of the gui
      */
     default Path getRelativePath() {
-        return this.getCustomContext().getSettings().getRelativePath();
+        return this.getGuiContext().getRelativePath();
     }
 
     /**
@@ -97,52 +92,28 @@ public interface CustomInventory {
      * @param id The id of the gui
      */
     default void setId(int id) {
-        this.getCustomContext().setId(id);
-    }
-
-    /**
-     * Set the completed flag of the gui
-     * @param completed The completed flag of the gui
-     */
-    default void setCompleted(boolean completed) {
-        this.getCustomContext().setCompleted(completed);
+        this.getGuiContext().setId(id);
     }
 
     default void setGuiFactory(GuiFactory guiFactory) {
-        this.getCustomContext().setGuiFactory(guiFactory);
-    }
-
-    /**
-     * Get the context of the gui, internal
-     * @return The context of the gui
-     */
-    default InventoryContext getInventoryContext() {
-        return this.getCustomContext().getInventoryContext();
-    }
-
-    default void setInventoryContext(InventoryContext context) {
-        this.getCustomContext().setInventoryContext(context);
-    }
-
-    default void setSettings(InventorySettings settings) {
-        this.getCustomContext().setSettings(settings);
+        this.getGuiContext().setGuiFactory(guiFactory);
     }
 
     /**
      * Get the context of the custom inventory
      */
-    CustomInventoryContext getCustomContext();
+    GuiContext getGuiContext();
 
     /**
      * Set the context of the custom inventory
      * @param context The context of the custom inventory
      */
-    void setCustomContext(CustomInventoryContext context);
+    void setCustomContext(GuiContext context);
 
     @Nullable
     default Inventory getInventory() {
 
-        CustomGui customGui = this.getCustomContext().getGuiFactory().getCustomGui(
+        CustomGui customGui = this.getCustomGui().getGuiFactory().getCustomGui(
                 this.getId()
         );
 
@@ -151,9 +122,13 @@ public interface CustomInventory {
         return customGui.getInventory();
     }
 
+    /**
+     * Get the custom gui of the inventory if it exists in the factory
+     * @return The custom gui instance of the inventory
+     */
     @Nullable
     default CustomGui getCustomGui() {
-        return this.getCustomContext().getGuiFactory().getCustomGui(
+        return this.getGuiContext().getGuiFactory().getCustomGui(
                 this.getId()
         );
     }

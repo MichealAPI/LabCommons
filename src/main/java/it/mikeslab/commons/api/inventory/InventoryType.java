@@ -1,4 +1,4 @@
-package it.mikeslab.commons.api.inventory.util;
+package it.mikeslab.commons.api.inventory;
 
 import org.jetbrains.annotations.Nullable;
 

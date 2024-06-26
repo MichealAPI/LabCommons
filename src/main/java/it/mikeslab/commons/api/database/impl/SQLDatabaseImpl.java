@@ -2,12 +2,11 @@ package it.mikeslab.commons.api.database.impl;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.database.Database;
 import it.mikeslab.commons.api.database.SerializableMapConvertible;
 import it.mikeslab.commons.api.database.pojo.URIBuilder;
 import it.mikeslab.commons.api.database.util.SQLUtil;
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import org.bson.Document;
 
 import java.sql.Connection;
@@ -63,9 +62,8 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
             return true;
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.severe(
+                    LogUtils.LogSource.DATABASE,
                     e
             );
             return false;
@@ -85,9 +83,8 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             dataSource.close();
             return true;
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.severe(
+                    LogUtils.LogSource.DATABASE,
                     e
             );
             return false;
@@ -117,9 +114,8 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.severe(
+                    LogUtils.LogSource.DATABASE,
                     e
             );
         }
@@ -146,9 +142,8 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         try (PreparedStatement pst = SQLUtil.prepareStatement(connection, sql, values)) {
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.severe(
+                    LogUtils.LogSource.DATABASE,
                     e
             );
         }
@@ -202,9 +197,8 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
                 }
             }
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.severe(
+                    LogUtils.LogSource.DATABASE,
                     e
             );
         }
@@ -261,9 +255,8 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         try (PreparedStatement pst = SQLUtil.prepareStatement(connection, query.toString(), Collections.emptyMap())) {
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.severe(
+                    LogUtils.LogSource.DATABASE,
                     e
             );
             return false;
@@ -339,9 +332,8 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         try (PreparedStatement pst = connection.prepareStatement(sql)) {
             pst.executeUpdate();
         } catch (Exception e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.severe(
+                    LogUtils.LogSource.DATABASE,
                     e
             );
         }

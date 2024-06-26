@@ -1,6 +1,6 @@
 package it.mikeslab.commons.api.various;
 
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,21 +18,18 @@ public class LabYaml extends YamlConfiguration {
             config.load(file);
             return true;
         } catch (InvalidConfigurationException e) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.severe(
+                    LogUtils.LogSource.CONFIG,
                     "Error loading YAML configuration file: " + file.getName()
             );
 
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.severe(
+                    LogUtils.LogSource.CONFIG,
                     "Ensure that your config is formatted correctly:"
             );
 
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
                     e.getMessage()
             );
             return false;
@@ -48,21 +45,18 @@ public class LabYaml extends YamlConfiguration {
             config.load(file);
         } catch (InvalidConfigurationException e) {
             // Handle the exception here (e.g., log the error)
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.severe(
+                    LogUtils.LogSource.CONFIG,
                     "Error loading YAML configuration file: " + file.getName()
             );
 
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.severe(
+                    LogUtils.LogSource.CONFIG,
                     "Ensure that your config is formatted correctly:"
             );
 
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
                     e.getMessage()
             );
             //Logs.logWarning(Arrays.toString(e.getStackTrace()));
@@ -80,9 +74,8 @@ public class LabYaml extends YamlConfiguration {
             super.load(file);
         } catch (Exception e) {
             // Handle the exception here (e.g., log the error)
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.severe(
+                    LogUtils.LogSource.CONFIG,
                     "Error loading YAML configuration file: " + file.getName()
             );
             //if (Settings.DEBUG.toBool()) Logs.logWarning(e.getMessage()); // todo add debug option
@@ -98,9 +91,8 @@ public class LabYaml extends YamlConfiguration {
             config.save(file);
         } catch (Exception e) {
             // Handle the exception here (e.g., log the error)
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.severe(
+                    LogUtils.LogSource.CONFIG,
                     "Error saving YAML configuration file: " + file.getName()
             );
             //if (Settings.DEBUG.toBool()) Logs.logWarning(e.getMessage()); // todo add debug option

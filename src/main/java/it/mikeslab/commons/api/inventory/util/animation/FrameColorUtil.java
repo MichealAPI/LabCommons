@@ -1,16 +1,19 @@
-package it.mikeslab.commons.api.inventory.util.frame;
+package it.mikeslab.commons.api.inventory.util.animation;
 
 import com.cryptomorin.xseries.XMaterial;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
+import it.mikeslab.commons.api.various.item.SkullUtil;
 import lombok.experimental.UtilityClass;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.intellij.lang.annotations.Language;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -43,10 +46,18 @@ public class FrameColorUtil {
         GuiElement defaultElementClone = guiElement.clone();
         ItemStack defaultItem;
 
+        Optional<SkullMeta> headValueSkullMeta = Optional.empty();
+
         // Due to the slowness of response by Mojang API, we need to check if the headValue is a base64 string
         // and if it is, avoid animating to prevent too many requests to the Mojang servers
         if(guiElement.getHeadValue() != null) {
+
+            headValueSkullMeta = Optional.ofNullable(
+                    (SkullMeta) SkullUtil.getHeadMeta(guiElement.getHeadValue())
+            );
+
             defaultItem = XMaterial.PLAYER_HEAD.parseItem();
+
         } else {
             defaultItem = defaultElementClone.create();
         }
@@ -63,7 +74,12 @@ public class FrameColorUtil {
         for (int i = 0; i < MAX_FRAMES; i++) {
             double phase = (i * 0.05) - 1; // range from -1 to 1
 
-            defaultItemClone = defaultItem.clone();
+            defaultItemClone = defaultItem.clone(); // Default item is a plain PLAYER_HEAD
+
+            if(headValueSkullMeta.isPresent()) {
+                defaultItemClone.setItemMeta(headValueSkullMeta.get());
+            }
+
             defaultItemCloneMeta = defaultItemClone.getItemMeta();
 
             String displayName = guiElementClone.getDisplayName();
@@ -76,8 +92,6 @@ public class FrameColorUtil {
                     .collect(Collectors.toList());
 
             // Clone the GuiElement and set the new displayName and lore
-
-            System.out.println(displayName + " MY BANANANAANAN DISPLAY NAME");
 
             defaultItemCloneMeta.setDisplayName(ComponentsUtil.getSerializedComponent(displayName));
             defaultItemCloneMeta.setLore(ComponentsUtil.getSerializedComponents(lore));

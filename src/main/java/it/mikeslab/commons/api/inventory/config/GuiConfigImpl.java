@@ -1,25 +1,16 @@
 package it.mikeslab.commons.api.inventory.config;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
-import it.mikeslab.commons.LabCommons;
-import it.mikeslab.commons.api.component.ComponentsUtil;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.util.config.FileUtil;
-import it.mikeslab.commons.api.inventory.util.frame.FrameColorUtil;
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -51,9 +42,8 @@ public class GuiConfigImpl implements GuiConfig {
 
         Optional<FileConfiguration> config = new FileUtil(instance).getConfig(relativePath);
         if(!config.isPresent()) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
                     String.format("Config '%s' not found", fileName)
             );
 
@@ -71,9 +61,8 @@ public class GuiConfigImpl implements GuiConfig {
     public GuiDetails getGuiDetails(Optional<String> key, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers) {
 
         if(config == null) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
                     "Config not loaded, load it first"
             );
             return null;
@@ -96,15 +85,14 @@ public class GuiConfigImpl implements GuiConfig {
 
         // all checks are done in the GuiConfig#getGuiDetails method
         if(section == null) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
                     String.format("Invalid section '%s'", section.getName())
             );
             return;
         }
 
-        Component guiTitle = ComponentsUtil.getComponent(section, ConfigField.TITLE.getField());
+        String guiTitle = section.getString(ConfigField.TITLE.getField());
         String[] layout = section.getStringList(ConfigField.LAYOUT.getField())
                 .toArray(new String[0]);
 
@@ -153,7 +141,6 @@ public class GuiConfigImpl implements GuiConfig {
             ConfigurationSection elementSection = elements.getConfigurationSection(charKey);
 
             GuiElement guiElement = this.loadElement(elementSection);
-            // this.postProcessElement(guiElement); // todo moved once again to CustomGui
 
             if(areActionConsumersEnabled) {
                 this.parseConsumers(elementSection, consumers, guiElement);
@@ -200,9 +187,6 @@ public class GuiConfigImpl implements GuiConfig {
 
         Optional<String> condition = Optional.ofNullable(section.getString(ConfigField.CONDITION.getField(), null));
 
-
-        // int order = isGrouped ? Integer.parseInt(charKey.split("-")[1]) : -1;
-
         return GuiElement.builder()
                 .customModelData(customModelData)
                 .displayName(displayName)
@@ -216,8 +200,6 @@ public class GuiConfigImpl implements GuiConfig {
                 .headValue(headValue)
                 .isGroupElement(isGroupElement)
                 .frames(Optional.empty())
-                //.isGrouped(isGrouped)
-                //.order(order)
                 .build();
     }
 

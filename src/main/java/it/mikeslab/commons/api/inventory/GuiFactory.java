@@ -2,8 +2,7 @@ package it.mikeslab.commons.api.inventory;
 
 import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
-import it.mikeslab.commons.api.inventory.util.CustomInventory;
-import it.mikeslab.commons.api.inventory.util.InventoryMap;
+import it.mikeslab.commons.api.inventory.helper.InventoryMap;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;

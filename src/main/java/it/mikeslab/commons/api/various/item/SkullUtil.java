@@ -1,4 +1,4 @@
-package it.mikeslab.commons.api.inventory.util;
+package it.mikeslab.commons.api.various.item;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
@@ -6,6 +6,7 @@ import com.mojang.authlib.properties.Property;
 import lombok.experimental.UtilityClass;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,6 +52,25 @@ public class SkullUtil {
             e.printStackTrace();
         }
         return head;
+    }
+
+
+    public ItemMeta getHeadMeta(@NotNull final String base64) {
+
+        SkullMeta skullMeta = (SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta();
+
+        final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "");
+        gameProfile.getProperties().put("textures", new Property("textures", base64));
+        final Field profileField;
+        assert skullMeta != null;
+        try {
+            profileField = skullMeta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(skullMeta, gameProfile);
+        } catch (final NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return skullMeta;
     }
 
     /**

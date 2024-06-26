@@ -2,8 +2,8 @@ package it.mikeslab.commons.api.inventory.pojo;
 
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
-import it.mikeslab.commons.api.inventory.util.ItemCreator;
-import it.mikeslab.commons.api.inventory.util.frame.FrameColorUtil;
+import it.mikeslab.commons.api.various.item.ItemCreator;
+import it.mikeslab.commons.api.inventory.util.animation.FrameColorUtil;
 import lombok.Builder;
 import lombok.Data;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -31,7 +31,10 @@ public class GuiElement {
     private List<String> lore;
     private Integer amount;
     private Boolean glow;
-    private String internalValue; // If the plugin should build that element in a specific way, internally
+    private String internalValue; // If the plugin should build that element
+                                  // In a specific way, internally.
+                                  // Pretty useful also using ConsumerFilters
+                                  // which contain the ANY (*) flag
 
     private Map<String, String> replacements;
 
@@ -40,7 +43,6 @@ public class GuiElement {
     private int customModelData;
 
     private boolean isGroupElement;
-    // private int order;
 
     private Optional<String> condition;
 
@@ -105,12 +107,11 @@ public class GuiElement {
 
             String newValue = PlaceholderAPI.setPlaceholders(papiReference, key);
 
-            System.out.println("Key: " + key + " Value: " + value + " New Value: " + newValue);
-
-//            if(!value.equals(newValue)) {
-//                placeholders.put(key, newValue);
-//                return true;
-//            }
+            // todo this has been restored. Watch out for consequences
+            if(!value.equals(newValue)) {
+                placeholders.put(key, newValue);
+                return true;
+            }
 
             return true;
         }
@@ -187,24 +188,23 @@ public class GuiElement {
 //        }
     }
 
+    /**
+     * Creates an itemStack with internal Placeholders and PlaceholderAPI support
+     * @param placeholders The placeholders to replace
+     * @param papiReference The player to parse the placeholders for, required by PlaceholderAPI
+     * @return The itemStack
+     */
     public ItemStack create(Map<String, String> placeholders, Player papiReference) {
 
-        GuiElement clone = this.parsePlaceholders(placeholders, papiReference); // HERE AND
-
-
-        // Early exit if replacements are provided, avoiding unnecessary processing
-        //if (replacements != null) {
-        //    clone = clone.executeReplacements(replacements); // TODO WARNING! DOUBLE CLONING | HERE
-        // }
-
-        System.out.println(this.getDisplayName() + " MY FEVORITE DISAPLY NAMRE");
+        GuiElement clone = this.parsePlaceholders(placeholders, papiReference);
 
         // Use ItemCreator to generate and return the final ItemStack
         return new ItemCreator().create(clone);
     }
 
     /**
-     * Quick method to create the itemStack
+     * Quick method to create an itemStack
+     * with replacements support, if they're present
      * @return The itemStack
      */
     public ItemStack create() {
@@ -222,7 +222,7 @@ public class GuiElement {
 
     /**
      * Quick method to create the itemStack
-     * with Placeholders support
+     * with internal placeholders (replacements) support
      * @return The itemStack
      */
     public GuiElement executeReplacements(Map<String, String> placeholders) {
@@ -247,6 +247,12 @@ public class GuiElement {
 
     }
 
+    /**
+     * Replaces placeholders in a string
+     * @param text The text to replace the placeholders in
+     * @param placeholders The placeholders to replace
+     * @return The text with the placeholders replaced
+     */
     private String replace(String text, Map<String, String> placeholders) {
 
         for(Map.Entry<String, String> entry : placeholders.entrySet()) {
@@ -256,6 +262,12 @@ public class GuiElement {
         return text;
     }
 
+    /**
+     * Replaces many placeholders in a list of strings
+     * @param lore The list of strings to replace the placeholders in
+     * @param placeholders The placeholders to replace
+     * @return The list of strings with the placeholders replaced
+     */
     private List<String> replaceMany(List<String> lore, Map<String, String> placeholders) {
 
         List<String> replacedLore = new ArrayList<>();
@@ -268,6 +280,13 @@ public class GuiElement {
     }
 
 
+    /**
+     * Parses the PlaceholderAPI placeholders along with
+     * possible internal given ones
+     * @param internalPlaceholders The internal placeholders
+     * @param player The player to parse the placeholders for, required by PlaceholderAPI
+     * @return A parsed cloned GUI element (to prevent overriding default placeholder tags)
+     */
     public GuiElement parsePlaceholders(Map<String, String> internalPlaceholders, Player player) {
 
         GuiElement element = this.clone(); // avoid removing the placeholders from the original element
@@ -295,6 +314,10 @@ public class GuiElement {
     }
 
 
+    /**
+     * Clones the element
+     * @return The cloned element
+     */
     public GuiElement clone() {
         return GuiElement.builder()
                 .material(material)

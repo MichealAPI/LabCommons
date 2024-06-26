@@ -1,6 +1,5 @@
 package it.mikeslab.commons.api.database.config;
 
-import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.database.Database;
 import it.mikeslab.commons.api.database.SerializableMapConvertible;
 import it.mikeslab.commons.api.database.SupportedDatabase;
@@ -8,7 +7,7 @@ import it.mikeslab.commons.api.database.impl.JSONDatabaseImpl;
 import it.mikeslab.commons.api.database.impl.MongoDatabaseImpl;
 import it.mikeslab.commons.api.database.impl.SQLDatabaseImpl;
 import it.mikeslab.commons.api.database.pojo.URIBuilder;
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -29,9 +28,8 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
         SupportedDatabase dbType = validateDatabaseType(typeAsString);
 
         if(dbType == null) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
                     String.format("Invalid database type: %s", typeAsString)
             );
             return null;
@@ -39,9 +37,8 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
 
         URIBuilder uriBuilder = composeUriBuilder(section);
         if(uriBuilder == null) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.severe(
+                    LogUtils.LogSource.CONFIG,
                     "An error occurred. Check for previous error messages in console."
             );
 
@@ -77,9 +74,8 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
 
         String uri = section.getString("uri", null);
         if(uri == null) {
-            LoggerUtil.log(
-                    Level.SEVERE,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.severe(
+                    LogUtils.LogSource.CONFIG,
                     "Database URI is null! Check your config!"
             );
             return null;

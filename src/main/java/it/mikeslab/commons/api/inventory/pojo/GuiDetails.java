@@ -5,14 +5,10 @@ import com.google.common.collect.Multimap;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import lombok.Data;
-import lombok.Getter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -27,7 +23,7 @@ public class GuiDetails {
 
     // Optional
     private InventoryHolder holder;
-    private Component inventoryName = Component.empty();
+    private String inventoryName = " ";
     private int inventorySize; // calculated or fixed, in case of a chest
     private Map<String, String> placeholders;
 
@@ -35,9 +31,8 @@ public class GuiDetails {
 
     private Map<String, Supplier<String>> injectedConditionPlaceholders;
 
-    private int animationInterval = 2;
-
-    // private boolean closeable;
+    private int animationInterval = 2; // default 2 ticks, it is configurable
+                                       // inside the API client
 
     @ApiStatus.Experimental
     private String text; // valid only for anvil menus

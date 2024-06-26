@@ -1,14 +1,12 @@
-package it.mikeslab.commons.api.inventory.util;
+package it.mikeslab.commons.api.inventory.util.config;
 
 import com.google.common.collect.Multimap;
-import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.experimental.UtilityClass;
 
-import java.util.Map;
 import java.util.logging.Level;
 
 @UtilityClass
@@ -42,9 +40,8 @@ public class GuiChecker {
         // parsing details
 
         if(!GuiChecker.isSizeValid(guiDetails)) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.API,
+            LogUtils.warn(
+                    LogUtils.LogSource.API,
                     "Invalid size (must be a multiple of 9 and less than 54)"
             );
             flag = 1;
@@ -53,9 +50,8 @@ public class GuiChecker {
         GuiType type = guiDetails.getGuiType();
 
         if(type == null) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.API,
+            LogUtils.warn(
+                    LogUtils.LogSource.API,
                     "Null inventory type"
             );
             flag = 1;
@@ -65,9 +61,8 @@ public class GuiChecker {
 
         // If it's empty, inventory will just be empty
         if(elements == null) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.API,
+            LogUtils.warn(
+                    LogUtils.LogSource.API,
                     "Null elements map"
             );
             flag = 1;
@@ -78,9 +73,9 @@ public class GuiChecker {
         // If the layout is not valid, we can't proceed
         if(flag == 0) {
             if(!elements.isEmpty() && isLayoutValid(layout)) {
-                LoggerUtil.log(
+                LogUtils.log(
                         Level.WARNING,
-                        LoggerUtil.LogSource.API,
+                        LogUtils.LogSource.API,
                         "Invalid layout"
                 );
                 flag = 1;

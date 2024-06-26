@@ -1,4 +1,4 @@
-package it.mikeslab.commons.api.inventory;
+package it.mikeslab.commons.api.inventory.util.action.internal;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

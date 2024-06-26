@@ -1,12 +1,12 @@
 package it.mikeslab.commons.api.inventory.event;
 
-import it.mikeslab.commons.api.inventory.ConsumerFilter;
+import it.mikeslab.commons.api.inventory.util.action.internal.ConsumerFilter;
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.factory.GuiFactoryImpl;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.util.ConditionUtil;
-import it.mikeslab.commons.api.inventory.util.CustomInventory;
+import it.mikeslab.commons.api.inventory.CustomInventory;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

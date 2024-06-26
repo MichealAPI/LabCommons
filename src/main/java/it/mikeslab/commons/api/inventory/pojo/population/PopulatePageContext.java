@@ -1,5 +1,6 @@
-package it.mikeslab.commons.api.inventory.pojo;
+package it.mikeslab.commons.api.inventory.pojo.population;
 
+import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bukkit.entity.Player;

@@ -5,7 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import it.mikeslab.commons.api.database.Database;
 import it.mikeslab.commons.api.database.SerializableMapConvertible;
 import it.mikeslab.commons.api.database.pojo.URIBuilder;
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import org.bson.Document;
 
 import java.io.*;
@@ -106,9 +106,8 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
             return file.createNewFile();
         } catch (IOException e) {
 
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.warn(
+                    LogUtils.LogSource.DATABASE,
                     "Error during createSourceFile: " + e
             );
 
@@ -122,9 +121,8 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
             List<T> objects = gson.fromJson(reader, listType);
             return objects != null ? objects : new ArrayList<>();
         } catch (IOException e) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.warn(
+                    LogUtils.LogSource.DATABASE,
                     "Error during readFromFile: " + e
             );
             return new ArrayList<>();
@@ -136,9 +134,8 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
             gson.toJson(objects, writer);
             return true;
         } catch (IOException e) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.warn(
+                    LogUtils.LogSource.DATABASE,
                     "Error during writeToFile: " + e
             );
             return false;

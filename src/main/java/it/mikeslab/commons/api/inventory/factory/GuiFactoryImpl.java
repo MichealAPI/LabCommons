@@ -4,11 +4,12 @@ import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
+import it.mikeslab.commons.api.inventory.util.animation.AnimationUtil;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
-import it.mikeslab.commons.api.inventory.util.CustomInventory;
-import it.mikeslab.commons.api.inventory.util.InventoryMap;
+import it.mikeslab.commons.api.inventory.CustomInventory;
+import it.mikeslab.commons.api.inventory.helper.InventoryMap;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.HumanEntity;
@@ -23,7 +24,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 
 public class GuiFactoryImpl implements GuiFactory {
 
@@ -71,9 +71,8 @@ public class GuiFactoryImpl implements GuiFactory {
     public void open(Player player, int id) {
 
         if(!cachedGuis.containsKey(id)) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.API,
+            LogUtils.warn(
+                    LogUtils.LogSource.API,
                     "(OPEN) Gui with id " + id + " not found"
             );
             return;
@@ -114,7 +113,7 @@ public class GuiFactoryImpl implements GuiFactory {
 
         // If it has an animation saved, start it
         if(customGui.isAnimated()) {
-            int taskId = customGui.getAnimationRunnable().runTaskTimer(
+            int taskId = AnimationUtil.getAnimationRunnable(customGui).runTaskTimer(
                     instance,
                     0,
                     customGui.getGuiDetails().getAnimationInterval()
@@ -153,9 +152,8 @@ public class GuiFactoryImpl implements GuiFactory {
     public void update(int id, @NotNull GuiDetails newGuiDetails) {
 
         if(!cachedGuis.containsKey(id)) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.API,
+            LogUtils.warn(
+                    LogUtils.LogSource.API,
                     "(UPDATE) Gui with id " + id + " not found"
             );
             return;

@@ -1,12 +1,10 @@
-package it.mikeslab.commons.api.inventory.pojo;
+package it.mikeslab.commons.api.inventory.pojo.population;
 
 import com.google.common.collect.Multimap;
+import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Map;
 
 
 /**

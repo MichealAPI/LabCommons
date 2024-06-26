@@ -1,5 +1,6 @@
-package it.mikeslab.commons.api.inventory.util;
+package it.mikeslab.commons.api.inventory.helper;
 
+import it.mikeslab.commons.api.inventory.CustomInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

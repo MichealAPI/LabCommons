@@ -2,14 +2,19 @@ package it.mikeslab.commons.api.inventory;
 
 import com.google.common.collect.Multimap;
 import it.mikeslab.commons.api.component.ComponentsUtil;
-import it.mikeslab.commons.api.inventory.pojo.*;
-import it.mikeslab.commons.api.inventory.util.GuiChecker;
+import it.mikeslab.commons.api.inventory.pojo.Animation;
+import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.commons.api.inventory.pojo.GuiElement;
+import it.mikeslab.commons.api.inventory.pojo.population.InventoryPopulationContext;
+import it.mikeslab.commons.api.inventory.pojo.population.PopulatePageContext;
+import it.mikeslab.commons.api.inventory.pojo.population.PopulateRowContext;
+import it.mikeslab.commons.api.inventory.util.MappingUtil;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
-import it.mikeslab.commons.api.inventory.util.frame.FrameColorUtil;
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.inventory.util.config.GuiChecker;
+import it.mikeslab.commons.api.inventory.util.animation.FrameColorUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.Getter;
 import lombok.Setter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,26 +23,24 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 
 @Getter
 @Setter
 public class CustomGui {
 
     private final GuiFactory guiFactory;
-    private final JavaPlugin instance;
     private final int id;
+
+    private JavaPlugin instance;
 
     private UUID ownerUUID;
 
     private GuiDetails guiDetails,
                        tempGuiDetails; // for placeholders / internal injections
 
-    // Note: the holder will also use this
     private Inventory inventory;
 
     private final Map<Character, List<Integer>> characterListMap = new HashMap<>(); // A mapping of slots to characters
@@ -48,42 +51,29 @@ public class CustomGui {
 
     private final Map<Character, ItemStack> cachedItems = new HashMap<>();
 
-    private boolean animated;
+    private boolean animated; // True if the AnimationRunnable should be requested
 
-    private int animationTaskId = -1;
+    private int animationTaskId = -1; // Refers to the BukkitTask id
 
     private InventoryPopulationContext populationContext;
 
-    private Player player; // This is not going to remain,
+    private Player tempPlayer; // This is not going to remain in memory
 
-    private boolean populateRequiredOnly;
 
     public CustomGui(GuiFactory guiFactory, JavaPlugin instance, int id) {
         this.guiFactory = guiFactory;
-        this.instance = instance;
         this.id = id;
-
-        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        if (stackTraceElements.length > 2) {
-            StackTraceElement caller = stackTraceElements[2];
-            LoggerUtil.log(
-                    Level.INFO,
-                    LoggerUtil.LogSource.CONFIG,
-                    String.format(
-                            "CustomGui instance created by %s",
-                            caller.getClassName()
-                    )
-            );
-        }
+        this.instance = instance;
     }
+
+
     // it is used just to initialize the inventory
 
     public void generateInventory() {
 
         if (!GuiChecker.isValid(guiDetails)) {
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.CONFIG,
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
                     "Invalid gui details"
             );
             return;
@@ -97,21 +87,19 @@ public class CustomGui {
                 .toInventoryType();
 
         // Optional details
-        Component title = this.getGuiDetails().getInventoryName(); // todo toString
+        String title = this.getGuiDetails().getInventoryName();
 
-        // this.getGuiDetails().setTempPageElements(new HashMap<>()); // reset temp
 
         // Generating inventory
-
-        if (inventory == null) { // todo temp remove previous: inventory == null
+        if (inventory == null) {
             if (type != InventoryType.CHEST) {
-                inventory = Bukkit.createInventory(null, type, ComponentsUtil.serialize(title));
+                inventory = Bukkit.createInventory(null, type, ComponentsUtil.getSerializedComponent(title));
             } else {
 
                 // We cannot extract to specify
                 // the size of the inventory
 
-                inventory = Bukkit.createInventory(null, size, ComponentsUtil.serialize(title));
+                inventory = Bukkit.createInventory(null, size, ComponentsUtil.getSerializedComponent(title));
             }
         }
 
@@ -127,7 +115,11 @@ public class CustomGui {
      */
     public void populateInventory() {
 
-        this.player = Bukkit.getPlayer(ownerUUID);
+        // A player instance is needed in many contexts,
+        // although having it stored could cause memory leaks on the long run
+        // a temporary player instance based on the player's UUID is considered
+        // to be the best approach
+        this.tempPlayer = Bukkit.getPlayer(ownerUUID);
 
         // Get the elements and layout from the GuiDetails
         Multimap<Character, GuiElement> elements = this.getGuiDetails().getElements();
@@ -138,8 +130,11 @@ public class CustomGui {
             return;
         }
 
-        // Map characters to slots
-        this.mapCharToSlot(layout);
+        // Map characters from the layout to slots
+        MappingUtil.mapCharToSlot(
+                layout,
+                characterListMap
+        );
 
         // Populate the inventory
         this.populationContext = new InventoryPopulationContext(
@@ -149,12 +144,19 @@ public class CustomGui {
 
         // Post-process guiElement for animations
         for (GuiElement guiElement : elements.values()) {
-            this.postProcessElement(guiElement, player);
+
+            // if an element should be animated, it will generate
+            // the missing animation frames
+            this.postProcessElement(guiElement, tempPlayer);
+
         }
 
+        // Populate the page
         this.populate();
 
-        this.player = null;
+        // Reset the temporary player instance to prevent
+        // memory leaks
+        this.tempPlayer = null;
 
     }
 
@@ -188,8 +190,11 @@ public class CustomGui {
 
         boolean isGroupElement = elementIterator.hasNext() && elementIterator.next().isGroupElement();
 
+        // If the number of elements is greater than the number of slots, then it's pageable
+        boolean canBePaginated = populationContext.getElements().get(targetChar).size() > slots.size();
+
         // If it is a group element and there are more elements than slots, create a new PageSystem
-        if (isGroupElement && populationContext.getElements().get(targetChar).size() > slots.size()) {
+        if (isGroupElement && canBePaginated) {
 
             if (this.pageSystemMap.containsKey(targetChar)) {
                 return;
@@ -221,20 +226,7 @@ public class CustomGui {
 
         for (GuiElement guiElement : element) {
 
-            if (guiFactory.getConditionParser() != null && guiElement.getCondition().isPresent()) {
-
-                boolean isValid = guiFactory.getConditionParser()
-                        .parse(
-                                Bukkit.getPlayer(ownerUUID),
-                                guiElement.getCondition().get(),
-                                this.getGuiDetails().getInjectedConditionPlaceholders()
-                        );
-
-                if (!isValid) {
-                    continue;
-                }
-
-            }
+            if(!this.hasValidCondition(guiElement)) continue;
 
             if (guiElement.isAnimated()) {
 
@@ -278,7 +270,7 @@ public class CustomGui {
 
         if (cachedItems.containsKey(targetChar)) {
 
-            boolean placeholdersUnchanged = element.containsPlaceholders() && !element.havePlaceholdersChanged(player);
+            boolean placeholdersUnchanged = element.containsPlaceholders() && !element.havePlaceholdersChanged(tempPlayer);
             boolean containsConditionPlaceholders = element.containsConditionPlaceholders(guiDetails);
 
             if (conditionAbsent && placeholdersUnchanged && !containsConditionPlaceholders) {
@@ -291,14 +283,18 @@ public class CustomGui {
             return new ItemStack(Material.AIR);
         }
 
-        Map<String, String> placeholders = this.getGuiDetails().getPlaceholders();
+        Map<String, String> internalPlaceholders = this.getGuiDetails().getPlaceholders();
 
-        for(Map.Entry<String, Supplier<String>> entry : this.getGuiDetails().getInjectedConditionPlaceholders().entrySet()) {
-            placeholders.put(entry.getKey(), entry.getValue().get());
-        }
+        // Adds the condition placeholders to the internal ones
+        internalPlaceholders.putAll(
+                this.getUpdatedConditionPlaceholders()
+        );
 
         // Create a new ItemStack based on the current context
-        ItemStack stack = element.create(placeholders, player);
+        ItemStack stack = element.create(
+                internalPlaceholders,
+                tempPlayer
+        );
 
         // Cache the ItemStack if no conditions are present
         if (conditionAbsent) {
@@ -315,8 +311,10 @@ public class CustomGui {
      * @param slots      The slots
      * @param item       The item to populate
      */
-    private void populateSlots(char targetChar, List<Integer> slots, ItemStack item, boolean metaReplaceOnly) {
+    public void populateSlots(char targetChar, List<Integer> slots, ItemStack item, boolean metaReplaceOnly) {
+
         int slotCounter = 0;
+
         for (String row : this.getGuiDetails().getInventoryLayout()) {
             slotCounter = populateRow(
                     new PopulateRowContext(
@@ -333,6 +331,7 @@ public class CustomGui {
                 break;
             }
         }
+
     }
 
     /**
@@ -369,56 +368,11 @@ public class CustomGui {
                 }
 
 
-                context.setSlotCounter(context.getSlotCounter() + 1); // todo there may be a problem here
+                context.setSlotCounter(context.getSlotCounter() + 1);
 
             } // todo isnt cached anymore
         }
         return context.getSlotCounter();
-    }
-
-    /**
-     * Map the characters to slots
-     *
-     * @param layout The layout
-     */
-    private void mapCharToSlot(String[] layout) {
-
-        // If the map is not empty, return early
-        if (!characterListMap.isEmpty()) {
-            return;
-        }
-
-        for (int i = 0; i < layout.length; i++) {
-            mapRowToSlots(layout[i], i);
-        }
-    }
-
-    /**
-     * Map a row of chars to slots
-     *
-     * @param row      The row
-     * @param rowIndex The row index
-     */
-    private void mapRowToSlots(String row, int rowIndex) {
-        for (int j = 0; j < row.length(); j++) {
-            char c = row.charAt(j);
-            if (c != ' ') {
-                addCharToMap(c, rowIndex * row.length() + j);
-            }
-        }
-    }
-
-    /**
-     * Add a character to the map
-     *
-     * @param c    The character
-     * @param slot The slot
-     */
-    private void addCharToMap(char c, int slot) {
-        if (!characterListMap.containsKey(c)) {
-            characterListMap.put(c, new ArrayList<>());
-        }
-        characterListMap.get(c).add(slot);
     }
 
     /**
@@ -445,19 +399,7 @@ public class CustomGui {
 
             GuiElement element = context.getSubList().get(i);
 
-            if (guiFactory.getConditionParser() != null && element.getCondition().isPresent()) {
-
-                boolean isValid = guiFactory.getConditionParser()
-                        .parse(
-                                player,
-                                element.getCondition().get(),
-                                this.getGuiDetails().getInjectedConditionPlaceholders()
-                        );
-
-                if (!isValid) {
-                    continue;
-                }
-            }
+            if(!this.hasValidCondition(element)) continue;
 
             GuiElement cloneElement = element.clone();
 
@@ -479,63 +421,29 @@ public class CustomGui {
     }
 
 
-    public BukkitRunnable getAnimationRunnable() {
 
-        if (!animated) {
-            throw new IllegalStateException("The gui is not animated");
+
+    private boolean hasValidCondition(GuiElement element) {
+        if (guiFactory.getConditionParser() != null && element.getCondition().isPresent()) {
+
+            return guiFactory.getConditionParser()
+                    .parse(
+                            tempPlayer,
+                            element.getCondition().get(),
+                            this.getGuiDetails().getInjectedConditionPlaceholders()
+                    );
         }
 
-        return new BukkitRunnable() {
-            int frame = 0;
-            final Player player = Bukkit.getPlayer(ownerUUID);
-
-            @Override
-            public void run() {
-
-                for (Map.Entry<Character, Animation> animatedElement : animatedElements.entrySet()) {
-
-                    ItemStack item = animatedElement
-                            .getValue()
-                            .getGuiElement()
-                            .getFrames()
-                            .get()[frame];
-
-                    populateSlots(
-                            animatedElement.getKey(),
-                            animatedElement.getValue().getSlots(),
-                            item,
-                            true
-                    );
-
-                    // If the player disconnects or whatever, stops the task
-                    if (player == null) {
-                        this.cancel();
-                        return;
-                    }
-
-                    player.updateInventory();
-                }
-
-                frame++;
-
-                if (frame >= FrameColorUtil.MAX_FRAMES) {
-                    frame = 0;
-                }
-            }
-        };
+        return true;
     }
 
 
     private void postProcessElement(GuiElement guiElement, Player player) {
         Optional<ItemStack[]> frames = Optional.empty();
 
-        if(populateRequiredOnly) return;
-
         boolean hasChangedPlaceholders = guiElement.containsPlaceholders() && guiElement.havePlaceholdersChanged(player);
         boolean containsConditionPlaceholders = guiElement.containsConditionPlaceholders(guiDetails);
 
-        System.out.println("v1: " + guiElement.containsPlaceholders());
-        System.out.println("v2: " + hasChangedPlaceholders);
 
         if (guiElement.getFrames().isPresent() && !hasChangedPlaceholders && !containsConditionPlaceholders) {
             return;
@@ -551,8 +459,13 @@ public class CustomGui {
 
         guiElement.setFrames(frames);
     }
-    
-    
+
+
+    /**
+     * Get the GuiDetails, preferred the temporary one
+     * to avoid overwriting the original one
+     * @return The GuiDetails
+     */
     public GuiDetails getGuiDetails() {
         
         if(this.tempGuiDetails != null) {
@@ -561,6 +474,21 @@ public class CustomGui {
         
         return this.guiDetails;
         
+    }
+
+
+    /**
+     * Get the latest value from each cached supplier
+     * @return The updated condition placeholders
+     */
+    private Map<String, String> getUpdatedConditionPlaceholders() {
+        Map<String, String> placeholders = new HashMap<>();
+
+        for(Map.Entry<String, Supplier<String>> entry : this.getGuiDetails().getInjectedConditionPlaceholders().entrySet()) {
+            placeholders.put(entry.getKey(), entry.getValue().get());
+        }
+
+        return placeholders;
     }
 
 

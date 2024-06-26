@@ -11,11 +11,10 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
-import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.database.Database;
 import it.mikeslab.commons.api.database.SerializableMapConvertible;
 import it.mikeslab.commons.api.database.pojo.URIBuilder;
-import it.mikeslab.commons.api.logger.LoggerUtil;
+import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.RequiredArgsConstructor;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
@@ -99,9 +98,8 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
         } catch (Exception e) {
 
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.warn(
+                    LogUtils.LogSource.DATABASE,
                     "Error during upsert: " + e
             );
 
@@ -177,9 +175,8 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
         } catch (Exception e) {
 
-            LoggerUtil.log(
-                    Level.WARNING,
-                    LoggerUtil.LogSource.DATABASE,
+            LogUtils.warn(
+                    LogUtils.LogSource.DATABASE,
                     "Error during delete: " + e);
 
             return false;
