@@ -2,6 +2,8 @@ package it.mikeslab.commons.api.inventory.util.animation;
 
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.pojo.Animation;
+import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
+import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
+import java.util.Optional;
 
 @UtilityClass
 public class AnimationUtil {
@@ -66,5 +69,35 @@ public class AnimationUtil {
             }
         };
     }
+
+    /**
+     * Post process a guiElement which needs an animation by
+     * requesting the creation of its missing frames
+     * @param guiDetails The customGui details
+     * @param guiElement The target element
+     * @param player The referencePlayer for Placeholders by PlaceholderAPI
+     */
+    public void postProcessElement(GuiDetails guiDetails, GuiElement guiElement, Player player) {
+        Optional<ItemStack[]> frames = Optional.empty();
+
+        boolean hasChangedPlaceholders = guiElement.containsPlaceholders() && guiElement.havePlaceholdersChanged(player);
+        boolean containsConditionPlaceholders = guiElement.containsConditionPlaceholders(guiDetails);
+
+
+        if(guiElement.getFrames().isPresent()) return;
+        if(!hasChangedPlaceholders) return;
+        if(!containsConditionPlaceholders) return;
+
+        if (guiElement.isAnimated()) {
+            frames = Optional.of(FrameColorUtil.getFrameColors(
+                    guiElement,
+                    guiDetails.getPlaceholders(),
+                    player)
+            );
+        }
+
+        guiElement.setFrames(frames);
+    }
+
 
 }

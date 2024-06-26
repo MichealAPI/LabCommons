@@ -10,6 +10,7 @@ import it.mikeslab.commons.api.inventory.pojo.population.PopulatePageContext;
 import it.mikeslab.commons.api.inventory.pojo.population.PopulateRowContext;
 import it.mikeslab.commons.api.inventory.util.MappingUtil;
 import it.mikeslab.commons.api.inventory.util.PageSystem;
+import it.mikeslab.commons.api.inventory.util.animation.AnimationUtil;
 import it.mikeslab.commons.api.inventory.util.config.GuiChecker;
 import it.mikeslab.commons.api.inventory.util.animation.FrameColorUtil;
 import it.mikeslab.commons.api.logger.LogUtils;
@@ -147,7 +148,11 @@ public class CustomGui {
 
             // if an element should be animated, it will generate
             // the missing animation frames
-            this.postProcessElement(guiElement, tempPlayer);
+            AnimationUtil.postProcessElement(
+                    getGuiDetails(),
+                    guiElement,
+                    tempPlayer
+            );
 
         }
 
@@ -235,7 +240,7 @@ public class CustomGui {
                 continue;
             }
 
-            ItemStack item = getItem(targetChar, guiElement);
+            ItemStack item = this.getItem(targetChar, guiElement);
             populateSlots(targetChar, slots, item, false);
         }
 
@@ -268,19 +273,13 @@ public class CustomGui {
         // Directly return from cache if conditions are met
         boolean conditionAbsent = !element.getCondition().isPresent();
 
-        if (cachedItems.containsKey(targetChar)) {
-
-            boolean placeholdersUnchanged = element.containsPlaceholders() && !element.havePlaceholdersChanged(tempPlayer);
-            boolean containsConditionPlaceholders = element.containsConditionPlaceholders(guiDetails);
-
-            if (conditionAbsent && placeholdersUnchanged && !containsConditionPlaceholders) {
-                return cachedItems.get(targetChar);
-            }
+        if (cachedItems.containsKey(targetChar) && isCacheable(element)) {
+            return cachedItems.get(targetChar);
         }
 
         // Handle group elements with a direct return of a new ItemStack
         if (element.isGroupElement() && pageSystemMap.containsKey(targetChar)) {
-            return new ItemStack(Material.AIR);
+            return null; // air
         }
 
         Map<String, String> internalPlaceholders = this.getGuiDetails().getPlaceholders();
@@ -438,28 +437,6 @@ public class CustomGui {
     }
 
 
-    private void postProcessElement(GuiElement guiElement, Player player) {
-        Optional<ItemStack[]> frames = Optional.empty();
-
-        boolean hasChangedPlaceholders = guiElement.containsPlaceholders() && guiElement.havePlaceholdersChanged(player);
-        boolean containsConditionPlaceholders = guiElement.containsConditionPlaceholders(guiDetails);
-
-
-        if (guiElement.getFrames().isPresent() && !hasChangedPlaceholders && !containsConditionPlaceholders) {
-            return;
-        }
-
-        if (guiElement.isAnimated()) {
-            frames = Optional.of(FrameColorUtil.getFrameColors(
-                    guiElement,
-                    getGuiDetails().getPlaceholders(),
-                    player)
-            );
-        }
-
-        guiElement.setFrames(frames);
-    }
-
 
     /**
      * Get the GuiDetails, preferred the temporary one
@@ -489,6 +466,24 @@ public class CustomGui {
         }
 
         return placeholders;
+    }
+
+    /**
+     * Check if the element is a static one by checking if contains
+     * conditions, changed placeholders or condition placeholders
+     * @param element The element to check
+     * @return True if the element is cacheable
+     */
+    private boolean isCacheable(GuiElement element) {
+
+        boolean placeholdersUnchanged = element.containsPlaceholders() && !element.havePlaceholdersChanged(tempPlayer);
+        boolean containsConditionPlaceholders = element.containsConditionPlaceholders(guiDetails);
+        boolean conditionAbsent = !element.getCondition().isPresent();
+
+        if(!conditionAbsent) return true;
+        if(!placeholdersUnchanged) return true;
+
+        return !containsConditionPlaceholders;  // todo I inverted logically the condition here, if some kind of problem occurs, take a look here
     }
 
 
