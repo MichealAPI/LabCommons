@@ -2,6 +2,7 @@ package it.mikeslab.commons.api.inventory.pojo;
 
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
+import it.mikeslab.commons.api.various.StringUtil;
 import it.mikeslab.commons.api.various.item.ItemCreator;
 import it.mikeslab.commons.api.inventory.util.animation.FrameColorUtil;
 import lombok.Builder;
@@ -125,16 +126,12 @@ public class GuiElement {
 
         for(String placeholder : placeholders) {
 
-            if(displayName != null && displayName.contains(placeholder)) {
-                return true;
+            if(displayName != null) {
+                return displayName.contains(placeholder);
             }
 
             if(lore != null) {
-                for(String line : lore) {
-                    if(line.contains(placeholder)) {
-                        return true;
-                    }
-                }
+                return StringUtil.contains(lore, placeholder);
             }
 
         }

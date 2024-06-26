@@ -23,4 +23,10 @@ public class StringUtil {
                 .orElse(new ArrayList<>());
     }
 
+
+    public boolean contains(List<String> strings, String string) {
+        return strings.stream().anyMatch(s -> s.contains(string));
+    }
+
+
 }
