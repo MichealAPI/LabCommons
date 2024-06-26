@@ -130,8 +130,8 @@ public class GuiListener implements Listener {
             GuiInteractEvent guiInteractEvent = fireClickEvent(event, clickedElement);
             if(guiInteractEvent.isCancelled()) return;
 
-            runDefaultActionHandler(gui, clickedElement, guiInteractEvent);
-            handleClickActions(gui, clickedElement, guiInteractEvent);
+            this.runDefaultActionHandler(gui, clickedElement, guiInteractEvent);
+            this.handleClickActions(gui, clickedElement, guiInteractEvent);
         }
     }
 
@@ -171,15 +171,15 @@ public class GuiListener implements Listener {
     /**
      * Run the default action handler
      * @param gui The gui
-     * @param clickedElement The clicked element
+     * @param clickedElements The clicked element
      * @param guiInteractEvent The custom click event
      */
-    private void runDefaultActionHandler(CustomGui gui, Collection<GuiElement> clickedElement, GuiInteractEvent guiInteractEvent) {
+    private void runDefaultActionHandler(CustomGui gui, Collection<GuiElement> clickedElements, GuiInteractEvent guiInteractEvent) {
         if(guiFactoryImpl.getActionHandler() != null) {
 
             Player player = Bukkit.getPlayer(gui.getOwnerUUID());
 
-            for(GuiElement element : clickedElement) {
+            for(GuiElement element : clickedElements) {
 
                 if(element.getCondition().isPresent() && guiFactoryImpl.getConditionParser() != null) {
 
@@ -189,7 +189,7 @@ public class GuiListener implements Listener {
                             gui.getGuiDetails().getInjectedConditionPlaceholders()
                     );
 
-
+                    // Parse the condition
                     boolean can = guiFactoryImpl.getConditionParser().parse(
                             guiInteractEvent.getWhoClicked(),
                             replacedCondition
@@ -198,12 +198,14 @@ public class GuiListener implements Listener {
                     if(!can) {
                         continue;
                     }
+
+                    this.acceptActionConsumers(
+                            gui.getId(),
+                            element,
+                            guiInteractEvent
+                    );
                 }
 
-
-                element.getActions().forEach(action -> {
-                    guiFactoryImpl.getActionHandler().handleAction(gui.getId(), action, guiInteractEvent);
-                });
             }
         }
     }
@@ -235,6 +237,12 @@ public class GuiListener implements Listener {
 
     boolean isCustomInventory(UUID referencePlayerUUID, Inventory inventory) {
         return guiFactoryImpl.getCustomInventory(referencePlayerUUID, inventory) != null;
+    }
+
+    private void acceptActionConsumers(int guiId, GuiElement element, GuiInteractEvent event) {
+        element.getActions().forEach(action -> {
+            guiFactoryImpl.getActionHandler().handleAction(guiId, action, event);
+        });
     }
 
 
