@@ -2,16 +2,12 @@ package it.mikeslab.commons.api.inventory.util.action;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
-import it.mikeslab.commons.api.inventory.event.GuiEvent;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
-import it.mikeslab.commons.api.inventory.event.GuiOpenEvent;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class ActionHandlerImpl implements ActionHandler {
 
@@ -26,43 +22,28 @@ public class ActionHandlerImpl implements ActionHandler {
     @Override
     public void handleAction(int inventoryId, String actionWithArgs, GuiInteractEvent event) {
 
-        // If it doesn't contain a colon, it's not a valid action
-        // if (!actionWithArgs.contains(":")) {
-        //    return;
-        //}
-
         String[] action = actionWithArgs.split(":");
         String prefix = action[0];
         String args = action.length > 1 ? action[1] : "";
 
+        // Remove leading space from args if present
         if(args.startsWith(" ")) {
             args = args.substring(1);
         }
 
-        // If the prefix is not registered, return
+        // Handle global actions
         if (this.globalActionsMap.containsKey(prefix)) {
-
-            // Get the action from the map
-            Collection<GuiAction> globalActions = this.globalActionsMap.get(prefix);
-
-            // Iterate over the globalActions
-            for (GuiAction guiAction : globalActions) {
+            for (GuiAction guiAction : this.globalActionsMap.get(prefix)) {
                 guiAction.getAction().accept(event, args);
             }
-
         }
 
-        // Custom inventory injected actions are more specific than globals
-        Multimap<String, GuiAction> injectedActions = this.injectedActions.getOrDefault(inventoryId, null);
-
+        // Handle custom-injected actions specific to the inventory
+        Multimap<String, GuiAction> injectedActions = this.injectedActions.get(inventoryId);
         if(injectedActions != null && injectedActions.containsKey(prefix)) {
-
-            Collection<GuiAction> guiActionCollection = injectedActions.get(prefix);
-
-            for(GuiAction guiAction : guiActionCollection) {
+            for (GuiAction guiAction : injectedActions.get(prefix)) {
                 guiAction.getAction().accept(event, args);
             }
-
         }
 
     }
