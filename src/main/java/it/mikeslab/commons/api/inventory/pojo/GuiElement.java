@@ -2,9 +2,9 @@ package it.mikeslab.commons.api.inventory.pojo;
 
 import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
+import it.mikeslab.commons.api.inventory.util.animation.FrameColorUtil;
 import it.mikeslab.commons.api.various.StringUtil;
 import it.mikeslab.commons.api.various.item.ItemCreator;
-import it.mikeslab.commons.api.inventory.util.animation.FrameColorUtil;
 import lombok.Builder;
 import lombok.Data;
 import me.clip.placeholderapi.PlaceholderAPI;

@@ -3,8 +3,6 @@ package it.mikeslab.commons.api.various.delay;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
-import java.util.function.Consumer;
-
 public interface DelayHandler<T extends DelayedAction> {
 
     /**

@@ -13,7 +13,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {

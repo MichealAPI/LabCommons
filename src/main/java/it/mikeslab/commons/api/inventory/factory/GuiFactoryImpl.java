@@ -1,14 +1,14 @@
 package it.mikeslab.commons.api.inventory.factory;
 
 import it.mikeslab.commons.api.inventory.CustomGui;
+import it.mikeslab.commons.api.inventory.CustomInventory;
 import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
-import it.mikeslab.commons.api.inventory.util.animation.AnimationUtil;
-import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
-import it.mikeslab.commons.api.inventory.CustomInventory;
 import it.mikeslab.commons.api.inventory.helper.InventoryMap;
+import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
+import it.mikeslab.commons.api.inventory.util.animation.AnimationUtil;
 import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.Getter;
 import lombok.Setter;

@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class DelayHandlerImpl<T extends DelayedAction> implements DelayHandler<T> {
 

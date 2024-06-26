@@ -5,7 +5,6 @@ import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.nio.file.Path;
 import java.util.Map;

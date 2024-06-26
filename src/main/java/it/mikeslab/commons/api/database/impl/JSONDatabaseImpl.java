@@ -12,7 +12,6 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {

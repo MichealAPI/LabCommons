@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.io.File;
-import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {

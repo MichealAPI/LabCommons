@@ -1,7 +1,6 @@
 package it.mikeslab.commons.api.inventory.util.action;
 
 import com.google.common.collect.Multimap;
-import it.mikeslab.commons.api.inventory.event.GuiEvent;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
 

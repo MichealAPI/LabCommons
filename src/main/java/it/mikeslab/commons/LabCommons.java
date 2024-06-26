@@ -2,14 +2,10 @@ package it.mikeslab.commons;
 
 import it.mikeslab.commons.api.chat.ChatMessagingHandler;
 import it.mikeslab.commons.api.chat.ChatMessagingListener;
-import it.mikeslab.commons.api.inventory.CustomGui;
 import lombok.Getter;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
