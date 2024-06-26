@@ -22,7 +22,8 @@ public class GuiContext {
 
     private Path relativePath; // The file name of the inventory
 
-    private boolean closeOnFail; // If the inventory should be closed if the checks fail
+    @Deprecated
+    private boolean closeOnFail; // If the inventory should be closed if the checks fail // todo remove
 
     private InventoryType inventoryType; // The type of the inventory
 

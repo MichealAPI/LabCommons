@@ -83,10 +83,8 @@ public class AnimationUtil {
         boolean hasChangedPlaceholders = guiElement.containsPlaceholders() && guiElement.havePlaceholdersChanged(player);
         boolean containsConditionPlaceholders = guiElement.containsConditionPlaceholders(guiDetails);
 
-
-        if(guiElement.getFrames().isPresent()) return;
-        if(!hasChangedPlaceholders) return;
-        if(!containsConditionPlaceholders) return;
+        if(guiElement.getFrames().isPresent() && !hasChangedPlaceholders) return;
+        if(containsConditionPlaceholders) return;
 
         if (guiElement.isAnimated()) {
             frames = Optional.of(FrameColorUtil.getFrameColors(

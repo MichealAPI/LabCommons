@@ -18,11 +18,12 @@ public class ActionHelper {
 
     /**
      * Execute the action handler for a specific element
+     *
      * @param element The element
      */
     public void executeActionHandler(GuiElement element) {
 
-        if(element.getCondition().isPresent() && guiFactory.getConditionParser() != null) {
+        if (element.getCondition().isPresent() && guiFactory.getConditionParser() != null) {
 
             String replacedCondition = ConditionUtil.replace(
                     player,
@@ -36,17 +37,18 @@ public class ActionHelper {
                     replacedCondition
             );
 
-            if(!can) {
+            if (!can) {
                 return;
             }
-
-            this.acceptActionConsumers(
-                    gui.getId(),
-                    element,
-                    event
-            );
         }
+
+        this.acceptActionConsumers(
+                gui.getId(),
+                element,
+                event
+        );
     }
+
 
 
     private void acceptActionConsumers(int guiId, GuiElement element, GuiInteractEvent event) {

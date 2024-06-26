@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -20,6 +22,8 @@ import java.util.UUID;
  */
 @UtilityClass
 public class SkullUtil {
+
+    private static final Map<String, SkullMeta> SKULL_META_CACHE = new HashMap<>();
 
     /**
      * Gets a head with the skin of the given OfflinePlayer
@@ -38,24 +42,20 @@ public class SkullUtil {
      */
     public ItemStack getHead(@NotNull final String base64) {
         final ItemStack head = XMaterial.PLAYER_HEAD.parseItem();
-        @SuppressWarnings("TypeMayBeWeakened") final SkullMeta meta = (SkullMeta) head.getItemMeta();
-        final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "");
-        gameProfile.getProperties().put("textures", new Property("textures", base64));
-        final Field profileField;
-        assert meta != null;
-        try {
-            profileField = meta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(meta, gameProfile);
-            head.setItemMeta(meta);
-        } catch (final NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+
+        final SkullMeta meta = (SkullMeta) getHeadMeta(base64);
+
+        head.setItemMeta(meta);
+
         return head;
     }
 
 
     public ItemMeta getHeadMeta(@NotNull final String base64) {
+
+        if(SKULL_META_CACHE.containsKey(base64)) {
+            return SKULL_META_CACHE.get(base64);
+        }
 
         SkullMeta skullMeta = (SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta();
 
@@ -70,6 +70,9 @@ public class SkullUtil {
         } catch (final NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
+
+        SKULL_META_CACHE.put(base64, skullMeta);
+
         return skullMeta;
     }
 

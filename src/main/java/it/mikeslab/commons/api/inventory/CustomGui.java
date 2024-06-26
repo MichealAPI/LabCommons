@@ -478,10 +478,9 @@ public class CustomGui {
         boolean containsConditionPlaceholders = element.containsConditionPlaceholders(guiDetails);
         boolean conditionAbsent = !element.getCondition().isPresent();
 
-        if(!conditionAbsent) return true;
-        if(!placeholdersUnchanged) return true;
+        if(!conditionAbsent && !placeholdersUnchanged) return true;
 
-        return !containsConditionPlaceholders;  // todo I inverted logically the condition here, if some kind of problem occurs, take a look here
+        return containsConditionPlaceholders;  // todo I inverted logically the condition here, if some kind of problem occurs, take a look here
     }
 
 
