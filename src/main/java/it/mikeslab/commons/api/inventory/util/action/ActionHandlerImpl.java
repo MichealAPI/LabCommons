@@ -31,22 +31,10 @@ public class ActionHandlerImpl implements ActionHandler {
             args = args.substring(1);
         }
 
-        // Handle global actions
-        if (this.globalActionsMap.containsKey(prefix)) {
-            for (GuiAction guiAction : this.globalActionsMap.get(prefix)) {
-                guiAction.getAction().accept(event, args);
-            }
-        }
-
-        // Handle custom-injected actions specific to the inventory
-        Multimap<String, GuiAction> injectedActions = this.injectedActions.get(inventoryId);
-        if(injectedActions != null && injectedActions.containsKey(prefix)) {
-            for (GuiAction guiAction : injectedActions.get(prefix)) {
-                guiAction.getAction().accept(event, args);
-            }
-        }
-
+        this.handleGlobalActions(prefix, event, args);
+        this.handleInjectedActions(inventoryId, prefix, event, args);
     }
+
 
 
     @Override
@@ -70,6 +58,45 @@ public class ActionHandlerImpl implements ActionHandler {
         actions.put(prefix, action);
 
         this.injectedActions.put(inventoryId, actions);
+    }
+
+
+    /**
+     * Handle the global actions
+     * @param prefix The action prefix
+     * @param event The event
+     * @param args The arguments
+     */
+    private void handleGlobalActions(String prefix, GuiInteractEvent event, String args) {
+
+        // Check if the action exists in the global actions map
+        if (this.globalActionsMap.containsKey(prefix)) {
+
+            for (GuiAction guiAction : this.globalActionsMap.get(prefix)) {
+
+                // accepts a consumer if the action is actually mapped
+                guiAction.getAction().accept(event, args);
+            }
+
+        }
+    }
+
+
+    private void handleInjectedActions(int inventoryId, String prefix, GuiInteractEvent event, String args) {
+
+        // Actions injected by specific inventory handling classes
+        Multimap<String, GuiAction> injectedActions = this.injectedActions.get(inventoryId);
+
+        // Check if they're not null and if they're mapped
+        if(injectedActions != null && injectedActions.containsKey(prefix)) {
+
+            for (GuiAction guiAction : injectedActions.get(prefix)) {
+
+                // if they're mapped, accept each of them
+                guiAction.getAction().accept(event, args);
+            }
+
+        }
     }
 
 
