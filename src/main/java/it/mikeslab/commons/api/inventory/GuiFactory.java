@@ -92,4 +92,10 @@ public interface GuiFactory {
     @Nullable
     CustomInventory getCustomInventory(UUID referencePlayerUUID, Inventory inventory);
 
+    /**
+     * Gets the action handler
+     * @return The action handler
+     */
+    ActionHandler getActionHandler();
+
 }
