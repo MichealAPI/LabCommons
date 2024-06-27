@@ -173,6 +173,12 @@ public interface Configurable {
      */
     File getFile();
 
+    /**
+     * Reload the configuration
+     */
+    default void reload() {
+        this.loadConfiguration(getFile());
+    }
 
     /**
      * Create a new instance of the ConfigurableImpl class

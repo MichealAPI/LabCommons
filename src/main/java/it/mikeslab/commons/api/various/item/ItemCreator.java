@@ -71,6 +71,13 @@ public class ItemCreator {
         if(SkullUtil.isBase64(headValue)) {
             return SkullUtil.getHead(headValue);
         } else {
+
+            if(headValue.equalsIgnoreCase("%player%") && element.getPlayerName() != null) {
+                return SkullUtil.getHead(
+                        Bukkit.getOfflinePlayer(element.getPlayerName())
+                );
+            }
+
             return SkullUtil.getHead(
                     Bukkit.getOfflinePlayer(headValue)
             );

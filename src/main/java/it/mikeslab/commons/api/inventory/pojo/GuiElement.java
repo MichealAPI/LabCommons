@@ -60,6 +60,8 @@ public class GuiElement {
     private Map<String, String> placeholders; // This is a cache for PlaceholderAPI.
                                               // No need to create new items if the placeholder values are the same
 
+    private String playerName;
+
     private Boolean isAnimated;
 
     /**
@@ -194,6 +196,10 @@ public class GuiElement {
     public ItemStack create(Map<String, String> placeholders, Player papiReference) {
 
         GuiElement clone = this.parsePlaceholders(placeholders, papiReference);
+
+        clone.setPlayerName(
+                papiReference.getName()
+        );
 
         // Use ItemCreator to generate and return the final ItemStack
         return new ItemCreator().create(clone);
