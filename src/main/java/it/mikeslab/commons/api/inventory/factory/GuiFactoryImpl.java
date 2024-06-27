@@ -145,8 +145,10 @@ public class GuiFactoryImpl implements GuiFactory {
         cachedGuis.remove(id);
     }
 
-
-
+    @Override
+    public void destroyAll() {
+        this.cachedGuis.clear();
+    }
 
     @Override
     public void update(int id, @NotNull GuiDetails newGuiDetails) {

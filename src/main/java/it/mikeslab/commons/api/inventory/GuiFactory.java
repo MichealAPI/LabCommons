@@ -45,6 +45,12 @@ public interface GuiFactory {
     void destroy(int id);
 
     /**
+     * Destroys all inventories
+     * by removing them from the cache
+     */
+    void destroyAll();
+
+    /**
      * Updates the inventory with the given id
      * @param id The id of the inventory
      * @param newGuiDetails The new details of the inventory
