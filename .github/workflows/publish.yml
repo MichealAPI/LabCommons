@@ -23,6 +23,6 @@ jobs:
           password: ${{ secrets.NEXUS_PASSWORD }}
           format: maven2
           repository: maven-releases
-          coordinates: groupId=it.mikeslab artifactId=LabCommons version=${{steps.version.outputs.version}} generate-pom=on
+          coordinates: groupId=it.mikeslab artifactId=LabCommons version=${{steps.version.outputs.version}}
           assets: extension=jar
           filename: ./target/LabCommons-*.jar
