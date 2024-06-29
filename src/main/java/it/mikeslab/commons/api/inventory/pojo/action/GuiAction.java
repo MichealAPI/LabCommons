@@ -20,10 +20,4 @@ public class GuiAction {
      */
     private final BiConsumer<GuiInteractEvent, String> action;
 
-    /**
-     * Whether the action is the default action, if it is,
-     * could be overridden
-     */
-    private final boolean defaultAction;
-
 }

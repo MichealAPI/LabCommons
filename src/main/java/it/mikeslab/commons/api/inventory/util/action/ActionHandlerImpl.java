@@ -34,7 +34,7 @@ public class ActionHandlerImpl implements ActionHandler {
 
         ActionContext context = new ActionContext(prefix, event, args);
 
-        this.handleGlobalActions(context);
+        this.handleGlobalActions(inventoryId, context);
         this.handleInjectedActions(inventoryId, context);
     }
 
@@ -68,7 +68,7 @@ public class ActionHandlerImpl implements ActionHandler {
      * Handle the global actions
      * @param context the action context
      */
-    private void handleGlobalActions(ActionContext context) {
+    private void handleGlobalActions(int inventoryId, ActionContext context) {
 
         String prefix = context.getPrefix();
         String args = context.getArgs();
@@ -76,6 +76,13 @@ public class ActionHandlerImpl implements ActionHandler {
 
         // Check if the action exists in the global actions map
         if (this.globalActionsMap.containsKey(prefix)) {
+
+            boolean areInjectedActionsPresent = this.injectedActions.containsKey(inventoryId);
+            boolean isOverridden = areInjectedActionsPresent && this.injectedActions.get(inventoryId).containsKey(prefix);
+
+            if(isOverridden) {
+                return;
+            }
 
             for (GuiAction guiAction : this.globalActionsMap.get(prefix)) {
 
@@ -99,13 +106,7 @@ public class ActionHandlerImpl implements ActionHandler {
         // Check if they're not null and if they're mapped
         if(injectedActions != null && injectedActions.containsKey(prefix)) {
 
-            boolean hasTwoOrMoreEntries = injectedActions.get(prefix).size() >= 2;
-
             for (GuiAction guiAction : injectedActions.get(prefix)) {
-
-                if(hasTwoOrMoreEntries && guiAction.isDefaultAction()) {
-                    continue;
-                }
 
                 // if they're mapped, accept each of them
                 guiAction.getAction().accept(event, args);

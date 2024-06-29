@@ -73,7 +73,7 @@ public class FrameColorUtil {
 
         // Iterate over the phase range
         for (int i = 0; i < MAX_FRAMES; i++) {
-            double phase = (i * 0.05) - 1; // range from -1 to 1
+            double phase = -i * 0.05 + 1; // range from -1 to 1
 
             defaultItemClone = defaultItem.clone(); // Default item is a plain PLAYER_HEAD
 
