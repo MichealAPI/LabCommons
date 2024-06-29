@@ -10,12 +10,5 @@ public interface ActionRegistrar {
      */
     Multimap<String, GuiAction> loadActions();
 
-    /**
-     * Checks if the action can override the current action
-     * @param prefix the prefix of the action
-     * @return whether the action can override the current action
-     */
-    boolean canOverride(String prefix);
-
 
 }
