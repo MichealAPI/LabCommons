@@ -14,6 +14,7 @@ import org.intellij.lang.annotations.Language;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class FrameColorUtil {
      * @param guiElement the GuiElement to base the frame colors on
      * @return an array of ItemStacks with different gradient color phases
      */
-    public ItemStack[] getFrameColors(GuiElement guiElement, Map<String, String> internalPlaceholders, Player referencePlayer) {
+    public ItemStack[] getFrameColors(GuiElement guiElement, Map<String, Supplier<String>> internalPlaceholders, Player referencePlayer) {
 
         ItemStack[] frameStacks = new ItemStack[MAX_FRAMES];
 
@@ -93,6 +94,7 @@ public class FrameColorUtil {
 
             // Clone the GuiElement and set the new displayName and lore
 
+            defaultItemCloneMeta.setCustomModelData(guiElementClone.getCustomModelData());
             defaultItemCloneMeta.setDisplayName(ComponentsUtil.getSerializedComponent(displayName));
             defaultItemCloneMeta.setLore(ComponentsUtil.getSerializedComponents(lore));
 

@@ -25,7 +25,7 @@ public class GuiDetails {
     private InventoryHolder holder;
     private String inventoryName = " ";
     private int inventorySize; // calculated or fixed, in case of a chest
-    private Map<String, String> placeholders;
+    private Map<String, Supplier<String>> placeholders;
 
     private Map<String, Consumer<GuiInteractEvent>> clickActions;
 

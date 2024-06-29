@@ -280,11 +280,11 @@ public class CustomGui {
             return null; // air
         }
 
-        Map<String, String> internalPlaceholders = this.getGuiDetails().getPlaceholders();
+        Map<String, Supplier<String>> internalPlaceholders = this.getGuiDetails().getPlaceholders();
 
         // Adds the condition placeholders to the internal ones
         internalPlaceholders.putAll(
-                this.getUpdatedConditionPlaceholders()
+                this.getGuiDetails().getInjectedConditionPlaceholders()
         );
 
         // Create a new ItemStack based on the current context
@@ -451,20 +451,6 @@ public class CustomGui {
         
     }
 
-
-    /**
-     * Get the latest value from each cached supplier
-     * @return The updated condition placeholders
-     */
-    private Map<String, String> getUpdatedConditionPlaceholders() {
-        Map<String, String> placeholders = new HashMap<>();
-
-        for(Map.Entry<String, Supplier<String>> entry : this.getGuiDetails().getInjectedConditionPlaceholders().entrySet()) {
-            placeholders.put(entry.getKey(), entry.getValue().get());
-        }
-
-        return placeholders;
-    }
 
     /**
      * Check if the element is a static one by checking if contains

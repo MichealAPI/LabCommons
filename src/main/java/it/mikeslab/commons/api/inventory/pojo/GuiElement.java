@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -37,7 +38,7 @@ public class GuiElement {
                                   // Pretty useful also using ConsumerFilters
                                   // which contain the ANY (*) flag
 
-    private Map<String, String> replacements;
+    // private Map<String, String> replacements;
 
     private List<String> actions;
 
@@ -193,7 +194,7 @@ public class GuiElement {
      * @param papiReference The player to parse the placeholders for, required by PlaceholderAPI
      * @return The itemStack
      */
-    public ItemStack create(Map<String, String> placeholders, Player papiReference) {
+    public ItemStack create(Map<String, Supplier<String>> placeholders, Player papiReference) {
 
         GuiElement clone = this.parsePlaceholders(placeholders, papiReference);
 
@@ -215,9 +216,9 @@ public class GuiElement {
         GuiElement clone = this;
 
         // If there are replacements, we need to create the itemStack with placeholder support
-        if(replacements != null) {
-            clone = this.executeReplacements(replacements);
-        }
+        //if(replacements != null) {
+        //    clone = this.executeReplacements(replacements);
+        //}
 
         return new ItemCreator().create(clone);
     }
@@ -228,15 +229,19 @@ public class GuiElement {
      * with internal placeholders (replacements) support
      * @return The itemStack
      */
-    public GuiElement executeReplacements(Map<String, String> placeholders) {
+    public GuiElement executeReplacements(Map<String, Supplier<String>> placeholders) {
 
         GuiElement clone = this.clone();
 
         if (clone.amount == null) clone.amount = 1;
 
-        if(clone.replacements != null) {
-            placeholders.putAll(clone.replacements);
-        }
+        //if(clone.replacements != null) {
+
+        //    for(Map.Entry<String, String> entry : clone.replacements.entrySet()) {
+              //  placeholders.put(entry.getKey(), entry::getValue);
+        //    }
+
+        //}
 
         if (clone.displayName != null) {
             clone.displayName = this.replace(clone.displayName, placeholders);
@@ -256,10 +261,10 @@ public class GuiElement {
      * @param placeholders The placeholders to replace
      * @return The text with the placeholders replaced
      */
-    private String replace(String text, Map<String, String> placeholders) {
+    private String replace(String text, Map<String, Supplier<String>> placeholders) {
 
-        for(Map.Entry<String, String> entry : placeholders.entrySet()) {
-            text = text.replace(entry.getKey(), entry.getValue());
+        for(Map.Entry<String, Supplier<String>> entry : placeholders.entrySet()) {
+            text = text.replace(entry.getKey(), entry.getValue().get());
         }
 
         return text;
@@ -271,7 +276,7 @@ public class GuiElement {
      * @param placeholders The placeholders to replace
      * @return The list of strings with the placeholders replaced
      */
-    private List<String> replaceMany(List<String> lore, Map<String, String> placeholders) {
+    private List<String> replaceMany(List<String> lore, Map<String, Supplier<String>> placeholders) {
 
         List<String> replacedLore = new ArrayList<>();
 
@@ -290,7 +295,7 @@ public class GuiElement {
      * @param player The player to parse the placeholders for, required by PlaceholderAPI
      * @return A parsed cloned GUI element (to prevent overriding default placeholder tags)
      */
-    public GuiElement parsePlaceholders(Map<String, String> internalPlaceholders, Player player) {
+    public GuiElement parsePlaceholders(Map<String, Supplier<String>> internalPlaceholders, Player player) {
 
         GuiElement element = this.clone(); // avoid removing the placeholders from the original element
 
