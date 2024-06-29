@@ -180,6 +180,17 @@ public interface Configurable {
         this.loadConfiguration(getFile());
     }
 
+    default void save() {
+        try {
+            getConfiguration().save(getFile());
+        } catch (Exception e) {
+            LogUtils.warn(
+                    LogUtils.LogSource.CONFIG,
+                    "Error during save: " + e
+            );
+        }
+    }
+
     /**
      * Create a new instance of the ConfigurableImpl class
      */

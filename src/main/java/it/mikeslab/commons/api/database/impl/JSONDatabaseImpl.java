@@ -10,6 +10,8 @@ import org.bson.Document;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,6 +21,7 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
     private final URIBuilder uriBuilder;
     private final Gson gson;
     private File sourceFile;
+    private T typeInstance;  // To store the instance of T
 
     private List<T> cache;  // in-memory cache
     private Map<Object, T> index;  // index for identifierValue
@@ -34,15 +37,16 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
     public boolean connect(T pojoClass) {
         String filePath = uriBuilder.getUri();
         this.sourceFile = new File(filePath);
+        this.typeInstance = pojoClass;  // Store the instance of T
 
         if (sourceFile.exists()) {
             this.cache = readFromFile();
-            this.index = cache.stream().collect(Collectors.toMap(T::getIdentifierValue, Function.identity()));
+            this.index = cache.stream()
+                    .collect(Collectors.toMap(SerializableMapConvertible::getIdentifierValue, Function.identity()));
             return true;
         } else {
             return createSourceFile(sourceFile);
         }
-
     }
 
     @Override
@@ -53,6 +57,7 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
     @Override
     public boolean disconnect() {
         this.sourceFile = null;
+        this.typeInstance = null;  // Clear the instance
         return true;
     }
 
@@ -115,8 +120,8 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
     }
 
     private List<T> readFromFile() {
-        try (Reader reader = new FileReader(sourceFile)) {
-            Type listType = TypeToken.getParameterized(List.class, SerializableMapConvertible.class).getType();
+        try (Reader reader = new InputStreamReader(Files.newInputStream(sourceFile.toPath()), StandardCharsets.UTF_8)) {
+            Type listType = TypeToken.getParameterized(List.class, typeInstance.getClass()).getType();  // Use the instance class
             List<T> objects = gson.fromJson(reader, listType);
             return objects != null ? objects : new ArrayList<>();
         } catch (IOException e) {
@@ -129,7 +134,7 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
     }
 
     private boolean writeToFile(List<T> objects) {
-        try (Writer writer = new FileWriter(sourceFile)) {
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(sourceFile.toPath()), StandardCharsets.UTF_8)) {
             gson.toJson(objects, writer);
             return true;
         } catch (IOException e) {
