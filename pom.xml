@@ -6,7 +6,7 @@
 
   <groupId>it.mikeslab</groupId>
   <artifactId>LabCommons</artifactId>
-  <version>2.4.0</version>
+  <version>2.4.0.1</version>
   <packaging>jar</packaging>
 
   <name>LabCommons</name>
@@ -40,7 +40,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.2.4</version>
+            <version>3.6.0</version>
             <executions>
                 <execution>
                     <phase>package</phase>

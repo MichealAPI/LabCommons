@@ -25,7 +25,7 @@ public class ActionHandlerImpl implements ActionHandler {
 
         String[] action = actionWithArgs.split(":");
         String prefix = action[0];
-        String args = action.length > 1 ? action[1] : "";
+        String args = action.length > 1 ? actionWithArgs.substring(prefix.length() + 1) : "";
 
         // Remove leading space from args if present
         if(args.startsWith(" ")) {
@@ -99,7 +99,13 @@ public class ActionHandlerImpl implements ActionHandler {
         // Check if they're not null and if they're mapped
         if(injectedActions != null && injectedActions.containsKey(prefix)) {
 
+            boolean hasTwoOrMoreEntries = injectedActions.get(prefix).size() >= 2;
+
             for (GuiAction guiAction : injectedActions.get(prefix)) {
+
+                if(hasTwoOrMoreEntries && guiAction.isDefaultAction()) {
+                    continue;
+                }
 
                 // if they're mapped, accept each of them
                 guiAction.getAction().accept(event, args);
