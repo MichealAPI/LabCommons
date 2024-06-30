@@ -1,6 +1,7 @@
 package it.mikeslab.commons.api.various.platform;
 
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.ApiStatus;
 
 @UtilityClass
 public class PlatformUtil {
@@ -49,6 +50,24 @@ public class PlatformUtil {
 
         return isUnknown;
     }
+
+    /**
+     * Experimental method to get the platform from a class name
+     * @param className the class name to check
+     * @return the platform
+     */
+    @ApiStatus.Experimental
+    public Platform fromClass(String className) {
+
+        if(className.contains(Platform.PAPER.name())) {
+            return Platform.PAPER;
+        } else if(className.contains(Platform.SPIGOT.name())) {
+            return Platform.SPIGOT;
+        }
+
+        return Platform.UNKNOWN;
+    }
+
 
     private void updateCache(Platform platform, boolean isPlatform) {
         CACHED_PLATFORM = isPlatform ? platform : null;
