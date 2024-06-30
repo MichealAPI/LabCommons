@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class GuiFactoryImpl implements GuiFactory {
 
@@ -39,7 +38,7 @@ public class GuiFactoryImpl implements GuiFactory {
     private ConditionParser conditionParser;
 
     @Getter @Setter
-    private Supplier<InventoryMap> inventoryMap;
+    private InventoryMap inventoryMap;
 
     public GuiFactoryImpl(final JavaPlugin instance) {
         this.cachedGuis = new HashMap<>();
@@ -176,14 +175,16 @@ public class GuiFactoryImpl implements GuiFactory {
         return cachedGuis.getOrDefault(id, null);
     }
 
+
+
     @Override
     public CustomInventory getCustomInventory(UUID referencePlayerUUID, Inventory inventory) {
 
         if(inventoryMap == null) return null;
 
-        if(!inventoryMap.get().containsKey(referencePlayerUUID)) return null;
+        if(!inventoryMap.containsKey(referencePlayerUUID)) return null;
 
-        Map<String, CustomInventory> customInventoryMap = inventoryMap.get().get(referencePlayerUUID);
+        Map<String, CustomInventory> customInventoryMap = inventoryMap.get(referencePlayerUUID);
 
         for(CustomInventory customInventory : customInventoryMap.values()) {
 

@@ -83,7 +83,7 @@ public interface GuiFactory {
      * Sets the inventory map
      * @param inventoryMap The inventory map supplier
      */
-    void setInventoryMap(Supplier<InventoryMap> inventoryMap);
+    void setInventoryMap(InventoryMap inventoryMap);
 
     /**
      * Gets the action handler
