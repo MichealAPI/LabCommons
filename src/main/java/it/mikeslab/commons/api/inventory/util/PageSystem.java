@@ -1,7 +1,7 @@
 package it.mikeslab.commons.api.inventory.util;
 
 import it.mikeslab.commons.api.inventory.CustomGui;
-import it.mikeslab.commons.api.inventory.GuiFactory;
+import it.mikeslab.commons.api.inventory.factory.GuiFactory;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.pojo.population.PopulatePageContext;
 import lombok.Getter;

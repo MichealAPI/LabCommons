@@ -2,6 +2,7 @@ package it.mikeslab.commons.api.inventory;
 
 import com.google.common.collect.Multimap;
 import it.mikeslab.commons.api.component.ComponentsUtil;
+import it.mikeslab.commons.api.inventory.factory.GuiFactory;
 import it.mikeslab.commons.api.inventory.pojo.Animation;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;

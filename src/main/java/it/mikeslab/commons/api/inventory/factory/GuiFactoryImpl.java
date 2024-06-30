@@ -2,7 +2,6 @@ package it.mikeslab.commons.api.inventory.factory;
 
 import it.mikeslab.commons.api.inventory.CustomGui;
 import it.mikeslab.commons.api.inventory.CustomInventory;
-import it.mikeslab.commons.api.inventory.GuiFactory;
 import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.helper.InventoryMap;

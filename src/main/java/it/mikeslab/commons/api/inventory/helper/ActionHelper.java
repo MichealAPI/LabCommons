@@ -1,7 +1,7 @@
 package it.mikeslab.commons.api.inventory.helper;
 
 import it.mikeslab.commons.api.inventory.CustomGui;
-import it.mikeslab.commons.api.inventory.GuiFactory;
+import it.mikeslab.commons.api.inventory.factory.GuiFactory;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.util.ConditionUtil;

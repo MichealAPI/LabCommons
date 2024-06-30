@@ -176,8 +176,8 @@ public interface Configurable {
     /**
      * Reload the configuration
      */
-    default void reload() {
-        this.loadConfiguration(getFile());
+    default Configurable reload() {
+        return this.loadConfiguration(getFile());
     }
 
     default void save() {

@@ -4,6 +4,7 @@ import it.mikeslab.commons.api.chat.ChatMessagingHandler;
 import it.mikeslab.commons.api.chat.ChatMessagingListener;
 import it.mikeslab.commons.api.config.ConfigurableEnum;
 import it.mikeslab.commons.api.config.impl.ConfigurableImpl;
+import it.mikeslab.commons.api.various.platform.PlatformUtil;
 import lombok.Getter;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.bukkit.Bukkit;
@@ -34,6 +35,7 @@ public final class LabCommons extends JavaPlugin {
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             PLACEHOLDER_API_ENABLED = true;
         }
+
     }
 
     public void disable() {
@@ -44,6 +46,7 @@ public final class LabCommons extends JavaPlugin {
             player.closeInventory();
 
         }
+
     }
 
 

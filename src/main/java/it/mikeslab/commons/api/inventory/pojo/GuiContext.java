@@ -1,6 +1,6 @@
 package it.mikeslab.commons.api.inventory.pojo;
 
-import it.mikeslab.commons.api.inventory.GuiFactory;
+import it.mikeslab.commons.api.inventory.factory.GuiFactory;
 import it.mikeslab.commons.api.inventory.InventoryType;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import lombok.Builder;

@@ -1,6 +1,7 @@
 package it.mikeslab.commons.api.inventory;
 
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
+import it.mikeslab.commons.api.inventory.factory.GuiFactory;
 import it.mikeslab.commons.api.inventory.pojo.GuiContext;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import org.bukkit.entity.Player;

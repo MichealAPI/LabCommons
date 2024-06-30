@@ -29,7 +29,7 @@ public class AnimationUtil {
         return new BukkitRunnable() {
             int frame = 0;
             final Player player = Bukkit.getPlayer( // Having the player cached here is not a problem,
-                    targetGui.getOwnerUUID()        // // since the task is canceled when the player closes the inventory
+                    targetGui.getOwnerUUID()        // since the task is canceled when the player closes the inventory
             );
 
             @Override

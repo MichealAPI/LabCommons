@@ -1,5 +1,7 @@
-package it.mikeslab.commons.api.inventory;
+package it.mikeslab.commons.api.inventory.factory;
 
+import it.mikeslab.commons.api.inventory.CustomGui;
+import it.mikeslab.commons.api.inventory.CustomInventory;
 import it.mikeslab.commons.api.inventory.config.ConditionParser;
 import it.mikeslab.commons.api.inventory.helper.InventoryMap;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;

@@ -14,6 +14,15 @@ public class PlatformUtil {
 
     private Platform CACHED_PLATFORM;
 
+    public Platform getPlatform() {
+        if(isPaper()) {
+            return Platform.PAPER;
+        } else if(isSpigot()) {
+            return Platform.SPIGOT;
+        } else {
+            return Platform.UNKNOWN;
+        }
+    }
 
     public boolean isPaper() {
 
