@@ -42,7 +42,11 @@ public class GuiConfigImpl implements GuiConfig {
             instance.saveResource(relativePathAsString, false);
         }
 
-        Optional<FileConfiguration> config = new FileUtil(instance).getConfig(relativePath);
+        Optional<FileConfiguration> config = FileUtil.getConfig(
+                instance.getDataFolder(),
+                relativePath
+        );
+
         if(!config.isPresent()) {
             LogUtils.warn(
                     LogUtils.LogSource.CONFIG,
