@@ -24,7 +24,7 @@ public abstract class MessageHelper {
      * @param target the target to send the message to
      * @param key the key of the configurable
      */
-    public abstract void sendMessage(CommandSender target, ConfigurableEnum key);
+    abstract void sendMessage(CommandSender target, ConfigurableEnum key);
 
     /**
      * Send a message to the target
@@ -32,7 +32,7 @@ public abstract class MessageHelper {
      * @param key the key of the configurable
      * @param tagResolvers the tag resolvers to apply
      */
-    public abstract void sendMessage(CommandSender target, ConfigurableEnum key, TagResolver.Single... tagResolvers);
+    abstract void sendMessage(CommandSender target, ConfigurableEnum key, TagResolver.Single... tagResolvers);
 
     /**
      * Send a message to the target
@@ -40,7 +40,7 @@ public abstract class MessageHelper {
      * @param titleKey the key of the title
      * @param subtitleKey the key of the subtitle
      */
-    public abstract void sendTitle(Player target, ConfigurableEnum titleKey, ConfigurableEnum subtitleKey);
+    abstract void sendTitle(Player target, ConfigurableEnum titleKey, ConfigurableEnum subtitleKey);
 
 
     /**
