@@ -2,12 +2,14 @@ package it.mikeslab.commons.api.inventory.util.action;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import it.mikeslab.commons.api.inventory.event.GuiEvent;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ActionHandlerImpl implements ActionHandler {
@@ -15,9 +17,13 @@ public class ActionHandlerImpl implements ActionHandler {
     private final Multimap<String, GuiAction> globalActionsMap;
     private final Map<Integer, Multimap<String, GuiAction>> injectedActions;
 
+    private final Map<Integer, String> closeActions, openActions;
+
     public ActionHandlerImpl(Multimap<String, GuiAction> globalActionsMap) {
         this.globalActionsMap = globalActionsMap;
         this.injectedActions = new HashMap<>();
+        this.closeActions = new HashMap<>();
+        this.openActions = new HashMap<>();
     }
 
     @Override
@@ -61,6 +67,28 @@ public class ActionHandlerImpl implements ActionHandler {
         actions.put(prefix, action);
 
         this.injectedActions.put(inventoryId, actions);
+    }
+
+    @Override
+    public void registerActions(int inventoryId, ActionEvent when, List<String> actions) {
+
+        Map<Integer, String> reference = this.getReferenceMap(when);
+
+        reference.put(inventoryId, String.join(",", actions));
+    }
+
+    @Override
+    public void handleActions(int inventoryId, ActionEvent when, GuiEvent event) {
+
+        Map<Integer, String> reference = this.getReferenceMap(when);
+
+        if(reference.isEmpty()) return;
+
+        GuiInteractEvent openInteractionEvent = new GuiInteractEvent(event); // inherit the event characteristics
+
+        for (String action : this.openActions.get(inventoryId).split(",")) {
+            this.handleAction(inventoryId, action, openInteractionEvent);
+        }
     }
 
 
@@ -113,6 +141,16 @@ public class ActionHandlerImpl implements ActionHandler {
             }
 
         }
+    }
+
+
+    /**
+     * Get the reference map
+     * @param when the action event
+     * @return the reference map
+     */
+    private Map<Integer, String> getReferenceMap(ActionEvent when) {
+        return when == ActionEvent.OPEN ? this.openActions : this.closeActions;
     }
 
 

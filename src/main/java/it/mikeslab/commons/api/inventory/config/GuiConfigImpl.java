@@ -3,8 +3,10 @@ package it.mikeslab.commons.api.inventory.config;
 import com.cryptomorin.xseries.XMaterial;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
+import it.mikeslab.commons.api.inventory.factory.GuiFactory;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
+import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import it.mikeslab.commons.api.inventory.util.config.FileUtil;
 import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.RequiredArgsConstructor;
@@ -113,9 +115,6 @@ public class GuiConfigImpl implements GuiConfig {
                 ConfigField.SIZE.getField()
         );
 
-        // List<String> onOpenActions = section.getStringList(ConfigField.ON_OPEN_ACTIONS.getField());
-        // List<String> onCloseActions = section.getStringList(ConfigField.ON_CLOSE_ACTIONS.getField());
-
         this.guiDetails = new GuiDetails(
                 layout,
                 guiType
@@ -124,10 +123,10 @@ public class GuiConfigImpl implements GuiConfig {
         this.guiDetails.setInventoryName(guiTitle);
         this.guiDetails.setInventorySize(size);
         this.guiDetails.setClickActions(consumers.orElse(new HashMap<>())); // default empty map for consumers
-        // this.guiDetails.setOnCloseActions(onCloseActions);
-        // this.guiDetails.setOnOpenActions(onOpenActions);
 
         this.loadElements(section, consumers);
+
+
 
     }
 
@@ -209,6 +208,16 @@ public class GuiConfigImpl implements GuiConfig {
                 .build();
     }
 
+    @Override
+    public void registerOpenCloseActions(int id, GuiFactory guiFactory) {
+
+        if(this.config == null) return;
+
+        this.registerAction(id, guiFactory, ConfigField.ON_OPEN_ACTIONS, ActionHandler.ActionEvent.OPEN);
+        this.registerAction(id, guiFactory, ConfigField.ON_CLOSE_ACTIONS, ActionHandler.ActionEvent.CLOSE);
+
+    }
+
 
     private void parseConsumers(ConfigurationSection section, Optional<Map<String, Consumer<GuiInteractEvent>>> consumers, GuiElement guiElement) {
 
@@ -230,6 +239,16 @@ public class GuiConfigImpl implements GuiConfig {
 
     }
 
+
+
+    void registerAction(int id, GuiFactory factory, ConfigField field, ActionHandler.ActionEvent when) {
+
+        List<String> actions = this.config.getStringList(field.getField());
+
+        factory.getActionHandler().
+                registerActions(id, when, actions);
+
+    }
 
 
 

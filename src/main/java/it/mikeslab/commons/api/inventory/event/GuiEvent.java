@@ -1,9 +1,11 @@
 package it.mikeslab.commons.api.inventory.event;
 
 import it.mikeslab.commons.api.inventory.CustomGui;
+import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -13,12 +15,14 @@ import org.jetbrains.annotations.NotNull;
 @Setter
 @Getter
 @RequiredArgsConstructor
-public class GuiCloseEvent extends Event implements Cancellable {
+public class GuiEvent extends Event implements Cancellable {
 
     boolean cancelled;
 
-    final InventoryCloseEvent event;
-    final CustomGui closedGui;
+    final Player player;
+    final CustomGui gui;
+
+    final ActionHandler.ActionEvent when;
 
     private static final HandlerList HANDLERS = new HandlerList();
 

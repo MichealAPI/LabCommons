@@ -2,6 +2,7 @@ package it.mikeslab.commons.api.inventory.config;
 
 
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
+import it.mikeslab.commons.api.inventory.factory.GuiFactory;
 import it.mikeslab.commons.api.inventory.pojo.GuiDetails;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import org.bukkit.configuration.ConfigurationSection;
@@ -38,5 +39,7 @@ public interface GuiConfig {
      * @return The element
      */
     GuiElement loadElement(ConfigurationSection section);
+
+    void registerOpenCloseActions(int id, GuiFactory guiFactory);
 
 }

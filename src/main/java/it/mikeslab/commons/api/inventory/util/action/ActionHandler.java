@@ -1,8 +1,11 @@
 package it.mikeslab.commons.api.inventory.util.action;
 
 import com.google.common.collect.Multimap;
+import it.mikeslab.commons.api.inventory.event.GuiEvent;
 import it.mikeslab.commons.api.inventory.event.GuiInteractEvent;
 import it.mikeslab.commons.api.inventory.pojo.action.GuiAction;
+
+import java.util.List;
 
 public interface ActionHandler {
 
@@ -12,8 +15,6 @@ public interface ActionHandler {
      * @param actionWithArgs The action with the arguments
      */
     void handleAction(int inventoryId, String actionWithArgs, GuiInteractEvent event);
-
-    // void handleAction(int inventoryId, String actionWithArgs, GuiEvent event);
 
     /**
      * Register an action with the given prefix
@@ -36,4 +37,24 @@ public interface ActionHandler {
      */
     void injectAction(int inventoryId, String prefix, GuiAction action);
 
+    /**
+     * Register actions to be executed when the inventory is opened or closed
+     * @param inventoryId The id of the inventory
+     * @param when When the actions should be executed
+     * @param actions The actions to execute
+     */
+    void registerActions(int inventoryId, ActionEvent when, List<String> actions);
+
+    /**
+     * Handle the actions for the given inventory
+     * @param inventoryId The id of the inventory
+     * @param when When the actions should be executed
+     * @param event The event that triggered the actions
+     */
+    void handleActions(int inventoryId, ActionEvent when, GuiEvent event);
+
+    enum ActionEvent {
+        OPEN,
+        CLOSE
+    }
 }

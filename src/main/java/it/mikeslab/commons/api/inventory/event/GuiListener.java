@@ -6,15 +6,14 @@ import it.mikeslab.commons.api.inventory.factory.GuiFactory;
 import it.mikeslab.commons.api.inventory.GuiType;
 import it.mikeslab.commons.api.inventory.helper.ActionHelper;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
+import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import it.mikeslab.commons.api.inventory.util.action.internal.ConsumerFilter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -69,20 +68,35 @@ public class GuiListener implements Listener {
 
     }
 
+    @EventHandler
+    public void onInventoryOpen(InventoryOpenEvent event) {
+
+            Player player = (Player) event.getPlayer();
+
+            CustomGui customGui = this.getCustomGui(
+                    player,
+                    event
+            );
+
+            if(customGui == null) return;
+
+            this.callEvent(
+                    player,
+                    customGui,
+                    ActionHandler.ActionEvent.OPEN
+            );
+
+    }
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
 
-        Inventory inventory = event.getInventory();
+        Player player = (Player) event.getPlayer();
 
-        CustomInventory customInventory = guiFactory.getCustomInventory(
-                event.getPlayer().getUniqueId(),
-                inventory
+        CustomGui customGui = this.getCustomGui(
+                player,
+                event
         );
-
-        if(customInventory == null) return;
-
-        CustomGui customGui = customInventory.getCustomGui();
 
         if(customGui == null) return;
 
@@ -91,21 +105,11 @@ public class GuiListener implements Listener {
             Bukkit.getScheduler().cancelTask(customGui.getAnimationTaskId());
         }
 
-        Player player = (Player) event.getPlayer();
-
-        GuiCloseEvent guiCloseEvent = new GuiCloseEvent(
-                event,
-                customGui
+        this.callEvent(
+                player,
+                customGui,
+                ActionHandler.ActionEvent.CLOSE
         );
-
-        Bukkit.getPluginManager().callEvent(guiCloseEvent);
-
-        if(guiCloseEvent.isCancelled()) {
-            Bukkit.getScheduler().runTask(instance, () -> {
-                player.openInventory(customGui.getInventory());
-            });
-        }
-
 
     }
 
@@ -219,7 +223,31 @@ public class GuiListener implements Listener {
         return guiFactory.getCustomInventory(referencePlayerUUID, inventory) != null;
     }
 
+    /**
+     * Get the custom gui from the player and the event
+     * @param player The player
+     * @param event The event
+     * @return The custom gui
+     */
+    private CustomGui getCustomGui(Player player, InventoryEvent event) {
+        CustomInventory customInventory = guiFactory.getCustomInventory(
+                player.getUniqueId(),
+                event.getInventory()
+        );
 
+        if(customInventory == null) return null;
 
+        return customInventory.getCustomGui();
+    }
+
+    private void callEvent(Player player, CustomGui gui, ActionHandler.ActionEvent when) {
+        GuiEvent guiEvent = new GuiEvent(
+                player,
+                gui,
+                when
+        );
+
+        Bukkit.getPluginManager().callEvent(guiEvent);
+    }
 
 }

@@ -22,9 +22,9 @@ public enum ConfigField {
     INTERNAL_VALUE("internalValue"),
     IS_GROUP_ELEMENT("isGroupElement"),
     CONDITION("condition"),
-    HEAD_VALUE("headValue");
-    // ON_OPEN_ACTIONS("on-open-actions"),
-    // ON_CLOSE_ACTIONS("on-close-actions"),;
+    HEAD_VALUE("headValue"),
+    ON_OPEN_ACTIONS("on-open-actions"),
+    ON_CLOSE_ACTIONS("on-close-actions");
 
     private final String field;
 

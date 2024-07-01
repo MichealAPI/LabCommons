@@ -37,4 +37,10 @@ public class GuiInteractEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
+    public GuiInteractEvent(GuiEvent parentEvent) {
+        this.whoClicked = parentEvent.getPlayer();
+        this.clickedElements = null;
+    }
+
+
 }

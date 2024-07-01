@@ -6,7 +6,7 @@
 
   <groupId>it.mikeslab</groupId>
   <artifactId>LabCommons</artifactId>
-  <version>2.4.0.7</version>
+  <version>2.4.0.8-DEV</version>
   <packaging>jar</packaging>
 
   <name>LabCommons</name>
