@@ -70,8 +70,10 @@ public class ComponentsUtil {
                 .build()
                 .serialize(component);
 
-        if(HexUtils.HEX_PATTERN.matcher(serialized).find()) {
-            serialized = HexUtils.translateHexCodes(serialized);
+        if(HexUtils.areHexesSupported()) {
+            if (HexUtils.HEX_PATTERN.matcher(serialized).find()) {
+                serialized = HexUtils.translateHexCodes(serialized);
+            }
         }
 
         return serialized;

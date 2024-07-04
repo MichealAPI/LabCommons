@@ -9,6 +9,8 @@ public class HexUtils {
 
     public static final Pattern HEX_PATTERN = Pattern.compile("#(\\w{5}[0-9a-f])");
 
+    private static Boolean ARE_HEXES_SUPPORTED;
+
     public static String translateHexCodes(String textToTranslate) {
 
         textToTranslate = textToTranslate.replace("&#", "#");
@@ -22,6 +24,26 @@ public class HexUtils {
 
         return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
 
+    }
+
+    /**
+     * Check if the server supports hex colors
+     * @return true if the server supports hex colors
+     */
+    public static boolean areHexesSupported() {
+
+        if(ARE_HEXES_SUPPORTED != null) {
+            return ARE_HEXES_SUPPORTED;
+        }
+
+        try {
+            Class.forName("net.md_5.bungee.api.ChatColor");
+            ARE_HEXES_SUPPORTED = true;
+        } catch (ClassNotFoundException e) {
+            ARE_HEXES_SUPPORTED = false;
+        }
+
+        return ARE_HEXES_SUPPORTED;
     }
 
 }
