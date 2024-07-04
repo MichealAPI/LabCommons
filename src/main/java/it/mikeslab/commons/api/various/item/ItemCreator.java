@@ -55,9 +55,10 @@ public class ItemCreator {
             applyGlow(meta);
         }
 
-        if(element.getCustomModelData() != -1) {
-            meta.setCustomModelData(element.getCustomModelData());
-        }
+        // TODO TEMPORARY DISABLED TO TEST 1.8
+        //if(element.getCustomModelData() != -1) {
+        //    meta.setCustomModelData(element.getCustomModelData());
+        //}
 
         item.setItemMeta(meta);
 

@@ -9,41 +9,35 @@ public class HexUtils {
 
     public static final Pattern HEX_PATTERN = Pattern.compile("#(\\w{5}[0-9a-f])");
 
-    private static Boolean ARE_HEXES_SUPPORTED;
+    private static boolean ARE_HEXES_SUPPORTED = true;
 
     public static String translateHexCodes(String textToTranslate) {
 
-        textToTranslate = textToTranslate.replace("&#", "#");
+        String result = null;
 
-        Matcher matcher = HEX_PATTERN.matcher(textToTranslate);
-        StringBuffer buffer = new StringBuffer();
-
-        while(matcher.find()) {
-            matcher.appendReplacement(buffer, ChatColor.of("#" + matcher.group(1)).toString());
-        }
-
-        return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
-
-    }
-
-    /**
-     * Check if the server supports hex colors
-     * @return true if the server supports hex colors
-     */
-    public static boolean areHexesSupported() {
-
-        if(ARE_HEXES_SUPPORTED != null) {
-            return ARE_HEXES_SUPPORTED;
+        if(!ARE_HEXES_SUPPORTED) {
+            return textToTranslate;
         }
 
         try {
-            Class.forName("net.md_5.bungee.api.ChatColor");
-            ARE_HEXES_SUPPORTED = true;
-        } catch (ClassNotFoundException e) {
+            textToTranslate = textToTranslate.replace("&#", "#");
+
+            Matcher matcher = HEX_PATTERN.matcher(textToTranslate);
+            StringBuffer buffer = new StringBuffer();
+
+            while (matcher.find()) {
+                matcher.appendReplacement(buffer, ChatColor.of("#" + matcher.group(1)).toString());
+            }
+
+            result = ChatColor
+                    .translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
+
+        } catch (Exception e) {
             ARE_HEXES_SUPPORTED = false;
         }
 
-        return ARE_HEXES_SUPPORTED;
+        return result;
     }
+
 
 }

@@ -32,7 +32,7 @@ public class SkullUtil {
         final ItemStack head = XMaterial.PLAYER_HEAD.parseItem();
         final SkullMeta meta = (SkullMeta) head.getItemMeta();
         assert meta != null;
-        meta.setOwningPlayer(player);
+        meta.setOwner(player.getName());
         head.setItemMeta(meta);
         return head;
     }

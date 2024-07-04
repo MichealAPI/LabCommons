@@ -94,7 +94,8 @@ public class FrameColorUtil {
 
             // Clone the GuiElement and set the new displayName and lore
 
-            defaultItemCloneMeta.setCustomModelData(guiElementClone.getCustomModelData());
+            // TODO TEMPORARY DISABLED TO TEST 1.8
+            // defaultItemCloneMeta.setCustomModelData(guiElementClone.getCustomModelData());
             defaultItemCloneMeta.setDisplayName(ComponentsUtil.getSerializedComponent(displayName));
             defaultItemCloneMeta.setLore(ComponentsUtil.getSerializedComponents(lore));
 
