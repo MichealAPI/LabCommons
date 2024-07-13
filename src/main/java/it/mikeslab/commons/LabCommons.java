@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-public final class LabCommons extends JavaPlugin {
+public final class LabCommons {
 
     public static String PLUGIN_NAME = "LabCommons"; // default value if not initialized
 
