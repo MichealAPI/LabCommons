@@ -15,7 +15,9 @@ import java.sql.ResultSet;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {
+public class    SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {
+
+    private static final int VARCHAR_LENGTH = 255;
 
     private final URIBuilder uriBuilder;
     private final HikariDataSource dataSource;
@@ -29,6 +31,8 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
         if (uriBuilder.getUsername() != null) config.setUsername(uriBuilder.getUsername());
         if (uriBuilder.getPassword() != null) config.setPassword(uriBuilder.getPassword());
+
+        // Databases are handled exclusively through the properties usage
 
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
@@ -237,7 +241,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
         StringBuilder query = new StringBuilder(
                 "CREATE TABLE " + uriBuilder.getTable()
-                        + " (" + pojoObject.getIdentifierName() + " VARCHAR("
+                        + " (" + pojoObject.getIdentifierName() + " VARCHAR(" + VARCHAR_LENGTH + ")"
                         + fixedIdFieldLengthLimit + ") PRIMARY KEY, "
         );
         List<String> fieldsClone = new ArrayList<>(fields);
@@ -245,7 +249,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
         for (int i = 0; i < fieldsClone.size(); i++) {
             query.append(fieldsClone.get(i));
-            query.append(" TEXT");
+            query.append(" VARCHAR(" + VARCHAR_LENGTH + ")");
             if (i != fieldsClone.size() - 1) query.append(", ");
         }
 
