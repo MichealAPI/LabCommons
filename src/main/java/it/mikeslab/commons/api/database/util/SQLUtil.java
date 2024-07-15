@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,5 +47,37 @@ public class SQLUtil {
         return resultValues;
     }
 
+
+    public String getTableCreationQuery(String tableName, List<String> columns) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("CREATE TABLE IF NOT EXISTS ")
+                .append(tableName)
+                .append(" (");
+        for (String column : columns) {
+            sb.append(column)
+                    .append(" ")
+                    .append("VARCHAR(255)")
+                    .append(", ");
+        }
+        sb.delete(sb.length() - 2, sb.length());
+        sb.append(");");
+        return sb.toString();
+    }
+
+    public String getIndexCreationQuery(String indexName, String table, List<String> columns) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("CREATE INDEX IF NOT EXISTS ")
+                .append(indexName)
+                .append(" ON ")
+                .append(table)
+                .append(" (");
+        for (String column : columns) {
+            sb.append(column)
+                    .append(", ");
+        }
+        sb.delete(sb.length() - 2, sb.length());
+        sb.append(");");
+        return sb.toString();
+    }
 
 }

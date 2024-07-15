@@ -9,19 +9,20 @@ import it.mikeslab.commons.api.database.util.SQLUtil;
 import it.mikeslab.commons.api.logger.LogUtils;
 import org.bson.Document;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class    SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {
-
-    private static final int VARCHAR_LENGTH = 255;
+public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements Database<T> {
 
     private final URIBuilder uriBuilder;
     private final HikariDataSource dataSource;
     private Connection connection;
+
+    private List<String> fields;
 
     public SQLDatabaseImpl(URIBuilder uriBuilder) {
         this.uriBuilder = uriBuilder;
@@ -49,14 +50,11 @@ public class    SQLDatabaseImpl<T extends SerializableMapConvertible<T>> impleme
             Class<T> pojoClass = (Class<T>) pojoObject.getClass();
 
             if (!tableExists()) {
-                List<String> fields = Arrays.stream(pojoClass.getDeclaredFields())
-                        .map(field -> field.getName())
+                this.fields = Arrays.stream(pojoClass.getDeclaredFields())
+                        .map(Field::getName)
                         .collect(Collectors.toList());
 
-                createTable(
-                        fields,
-                        pojoObject
-                );
+                this.createTableIfNotExists();
 
                 this.createIndexesIfNotExists(
                         pojoObject.getIdentifierName()
@@ -230,39 +228,21 @@ public class    SQLDatabaseImpl<T extends SerializableMapConvertible<T>> impleme
 
     /**
      * Create a table in the database
-     * @param fields List of fields
-     * @param pojoObject Pojo object from which fields are taken
-     * @return true if the table is created, false otherwise
      */
-    private boolean createTable(List<String> fields, T pojoObject) {
-        // Limit the length of the fixed id field
-        // MySQL doesn't support unique indexes with variable length
-        final int fixedIdFieldLengthLimit = 100;
+    private void createTableIfNotExists() {
 
-        StringBuilder query = new StringBuilder(
-                "CREATE TABLE " + uriBuilder.getTable()
-                        + " (" + pojoObject.getIdentifierName() + " VARCHAR(" + VARCHAR_LENGTH + ")"
-                        + fixedIdFieldLengthLimit + ") PRIMARY KEY, "
+        String sql = SQLUtil.getTableCreationQuery(
+                uriBuilder.getTable(),
+                fields
         );
-        List<String> fieldsClone = new ArrayList<>(fields);
-        fieldsClone.remove(pojoObject.getIdentifierName());
 
-        for (int i = 0; i < fieldsClone.size(); i++) {
-            query.append(fieldsClone.get(i));
-            query.append(" VARCHAR(" + VARCHAR_LENGTH + ")");
-            if (i != fieldsClone.size() - 1) query.append(", ");
-        }
-
-        query.append(")");
-
-        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, query.toString(), Collections.emptyMap())) {
-            return pst.executeUpdate() > 0;
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, sql, Collections.emptyMap())) {
+            pst.executeUpdate();
         } catch (Exception e) {
             LogUtils.severe(
                     LogUtils.LogSource.DATABASE,
                     e
             );
-            return false;
         }
     }
 
@@ -331,7 +311,17 @@ public class    SQLDatabaseImpl<T extends SerializableMapConvertible<T>> impleme
 
 
     private void createIndexesIfNotExists(String identifierName) {
-        String sql = "CREATE INDEX IF NOT EXISTS " + uriBuilder.getTable() + "_" + identifierName + "_index ON " + uriBuilder.getTable() + " (" + identifierName + ")";
+
+        if(fields == null || fields.isEmpty()) {
+            return;
+        }
+
+        String sql = SQLUtil.getIndexCreationQuery(
+                identifierName,
+                uriBuilder.getTable(),
+                this.fields
+        );
+
         try (PreparedStatement pst = connection.prepareStatement(sql)) {
             pst.executeUpdate();
         } catch (Exception e) {
