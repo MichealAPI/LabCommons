@@ -1,5 +1,6 @@
 package it.mikeslab.commons.api.database.util;
 
+import it.mikeslab.commons.api.database.pojo.URIBuilder;
 import lombok.experimental.UtilityClass;
 
 import java.sql.Connection;
@@ -30,6 +31,9 @@ public class SQLUtil {
         for (Object value : values.values()) {
             pst.setObject(index++, value);
         }
+
+        System.out.println(sql);
+
         return pst;
     }
 
@@ -79,5 +83,72 @@ public class SQLUtil {
         sb.append(");");
         return sb.toString();
     }
+
+    public String getFindStatement(URIBuilder uriBuilder, Map<String, Object> values) {
+
+        // Convert the map to a list of "key = ?" format
+        StringBuilder whereClause = new StringBuilder();
+        for (String key : values.keySet()) {
+            if (whereClause.length() > 0) {
+                whereClause.append(" AND ");
+            }
+            whereClause.append(key).append(" = ?");
+
+        }
+
+        return "SELECT * FROM " + uriBuilder.getTable() + " WHERE " + whereClause;
+
+    }
+
+
+    public String getUpsertStatement(URIBuilder uriBuilder, Map<String, Object> values, Map<String, Object> updateQueryMap, String identifierFieldName) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(buildInsertStatement(uriBuilder.getTable(), values));
+        if (!updateQueryMap.isEmpty()) {
+            sb.append(buildUpdateStatement(
+                    updateQueryMap,
+                    identifierFieldName,
+                    uriBuilder.isSqlite()
+            ));
+        }
+
+        return sb.toString();
+    }
+
+    private String buildInsertStatement(String table, Map<String, Object> values) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO ").append(table).append(" (");
+        sb.append(String.join(", ", values.keySet()));
+        sb.append(") VALUES (");
+
+        sb.append("?");
+
+        if (values.size() > 1) {
+            for(int i = 1; i < values.size(); i++) {
+                sb.append(", ?");
+            }
+        }
+
+        sb.append(")");
+        return sb.toString();
+    }
+
+    private String buildUpdateStatement(Map<String, Object> updateQueryMap, String identifierFieldName, boolean isSqlite) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ON ");
+        sb.append(isSqlite ? " CONFLICT(" + identifierFieldName + ") DO UPDATE SET " :
+                " DUPLICATE KEY UPDATE ");
+
+        int i = 0;
+        for (Map.Entry<String, Object> entry : updateQueryMap.entrySet()) {
+            sb.append(entry.getKey()).append(" = ?");
+            if (i++ < updateQueryMap.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
+    }
+
 
 }

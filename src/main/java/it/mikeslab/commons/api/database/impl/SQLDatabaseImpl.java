@@ -105,7 +105,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         Map<String, Object> updateQueryMap = new HashMap<>(values);
         updateQueryMap.remove(pojoObject.getIdentifierName());
 
-        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getUpsertStatement(values, updateQueryMap, pojoObject.getIdentifierName()), values)) {
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, SQLUtil.getUpsertStatement(uriBuilder, values, updateQueryMap, pojoObject.getIdentifierName()), values)) {
             int index = values.size() + 1;
             if (!updateQueryMap.isEmpty()) {
                 for (Object value : updateQueryMap.values()) {
@@ -191,7 +191,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
         List<Document> foundDocuments = new ArrayList<>();
 
-        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, getFindStatement(document), document)) {
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, SQLUtil.getFindStatement(uriBuilder, document), document)) {
             try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     foundDocuments.add(new Document(SQLUtil.getResultValues(rs)));
@@ -247,67 +247,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     }
 
 
-    private String getFindStatement(Map<String, Object> values) {
-
-        // Convert the map to a list of "key = ?" format
-        StringBuilder whereClause = new StringBuilder();
-        for (String key : values.keySet()) {
-            if (whereClause.length() > 0) {
-                whereClause.append(" AND ");
-            }
-            whereClause.append(key).append(" = ?");
-
-        }
-
-        return "SELECT * FROM " + uriBuilder.getTable() + " WHERE " + whereClause;
-
-    }
-
-
-    private String getUpsertStatement(Map<String, Object> values, Map<String, Object> updateQueryMap, String identifierFieldName) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(buildInsertStatement(values));
-        if (!updateQueryMap.isEmpty()) {
-            sb.append(buildUpdateStatement(updateQueryMap, identifierFieldName));
-        }
-
-        return sb.toString();
-    }
-
-    private String buildInsertStatement(Map<String, Object> values) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO ").append(uriBuilder.getTable()).append(" (");
-        sb.append(String.join(", ", values.keySet()));
-        sb.append(") VALUES (");
-
-        sb.append("?");
-
-        if (values.size() > 1) {
-            for(int i = 1; i < values.size(); i++) {
-                sb.append(", ?");
-            }
-        }
-
-        sb.append(")");
-        return sb.toString();
-    }
-
-    private String buildUpdateStatement(Map<String, Object> updateQueryMap, String identifierFieldName) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(" ON ");
-        sb.append(uriBuilder.isSqlite() ? " CONFLICT(" + identifierFieldName + ") DO UPDATE SET " :
-                " DUPLICATE KEY UPDATE ");
-
-        int i = 0;
-        for (Map.Entry<String, Object> entry : updateQueryMap.entrySet()) {
-            sb.append(entry.getKey()).append(" = ?");
-            if (i++ < updateQueryMap.size() - 1) {
-                sb.append(", ");
-            }
-        }
-        return sb.toString();
-    }
 
 
     private void createIndexesIfNotExists(String identifierName) {
