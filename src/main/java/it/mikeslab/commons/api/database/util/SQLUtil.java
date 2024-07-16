@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility class for {@link it.mikeslab.commons.api.database.impl.SQLDatabaseImpl} operations
@@ -52,12 +53,17 @@ public class SQLUtil {
     }
 
 
-    public String getTableCreationQuery(String tableName, List<String> columns) {
-        StringBuilder sb = new StringBuilder();
+    public String getTableCreationQuery(String tableName, String identifier, Set<String> columns) {
+        StringBuilder sb = new StringBuilder(); // todo needs a more robust logging system
         sb.append("CREATE TABLE IF NOT EXISTS ")
                 .append(tableName)
-                .append(" (");
+                .append(" (")
+                .append(identifier)
+                .append(" VARCHAR(255) UNIQUE, ");
         for (String column : columns) {
+
+            if(column == identifier) continue;
+
             sb.append(column)
                     .append(" ")
                     .append("VARCHAR(255)")
@@ -68,7 +74,7 @@ public class SQLUtil {
         return sb.toString();
     }
 
-    public String getIndexCreationQuery(String indexName, String table, List<String> columns) {
+    public String getIndexCreationQuery(String indexName, String table, Set<String> columns) {
         StringBuilder sb = new StringBuilder();
         sb.append("CREATE INDEX IF NOT EXISTS ")
                 .append(indexName)

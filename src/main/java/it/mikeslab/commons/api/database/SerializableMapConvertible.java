@@ -1,6 +1,7 @@
 package it.mikeslab.commons.api.database;
 
 import java.util.Map;
+import java.util.Set;
 
 public interface SerializableMapConvertible<T> {
 
@@ -26,5 +27,10 @@ public interface SerializableMapConvertible<T> {
      * @return Returns the identifier field value
      */
     Object getIdentifierValue();
+
+    /**
+     * @return Returns the values identifiers
+     */
+    Set<String> valuesIdentifiers();
 
 }

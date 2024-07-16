@@ -22,7 +22,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     private final HikariDataSource dataSource;
     private Connection connection;
 
-    private List<String> fields;
+    private Set<String> fields;
 
     public SQLDatabaseImpl(URIBuilder uriBuilder) {
         this.uriBuilder = uriBuilder;
@@ -47,18 +47,14 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         try {
             this.connection = dataSource.getConnection();
 
-            Class<T> pojoClass = (Class<T>) pojoObject.getClass();
-
             if (!tableExists()) {
-                this.fields = Arrays.stream(pojoClass.getDeclaredFields())
-                        .map(Field::getName)
-                        .collect(Collectors.toList());
+                this.fields = null; // pojoObject.values().keySet(); // todo DEV BUILD, DO NOT USE
 
-                this.createTableIfNotExists();
+                String uniqueIdentifier = pojoObject.getIdentifierName();
 
-                this.createIndexesIfNotExists(
-                        pojoObject.getIdentifierName()
-                );
+                this.createTableIfNotExists(uniqueIdentifier);
+                this.createIndexesIfNotExists(uniqueIdentifier);
+
             }
 
             return true;
@@ -229,10 +225,11 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     /**
      * Create a table in the database
      */
-    private void createTableIfNotExists() {
+    private void createTableIfNotExists(String uniqueIdentifier) {
 
         String sql = SQLUtil.getTableCreationQuery(
                 uriBuilder.getTable(),
+                uniqueIdentifier,
                 fields
         );
 
