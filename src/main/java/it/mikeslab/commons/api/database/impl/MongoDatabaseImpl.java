@@ -51,7 +51,7 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
         // Create an index on the identifier field
         mongoDatabase.getCollection(uriBuilder.getTable())
-                .createIndex(Indexes.text(pojoObject.getIdentifierName()));
+                .createIndex(Indexes.text(pojoObject.getUniqueIdentifierName()));
 
         return isConnected();
     }
@@ -189,8 +189,8 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
     private Bson generateIdFilter(T pojoObject) {
         return Filters.eq(
-                pojoObject.getIdentifierName(),
-                pojoObject.getIdentifierValue()
+                pojoObject.getUniqueIdentifierName(),
+                pojoObject.getUniqueIdentifierValue()
         );
     }
 

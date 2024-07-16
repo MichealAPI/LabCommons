@@ -50,7 +50,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             if (!tableExists()) {
                 this.fields = null; // pojoObject.values().keySet(); // todo DEV BUILD, DO NOT USE
 
-                String uniqueIdentifier = pojoObject.getIdentifierName();
+                String uniqueIdentifier = pojoObject.getUniqueIdentifierName();
 
                 this.createTableIfNotExists(uniqueIdentifier);
                 this.createIndexesIfNotExists(uniqueIdentifier);
@@ -99,9 +99,9 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
 
         // A Map object for Updating, without Identifier
         Map<String, Object> updateQueryMap = new HashMap<>(values);
-        updateQueryMap.remove(pojoObject.getIdentifierName());
+        updateQueryMap.remove(pojoObject.getUniqueIdentifierName());
 
-        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, SQLUtil.getUpsertStatement(uriBuilder, values, updateQueryMap, pojoObject.getIdentifierName()), values)) {
+        try (PreparedStatement pst = SQLUtil.prepareStatement(connection, SQLUtil.getUpsertStatement(uriBuilder, values, updateQueryMap, pojoObject.getUniqueIdentifierName()), values)) {
             int index = values.size() + 1;
             if (!updateQueryMap.isEmpty()) {
                 for (Object value : updateQueryMap.values()) {
@@ -129,11 +129,11 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
     @Override
     public boolean delete(T pojoObject) {
         String sql = "DELETE FROM " + uriBuilder.getTable()
-                + " WHERE " + pojoObject.getIdentifierName() + " = ?";
+                + " WHERE " + pojoObject.getUniqueIdentifierName() + " = ?";
 
         Map<String, Object> values = Collections.singletonMap(
-                pojoObject.getIdentifierName(),
-                pojoObject.getIdentifierValue()
+                pojoObject.getUniqueIdentifierName(),
+                pojoObject.getUniqueIdentifierValue()
         );
 
         try (PreparedStatement pst = SQLUtil.prepareStatement(connection, sql, values)) {
