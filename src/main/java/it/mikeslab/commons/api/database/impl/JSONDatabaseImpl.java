@@ -42,7 +42,7 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
         if (sourceFile.exists()) {
             this.cache = readFromFile();
             this.index = cache.stream()
-                    .collect(Collectors.toMap(SerializableMapConvertible::getIdentifierValue, Function.identity()));
+                    .collect(Collectors.toMap(SerializableMapConvertible::getUniqueIdentifierName, Function.identity()));
             return true;
         } else {
             return createSourceFile(sourceFile);
@@ -63,21 +63,21 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
 
     @Override
     public boolean upsert(T pojoObject) {
-        T existing = index.get(pojoObject.getIdentifierValue());
+        T existing = index.get(pojoObject.getUniqueIdentifierName());
         if (existing != null) {
             cache.remove(existing);
         }
         cache.add(pojoObject);
-        index.put(pojoObject.getIdentifierValue(), pojoObject);
+        index.put(pojoObject.getUniqueIdentifierName(), pojoObject);
         return writeToFile(cache);
     }
 
     @Override
     public boolean delete(T pojoObject) {
-        T existing = index.get(pojoObject.getIdentifierValue());
+        T existing = index.get(pojoObject.getUniqueIdentifierName());
         if (existing != null) {
             cache.remove(existing);
-            index.remove(pojoObject.getIdentifierValue());
+            index.remove(pojoObject.getUniqueIdentifierName());
             return writeToFile(cache);
         }
         return false;
@@ -85,13 +85,13 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
 
     @Override
     public T findOne(T pojoObject) {
-        return index.get(pojoObject.getIdentifierValue());
+        return index.get(pojoObject.getUniqueIdentifierName());
     }
 
     @Override
     public List<T> findMany(T pojoObject) {
         return cache.stream()
-                .filter(obj -> obj.getIdentifierValue().equals(pojoObject.getIdentifierValue()))
+                .filter(obj -> obj.getUniqueIdentifierValue().equals(pojoObject.getUniqueIdentifierValue()))
                 .collect(Collectors.toList());
     }
 

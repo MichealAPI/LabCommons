@@ -21,16 +21,16 @@ public interface SerializableMapConvertible<T> {
     /**
      * @return Returns the identifier field name
      */
-    String getIdentifierName();
+    String getUniqueIdentifierName();
 
     /**
      * @return Returns the identifier field value
      */
-    Object getIdentifierValue();
+    Object getUniqueIdentifierValue();
 
     /**
      * @return Returns the values identifiers
      */
-    Set<String> valuesIdentifiers();
+    Set<String> identifiers();
 
 }
