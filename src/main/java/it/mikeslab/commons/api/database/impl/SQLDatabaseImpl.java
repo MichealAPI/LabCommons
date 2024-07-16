@@ -48,7 +48,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             this.connection = dataSource.getConnection();
 
             if (!tableExists()) {
-                this.fields = null; // pojoObject.values().keySet(); // todo DEV BUILD, DO NOT USE
+                this.fields = pojoObject.identifiers();
 
                 String uniqueIdentifier = pojoObject.getUniqueIdentifierName();
 
