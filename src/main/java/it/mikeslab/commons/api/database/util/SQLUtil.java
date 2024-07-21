@@ -85,6 +85,9 @@ public class SQLUtil {
                 .append(table)
                 .append(" (");
         for (String column : columns) {
+
+            column = replaceUnsupportedCharacters(column);
+
             sb.append(column)
                     .append(", ");
         }
@@ -160,7 +163,7 @@ public class SQLUtil {
 
         int i = 0;
         for (Map.Entry<String, Object> entry : updateQueryMap.entrySet()) {
-            sb.append(entry.getKey()).append(" = ?");
+            sb.append(replaceUnsupportedCharacters(entry.getKey())).append(" = ?");
             if (i++ < updateQueryMap.size() - 1) {
                 sb.append(", ");
             }
