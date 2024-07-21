@@ -79,7 +79,7 @@ public class SQLUtil {
 
     public String getIndexCreationQuery(String indexName, String table, Set<String> columns) {
         StringBuilder sb = new StringBuilder();
-        sb.append("CREATE INDEX IF NOT EXISTS ")
+        sb.append("CREATE INDEX ")
                 .append(indexName)
                 .append(" ON ")
                 .append(table)

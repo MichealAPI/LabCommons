@@ -55,7 +55,6 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
                 String uniqueIdentifier = pojoObject.getUniqueIdentifierName();
 
                 this.createTableIfNotExists(uniqueIdentifier);
-                this.createIndexesIfNotExists(uniqueIdentifier);
 
             }
 
@@ -243,12 +242,14 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
                     e
             );
         }
+
+        this.createIndexes(uniqueIdentifier);
     }
 
 
 
 
-    private void createIndexesIfNotExists(String identifierName) {
+    private void createIndexes(String identifierName) {
 
         if(fields == null || fields.isEmpty()) {
             return;
