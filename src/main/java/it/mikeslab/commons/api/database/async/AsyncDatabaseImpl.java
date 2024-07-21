@@ -2,12 +2,14 @@ package it.mikeslab.commons.api.database.async;
 
 import it.mikeslab.commons.api.database.Database;
 import it.mikeslab.commons.api.database.SerializableMapConvertible;
+import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 @Getter
 @RequiredArgsConstructor
@@ -42,7 +44,19 @@ public class AsyncDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
 
     @Override
     public CompletableFuture<T> findOne(T pojoObject) {
-        return CompletableFuture.supplyAsync(() -> syncDatabase.findOne(pojoObject));
+        return CompletableFuture.supplyAsync(() -> {
+
+            T result = null;
+
+            try {
+                result = syncDatabase.findOne(pojoObject);
+            } catch (Exception e) { // todo custom exception
+                LogUtils.log(Level.WARNING, LogUtils.LogSource.DATABASE, e);
+            }
+
+            return result;
+
+        });
     }
 
     @Override

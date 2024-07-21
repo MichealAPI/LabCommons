@@ -1,0 +1,7 @@
+
+# Sensitive private data
+
+SQL_TEST_DB_URL: "jdbc:mysql://localhost:3306/testdb"
+SQL_TEST_DB_USER: "root"
+SQL_TEST_DB_PASSWORD: "test"
+SQL_TEST_DB_TABLE: "testtable"

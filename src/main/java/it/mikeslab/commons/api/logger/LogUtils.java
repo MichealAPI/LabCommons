@@ -9,12 +9,31 @@ import java.util.logging.Level;
 @UtilityClass
 public class LogUtils {
 
+    private Boolean IS_TEST;
+
     public void log(Level logLevel, LogSource logSource, Exception exception) {
-        Bukkit.getLogger().log(logLevel, "[" + LabCommons.PLUGIN_NAME + "] -> (" + logSource.sourceDisplayName + "): " + exception.getMessage());
+        log(logLevel, "[" + LabCommons.PLUGIN_NAME + "] -> (" + logSource.sourceDisplayName + "): " + exception.getMessage());
     }
 
     public void log(Level logLevel, LogSource logSource, String message) {
-        Bukkit.getLogger().log(logLevel, "[" + LabCommons.PLUGIN_NAME + "] -> (" + logSource.sourceDisplayName + "): " + message);
+        log(logLevel, "[" + LabCommons.PLUGIN_NAME + "] -> (" + logSource.sourceDisplayName + "): " + message);
+    }
+
+    private void log(Level logLevel, String message) {
+
+        if(IS_TEST == null) {
+            IS_TEST = isTest();
+        }
+
+        if(IS_TEST) {
+            System.out.println(message);
+        } else {
+            Bukkit.getLogger().log(
+                    logLevel,
+                    message
+            );
+        }
+
     }
 
     // Shortcuts for logging
@@ -43,6 +62,18 @@ public class LogUtils {
         log(Level.SEVERE, logSource, exception);
     }
 
+    private static boolean isTest() {
+
+        try {
+            Bukkit.getLogger();
+            return false;
+        } catch (NullPointerException e) {
+            // If Bukkit is not initialized, we are in a test environment
+            return true;
+        }
+
+    }
+
     public enum LogSource {
 
 
@@ -53,7 +84,8 @@ public class LogUtils {
         CONFIG("Config"),
         UTIL("Util"),
         API("API"),
-        OTHER("Other");
+        OTHER("Other"),
+        TEST("Test");
 
         private final String sourceDisplayName;
 

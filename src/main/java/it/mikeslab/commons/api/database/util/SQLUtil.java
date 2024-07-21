@@ -33,7 +33,7 @@ public class SQLUtil {
             pst.setObject(index++, value);
         }
 
-        System.out.println(sql);
+        // System.out.println(sql);
 
         return pst;
     }

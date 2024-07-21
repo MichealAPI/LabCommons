@@ -114,3 +114,6 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+# Sensitive
+test/resources/
