@@ -261,6 +261,7 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         );
 
         try (PreparedStatement pst = connection.prepareStatement(sql)) {
+            System.out.println(pst.toString());
             pst.executeUpdate();
         } catch (Exception e) {
             LogUtils.severe(
