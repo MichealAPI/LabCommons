@@ -4,10 +4,7 @@ import it.mikeslab.commons.api.database.Database;
 import it.mikeslab.commons.api.database.pojo.TestObject;
 import it.mikeslab.commons.api.database.pojo.URIBuilder;
 import it.mikeslab.commons.api.logger.LogUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
@@ -49,11 +46,13 @@ public class SQLDatabaseTest {
     }
 
     @Test
+    @Order(1)
     public void testConnect() {
         Assertions.assertNotNull(db);
     }
 
     @Test
+    @Order(2)
     public void testUpsert() {
         
         Map<TestObject.TestEnum, String> testValues = this.getTestValues();
@@ -71,8 +70,9 @@ public class SQLDatabaseTest {
     }
     
     @Test
+    @Order(3)
     public void testFindOne() {
-        
+
         Map<TestObject.TestEnum, String> testValues = this.getTestValues();
         
         // TEST1 stands for the identifier
@@ -80,6 +80,14 @@ public class SQLDatabaseTest {
                 testValues.get(
                         TestObject.TestEnum.TEST1
                 )
+        );
+
+        LogUtils.log(
+                Level.INFO,
+                LogUtils.LogSource.TEST,
+                "Finding object with identifier: " + filter
+                        .getValues()
+                        .get(TestObject.TestEnum.TEST1)
         );
         
         TestObject result = db.findOne(filter);

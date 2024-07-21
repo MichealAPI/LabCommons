@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -31,8 +32,6 @@ public class SQLUtil {
         for (Object value : values.values()) {
             pst.setObject(index++, value);
         }
-
-        System.out.println(pst.toString());
 
         // System.out.println(sql);
 
@@ -63,8 +62,6 @@ public class SQLUtil {
                 .append(" VARCHAR(255) UNIQUE, ");
         for (String column : columns) {
 
-            column = replaceUnsupportedCharacters(column);
-
             if(column == identifier) continue;
 
             sb.append(column)
@@ -77,35 +74,31 @@ public class SQLUtil {
         return sb.toString();
     }
 
-    public String getIndexCreationQuery(String indexName, String table, Set<String> columns) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("CREATE INDEX ")
-                .append(indexName)
-                .append(" ON ")
-                .append(table)
-                .append(" (");
-        for (String column : columns) {
-
-            column = replaceUnsupportedCharacters(column);
-
-            sb.append(column)
-                    .append(", ");
-        }
-        sb.delete(sb.length() - 2, sb.length());
-        sb.append(");");
-
-        System.out.println("BARTOAJKEWROJKAE: " + sb.toString());
-
-        return sb.toString();
-    }
+//    public String getIndexCreationQuery(String indexName, String table, Set<String> columns) {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("CREATE INDEX ")
+//                .append(indexName)
+//                .append(" ON ")
+//                .append(table)
+//                .append(" (");
+//        for (String column : columns) {
+//
+//            column = replaceUnsupportedCharacters(column);
+//
+//            sb.append(column)
+//                    .append(", ");
+//        }
+//        sb.delete(sb.length() - 2, sb.length());
+//        sb.append(");");
+//
+//        return sb.toString();
+//    }
 
     public String getFindStatement(URIBuilder uriBuilder, Map<String, Object> values) {
 
         // Convert the map to a list of "key = ?" format
         StringBuilder whereClause = new StringBuilder();
         for (String key : values.keySet()) {
-
-            key = replaceUnsupportedCharacters(key);
 
             if (whereClause.length() > 0) {
                 whereClause.append(" AND ");
@@ -132,11 +125,6 @@ public class SQLUtil {
         }
 
         return sb.toString();
-    }
-
-    public String replaceUnsupportedCharacters(String input) {
-        return input.replace("-", "_")
-                .toLowerCase();
     }
 
     private String buildInsertStatement(String table, Map<String, Object> values) {
@@ -166,7 +154,7 @@ public class SQLUtil {
 
         int i = 0;
         for (Map.Entry<String, Object> entry : updateQueryMap.entrySet()) {
-            sb.append(replaceUnsupportedCharacters(entry.getKey())).append(" = ?");
+            sb.append(entry.getKey()).append(" = ?");
             if (i++ < updateQueryMap.size() - 1) {
                 sb.append(", ");
             }

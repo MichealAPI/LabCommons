@@ -243,33 +243,33 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
             );
         }
 
-        this.createIndexes(uniqueIdentifier);
+        // this.createIndexes(uniqueIdentifier);
     }
 
 
 
 
-    private void createIndexes(String identifierName) {
-
-        if(fields == null || fields.isEmpty()) {
-            return;
-        }
-
-        String sql = SQLUtil.getIndexCreationQuery(
-                identifierName,
-                uriBuilder.getTable(),
-                this.fields
-        );
-
-        try (PreparedStatement pst = connection.prepareStatement(sql)) {
-            pst.executeUpdate();
-        } catch (Exception e) {
-            LogUtils.severe(
-                    LogUtils.LogSource.DATABASE,
-                    e
-            );
-        }
-    }
+//    private void createIndexes(String identifierName) {
+//
+//        if(fields == null || fields.isEmpty()) {
+//            return;
+//        }
+//
+//        String sql = SQLUtil.getIndexCreationQuery(
+//                identifierName,
+//                uriBuilder.getTable(),
+//                this.fields
+//        );
+//
+//        try (PreparedStatement pst = connection.prepareStatement(sql)) {
+//            pst.executeUpdate();
+//        } catch (Exception e) {
+//            LogUtils.severe(
+//                    LogUtils.LogSource.DATABASE,
+//                    e
+//            );
+//        }
+//    }
 
 
 }
