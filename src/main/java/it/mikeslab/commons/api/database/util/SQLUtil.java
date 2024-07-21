@@ -93,6 +93,9 @@ public class SQLUtil {
         }
         sb.delete(sb.length() - 2, sb.length());
         sb.append(");");
+
+        System.out.println("BARTOAJKEWROJKAE: " + sb.toString());
+
         return sb.toString();
     }
 
