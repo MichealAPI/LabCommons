@@ -37,6 +37,9 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+
         dataSource = new HikariDataSource(config);
     }
 
