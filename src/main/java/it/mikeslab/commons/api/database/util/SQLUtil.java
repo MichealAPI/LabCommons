@@ -63,6 +63,8 @@ public class SQLUtil {
                 .append(" VARCHAR(255) UNIQUE, ");
         for (String column : columns) {
 
+            column = replaceUnsupportedCharacters(column);
+
             if(column == identifier) continue;
 
             sb.append(column)
@@ -96,6 +98,9 @@ public class SQLUtil {
         // Convert the map to a list of "key = ?" format
         StringBuilder whereClause = new StringBuilder();
         for (String key : values.keySet()) {
+
+            key = replaceUnsupportedCharacters(key);
+
             if (whereClause.length() > 0) {
                 whereClause.append(" AND ");
             }
@@ -123,6 +128,11 @@ public class SQLUtil {
         return sb.toString();
     }
 
+    public String replaceUnsupportedCharacters(String input) {
+        return input.replace("-", "_")
+                .toLowerCase();
+    }
+
     private String buildInsertStatement(String table, Map<String, Object> values) {
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO ").append(table).append(" (");
@@ -140,6 +150,7 @@ public class SQLUtil {
         sb.append(")");
         return sb.toString();
     }
+
 
     private String buildUpdateStatement(Map<String, Object> updateQueryMap, String identifierFieldName, boolean isSqlite) {
         StringBuilder sb = new StringBuilder();
