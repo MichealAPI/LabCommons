@@ -1,7 +1,0 @@
-
-# Sensitive private data
-
-SQL_TEST_DB_URL: "jdbc:mysql://mysql.mikeslab.it:3306/testdb"
-SQL_TEST_DB_USER: "mikeslab"
-SQL_TEST_DB_PASSWORD: "asdw^w4sCAS"
-SQL_TEST_DB_TABLE: "testtable"

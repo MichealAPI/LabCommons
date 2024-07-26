@@ -2,224 +2,234 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>it.mikeslab</groupId>
-  <artifactId>LabCommons</artifactId>
-  <version>2.4.0.9.6.2</version>
-  <description>A Java Library for MikesLab's Minecraft plug-ins</description>
-  <packaging>jar</packaging>
+    <groupId>it.mikeslab</groupId>
+    <artifactId>LabCommons</artifactId>
+    <version>2.4.1</version>
+    <description>A Java Library for MikesLab's Minecraft plug-ins</description>
+    <packaging>jar</packaging>
 
-  <name>LabCommons</name>
+    <name>LabCommons</name>
 
-  <properties>
-    <java.version>8</java.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <properties>
+        <java.version>8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-  <licenses>
-    <license>
-        <name>Gnu General Public License</name>
-        <url>https://www.gnu.org/licenses/gpl-3.0.html#license-text</url>
-    </license>
-  </licenses>
+    <licenses>
+        <license>
+            <name>Gnu General Public License</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.html#license-text</url>
+        </license>
+    </licenses>
 
-  <build>
-    <plugins>
+    <build>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <source>8</source>
-          <target>8</target>
-        </configuration>
-      </plugin>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.3.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
+        <plugins>
 
-        <plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.cryptomorin.xseries</pattern>
+                                    <!-- Be sure to change the package below -->
+                                    <shadedPattern>it.mikeslab.commons.api.various.util</shadedPattern>
+                                </relocation>
+                            </relocations>
+
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>com/cryptomorin/xseries/XBiome*</exclude>
+                                        <exclude>com/cryptomorin/xseries/NMSExtras*</exclude>
+                                        <exclude>com/cryptomorin/xseries/NoteBlockMusic*</exclude>
+                                        <exclude>com/cryptomorin/xseries/SkullCacheListener*</exclude>
+                                        <exclude>com/cryptomorin/xseries/XTag*</exclude>
+                                        <exclude>com/cryptomorin/xseries/XWorldBorder*</exclude>
+                                        <exclude>com/cryptomorin/xseries/XEnchantment*</exclude>
+                                        <exclude>com/cryptomorin/xseries/XBlock*</exclude>
+                                        <exclude>com/cryptomorin/xseries/XParticle*</exclude>
+                                        <exclude>com/cryptomorin/xseries/XEntity*</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
+            <id>minecraft-repo</id>
+            <url>https://libraries.minecraft.net/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+
+        <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
             <version>3.6.0</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>shade</goal>
-                    </goals>
-                    <configuration>
-                        <relocations>
-                            <relocation>
-                                <pattern>com.cryptomorin.xseries</pattern>
-                                <!-- Be sure to change the package below -->
-                                <shadedPattern>it.mikeslab.commons.api.various.util</shadedPattern>
-                            </relocation>
-                        </relocations>
+            <scope>provided</scope>
+        </dependency>
 
-                        <filters>
-                            <filter>
-                                <artifact>*:*</artifact>
-                                <excludes>
-                                    <exclude>com/cryptomorin/xseries/XBiome*</exclude>
-                                    <exclude>com/cryptomorin/xseries/NMSExtras*</exclude>
-                                    <exclude>com/cryptomorin/xseries/NoteBlockMusic*</exclude>
-                                    <exclude>com/cryptomorin/xseries/SkullCacheListener*</exclude>
-                                    <exclude>com/cryptomorin/xseries/XTag*</exclude>
-                                    <exclude>com/cryptomorin/xseries/XWorldBorder*</exclude>
-                                    <exclude>com/cryptomorin/xseries/XEnchantment*</exclude>
-                                    <exclude>com/cryptomorin/xseries/XBlock*</exclude>
-                                    <exclude>com/cryptomorin/xseries/XParticle*</exclude>
-                                    <exclude>com/cryptomorin/xseries/XEntity*</exclude>
-                                </excludes>
-                            </filter>
-                        </filters>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>3.3.2</version>
+            <scope>provided</scope>
+        </dependency>
 
-      <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>3.2.0</version>
-          <executions>
-              <execution>
-                  <id>auto-clean</id>
-                  <phase>initialize</phase>
-                  <goals>
-                      <goal>clean</goal>
-                  </goals>
-              </execution>
-          </executions>
-      </plugin>
-    </plugins>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-  </build>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
 
-  <repositories>
-      <repository>
-          <id>spigot-repo</id>
-          <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-      </repository>
-      <repository>
-          <id>sonatype</id>
-          <url>https://oss.sonatype.org/content/groups/public/</url>
-      </repository>
-      <repository>
-          <id>placeholderapi</id>
-          <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-      </repository>
-      <repository>
-          <id>minecraft-repo</id>
-          <url>https://libraries.minecraft.net/</url>
-      </repository>
-  </repositories>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.32</version>
+            <scope>provided</scope>
+        </dependency>
 
-  <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>4.0.3</version>
+            <scope>provided</scope>
+        </dependency>
 
-      <dependency>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>3.6.0</version>
-          <scope>provided</scope>
-      </dependency>
+        <!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>5.0.1</version>
+            <scope>provided</scope>
+        </dependency>
 
-      <dependency>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>3.3.2</version>
-          <scope>provided</scope>
-      </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.23.1</version>
+            <scope>provided</scope>
+        </dependency>
 
-      <dependency>
-          <groupId>org.spigotmc</groupId>
-          <artifactId>spigot-api</artifactId>
-          <version>1.16.5-R0.1-SNAPSHOT</version>
-          <scope>provided</scope>
-      </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-minimessage</artifactId>
+            <version>4.17.0</version>
+        </dependency>
 
-      <dependency>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok</artifactId>
-          <version>1.18.32</version>
-          <scope>provided</scope>
-      </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.3.3</version>
+        </dependency>
 
-      <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
-      <dependency>
-          <groupId>com.zaxxer</groupId>
-          <artifactId>HikariCP</artifactId>
-          <version>4.0.3</version>
-          <scope>provided</scope>
-      </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.5</version>
+            <scope>provided</scope>
+        </dependency>
 
-      <!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync -->
-      <dependency>
-          <groupId>org.mongodb</groupId>
-          <artifactId>mongodb-driver-sync</artifactId>
-          <version>5.0.1</version>
-          <scope>provided</scope>
-      </dependency>
+        <dependency>
+            <groupId>com.github.cryptomorin</groupId>
+            <artifactId>XSeries</artifactId>
+            <version>11.2.0</version>
+            <scope>compile</scope>
+        </dependency>
 
-      <dependency>
-          <groupId>org.apache.logging.log4j</groupId>
-          <artifactId>log4j-core</artifactId>
-          <version>2.23.1</version>
-          <scope>provided</scope>
-      </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>authlib</artifactId>
+            <version>1.5.21</version>
+            <scope>provided</scope>
+        </dependency>
 
-      <dependency>
-          <groupId>net.kyori</groupId>
-          <artifactId>adventure-text-minimessage</artifactId>
-          <version>4.17.0</version>
-      </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.3</version>
+            <scope>test</scope>
+        </dependency>
 
-      <dependency>
-          <groupId>net.kyori</groupId>
-          <artifactId>adventure-platform-bukkit</artifactId>
-          <version>4.3.3</version>
-      </dependency>
+        <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.0.0</version>
+            <scope>test</scope>
+        </dependency>
 
-      <dependency>
-          <groupId>me.clip</groupId>
-          <artifactId>placeholderapi</artifactId>
-          <version>2.11.5</version>
-          <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-          <groupId>com.github.cryptomorin</groupId>
-          <artifactId>XSeries</artifactId>
-          <version>11.2.0</version>
-          <scope>compile</scope>
-      </dependency>
-
-      <dependency>
-          <groupId>com.mojang</groupId>
-          <artifactId>authlib</artifactId>
-          <version>1.5.21</version>
-          <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter</artifactId>
-          <version>5.10.3</version>
-          <scope>test</scope>
-      </dependency>
-
-      <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
-      <dependency>
-          <groupId>com.mysql</groupId>
-          <artifactId>mysql-connector-j</artifactId>
-          <version>9.0.0</version>
-          <scope>test</scope>
-      </dependency>
-
-  </dependencies>
+    </dependencies>
 </project>
