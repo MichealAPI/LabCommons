@@ -18,13 +18,6 @@ public class URIUtil {
     }
 
     private URIBuilder getDefaultURI(String prefix) {
-
-        String str = System.getenv(prefix + "_TEST_DB_URL");
-
-        String res = str.substring(0, Math.min(str.length(), 20));
-
-        System.out.println("TEST CODE: " + res);
-
         return URIBuilder.builder()
                 .uri(System.getenv(prefix + "_TEST_DB_URL"))
                 .username(System.getenv(prefix + "_TEST_DB_USER"))
