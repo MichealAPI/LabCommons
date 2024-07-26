@@ -7,6 +7,16 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      MONGO_TEST_DB: ${{ secrets.MONGO_TEST_DB }}
+      MONGO_TEST_DB_PASSWORD: ${{ secrets.MONGO_TEST_DB_PASSWORD }}
+      MONGO_TEST_DB_TABLE: ${{ secrets.MONGO_TEST_DB_TABLE }}
+      MONGO_TEST_DB_URL: ${{ secrets.MONGO_TEST_DB_URL }}
+      SQL_TEST_DB_PASSWORD: ${{ secrets.SQL_TEST_DB_PASSWORD }}
+      SQL_TEST_DB_TABLE: ${{ secrets.SQL_TEST_DB_TABLE }}
+      SQL_TEST_DB_URL: ${{ secrets.SQL_TEST_DB_URL }}
+      SQL_TEST_DB_USER: ${{ secrets.SQL_TEST_DB_USER }}
+
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK 1.8
