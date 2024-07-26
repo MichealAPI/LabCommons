@@ -21,7 +21,7 @@ public class URIUtil {
 
         String str = System.getenv(prefix + "_TEST_DB_URL");
 
-        String res = str.substring(0, Math.min(str.length(), 8));
+        String res = str.substring(0, Math.min(str.length(), 20));
 
         System.out.println("TEST CODE: " + res);
 
