@@ -15,8 +15,6 @@ public class DatabaseTest {
     @Test
     public void test() {
 
-        System.out.println("DANGEROUS TEST CODE: " + System.getenv("MONGO_TEST_DB_TABLE"));
-
         for(Database database : Database.values()) {
 
             LogUtils.info(
