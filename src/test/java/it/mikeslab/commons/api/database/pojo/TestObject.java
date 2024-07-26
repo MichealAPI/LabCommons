@@ -27,6 +27,7 @@ public class TestObject implements SerializableMapConvertible<TestObject> {
         testObject.values = new HashMap<>();
 
         for(Map.Entry<String, Object> entry : map.entrySet()) {
+
             testObject.values.put(
                     TestEnum.valueOf(entry.getKey()),
                     entry.getValue().toString()

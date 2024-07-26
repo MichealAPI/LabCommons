@@ -135,6 +135,9 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
         if(resultDocument.first() == null) return pojoObjects; // Return empty set if no results
 
         for(Document doc : resultDocument) {
+
+            doc.remove("_id");
+
             T resultPojo = pojoObject.fromMap(doc);
             pojoObjects.add(resultPojo);
         }
