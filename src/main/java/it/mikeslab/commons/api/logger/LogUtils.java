@@ -12,7 +12,12 @@ public class LogUtils {
     private Boolean IS_TEST;
 
     public void log(Level logLevel, LogSource logSource, Exception exception) {
-        log(logLevel, "[" + LabCommons.PLUGIN_NAME + "] -> (" + logSource.sourceDisplayName + "): " + exception.getMessage());
+        log(logLevel, "[" + LabCommons.PLUGIN_NAME + "] -> (" + logSource.sourceDisplayName + "): ");
+
+        for(StackTraceElement element : exception.getStackTrace()) {
+            log(logLevel, element.toString());
+        }
+
     }
 
     public void log(Level logLevel, LogSource logSource, String message) {
