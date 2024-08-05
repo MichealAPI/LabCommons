@@ -32,11 +32,13 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         if (uriBuilder.getUsername() != null) config.setUsername(uriBuilder.getUsername());
         if (uriBuilder.getPassword() != null) config.setPassword(uriBuilder.getPassword());
 
-        // Databases are handled exclusively through the properties usage
+        // Databases are handled exclusively through the property usage
 
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.addDataSourceProperty("characterEncoding","utf8");
+        config.addDataSourceProperty("useUnicode","true");
 
         config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
