@@ -80,9 +80,18 @@ public class ConfigDatabaseUtil<T extends SerializableMapConvertible<T>> {
             return null;
         }
 
-        uri = uri.replace("{dataFolder}", dataFolder.getAbsolutePath())
-                .replace("/", File.separator)
-                .replace("\\", File.separator);
+        // File-based only selection
+        if (uri.contains("{dataFolder}")) { // This means that it is a file-based database, therefore,
+                                            // we must use File.separators instead of slashes
+
+            uri = uri.replace("/", File.separator)
+                    .replace("\\", File.separator);
+
+        }
+
+        uri = uri.replace("{dataFolder}", dataFolder.getAbsolutePath());
+
+
 
         uriBuilderBuilder.uri(uri);
 
