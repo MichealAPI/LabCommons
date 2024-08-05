@@ -39,6 +39,11 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
         this.sourceFile = new File(filePath);
         this.typeInstance = pojoClass;  // Store the instance of T
 
+        LogUtils.debug(
+                LogUtils.LogSource.DATABASE,
+                "Connecting to " + uriBuilder.getUri()
+        );
+
         if (sourceFile.exists()) {
             this.cache = readFromFile();
             this.index = cache.stream()

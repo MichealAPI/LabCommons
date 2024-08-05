@@ -45,6 +45,11 @@ public class MongoDatabaseImpl<T extends SerializableMapConvertible<T>> implemen
                 .serverApi(serverApi)
                 .build();
 
+        LogUtils.debug(
+                LogUtils.LogSource.DATABASE,
+                "Connecting to " + uriBuilder.getUri()
+        );
+
         // Create a new client and connect to the server
         mongoClient = MongoClients.create(settings);
         mongoDatabase = mongoClient.getDatabase(uriBuilder.getDatabase());

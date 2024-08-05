@@ -9,7 +9,15 @@ import java.util.logging.Level;
 @UtilityClass
 public class LogUtils {
 
+    public static boolean DEBUG = false;
+
     private Boolean IS_TEST;
+
+    public void debug(LogSource logSource, String message) {
+        if(DEBUG) {
+            log(Level.INFO, logSource, "[DEBUG] " + message);
+        }
+    }
 
     public void log(Level logLevel, LogSource logSource, Exception exception) {
         log(logLevel, "[" + LabCommons.PLUGIN_NAME + "] -> (" + logSource.sourceDisplayName + "): ");

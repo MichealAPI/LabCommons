@@ -4,6 +4,7 @@ import it.mikeslab.commons.api.chat.ChatMessagingHandler;
 import it.mikeslab.commons.api.chat.ChatMessagingListener;
 import it.mikeslab.commons.api.config.ConfigurableEnum;
 import it.mikeslab.commons.api.config.impl.ConfigurableImpl;
+import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.Getter;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.bukkit.Bukkit;
@@ -48,6 +49,13 @@ public final class LabCommons {
 
     }
 
+    public static void enableDebuggingMode() {
+        LogUtils.DEBUG = true;
+    }
+
+    public static void disableDebuggingMode() {
+        LogUtils.DEBUG = false;
+    }
 
     /**
      * Set the log level to WARN for the MongoDB driver

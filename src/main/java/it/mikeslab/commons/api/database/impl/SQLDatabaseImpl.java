@@ -29,6 +29,11 @@ public class SQLDatabaseImpl<T extends SerializableMapConvertible<T>> implements
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(uriBuilder.getUri());
 
+        LogUtils.debug(
+                LogUtils.LogSource.DATABASE,
+                "Connecting to " + uriBuilder.getUri()
+        );
+
         if (uriBuilder.getUsername() != null) config.setUsername(uriBuilder.getUsername());
         if (uriBuilder.getPassword() != null) config.setPassword(uriBuilder.getPassword());
 
