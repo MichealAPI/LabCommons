@@ -51,7 +51,7 @@ public class FrameColorUtil {
 
         // Due to the slowness of response by Mojang API, we need to check if the headValue is a base64 string
         // and if it is, avoid animating to prevent too many requests to the Mojang servers
-        if(guiElement.getHeadValue() != null) {
+        if(guiElement.getHeadValue() != null && false) { // todo remove: this is a temporary bypass for testing purposes
 
             headValueSkullMeta = Optional.ofNullable(
                     (SkullMeta) SkullUtil.getHeadMeta(guiElement.getHeadValue())
