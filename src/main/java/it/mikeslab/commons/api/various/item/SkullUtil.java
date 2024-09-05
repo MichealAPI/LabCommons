@@ -1,8 +1,8 @@
 package it.mikeslab.commons.api.various.item;
 
-import com.cryptomorin.xseries.XMaterial;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import com.cryptomorin.xseries.profiles.builder.XSkull;
+import com.cryptomorin.xseries.profiles.objects.ProfileInputType;
+import com.cryptomorin.xseries.profiles.objects.Profileable;
 import lombok.experimental.UtilityClass;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
@@ -10,11 +10,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Utility class for working with Skulls
@@ -29,25 +27,14 @@ public class SkullUtil {
      * Gets a head with the skin of the given OfflinePlayer
      */
     public ItemStack getHead(@NotNull final OfflinePlayer player) {
-        final ItemStack head = XMaterial.PLAYER_HEAD.parseItem();
-        final SkullMeta meta = (SkullMeta) head.getItemMeta();
-        assert meta != null;
-        meta.setOwner(player.getName());
-        head.setItemMeta(meta);
-        return head;
+        return XSkull.createItem().profile(Profileable.of(player)).apply();
     }
 
     /**
      * Gets a head with the given base64 skin
      */
     public ItemStack getHead(@NotNull final String base64) {
-        final ItemStack head = XMaterial.PLAYER_HEAD.parseItem();
-
-        final SkullMeta meta = (SkullMeta) getHeadMeta(base64);
-
-        head.setItemMeta(meta);
-
-        return head;
+        return XSkull.createItem().profile(Profileable.of(ProfileInputType.BASE64, base64)).apply();
     }
 
 
@@ -57,19 +44,7 @@ public class SkullUtil {
             return SKULL_META_CACHE.get(base64);
         }
 
-        SkullMeta skullMeta = (SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta();
-
-        final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "");
-        gameProfile.getProperties().put("textures", new Property("textures", base64));
-        final Field profileField;
-        assert skullMeta != null;
-        try {
-            profileField = skullMeta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(skullMeta, gameProfile);
-        } catch (final NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        SkullMeta skullMeta = (SkullMeta) getHead(base64).getItemMeta();
 
         SKULL_META_CACHE.put(base64, skullMeta);
 
@@ -92,4 +67,5 @@ public class SkullUtil {
 
         return true;
     }
+
 }
