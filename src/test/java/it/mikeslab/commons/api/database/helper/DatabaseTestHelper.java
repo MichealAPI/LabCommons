@@ -2,6 +2,8 @@ package it.mikeslab.commons.api.database.helper;
 
 import com.google.common.base.Stopwatch;
 import it.mikeslab.commons.api.database.Database;
+import it.mikeslab.commons.api.database.impl.DatabaseTest;
+import it.mikeslab.commons.api.database.impl.JSONDatabaseImpl;
 import it.mikeslab.commons.api.database.impl.MongoDatabaseImpl;
 import it.mikeslab.commons.api.database.impl.SQLDatabaseImpl;
 import it.mikeslab.commons.api.database.pojo.TestObject;
@@ -10,8 +12,10 @@ import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -19,6 +23,7 @@ import java.util.logging.Level;
 public class DatabaseTestHelper {
 
     private final URIBuilder uriBuilder;
+    private final DatabaseTest.Database type;
     private Database<TestObject> db;
 
     /**
@@ -26,10 +31,34 @@ public class DatabaseTestHelper {
      */
     public void setUp() {
 
-        if(uriBuilder.getUri().startsWith("mongodb")) {
-            db = new MongoDatabaseImpl<>(uriBuilder);
-        } else {
-            db = new SQLDatabaseImpl<>(uriBuilder);
+        switch (type) {
+
+            case MONGODB:
+                db = new MongoDatabaseImpl<>(uriBuilder);
+                break;
+
+            case SQL:
+                db = new SQLDatabaseImpl<>(uriBuilder);
+                break;
+
+            case JSON:
+
+                // deletes the file if it exists to test
+                // the creation of a new file
+
+                File file = new File(uriBuilder.getUri());
+
+                if (file.exists()) {
+                    file.delete();
+                }
+
+                db = new JSONDatabaseImpl<>(uriBuilder);
+                break;
+            default:
+                LogUtils.warn(
+                        LogUtils.LogSource.TEST,
+                        "No database implementation found for " + type.name()
+                );
         }
 
         db.connect(new TestObject());
@@ -56,26 +85,29 @@ public class DatabaseTestHelper {
     }
 
 
-    public void testUpsert() {
+    public void testUpsert(int howMany) {
 
+        for (int i = 0; i < howMany; i++) {
 
-        Map<TestObject.TestEnum, String> testValues = this.getTestValues();
-        
-        TestObject testObject = new TestObject(testValues);
+            Map<TestObject.TestEnum, String> testValues = this.getTestValues();
 
-        Stopwatch timer = Stopwatch.createStarted();
+            TestObject testObject = new TestObject(testValues);
 
-        boolean result = db.upsert(testObject); //.join();
+            Stopwatch timer = Stopwatch.createStarted();
 
-        timer.stop();
+            boolean result = db.upsert(testObject); //.join();
 
-        LogUtils.info(
-                LogUtils.LogSource.TEST,
-                "Upsert result: " + (result ? "SUCCESS" : "FAILURE") +
-                        " Performed in: " + timer.elapsed(TimeUnit.MILLISECONDS) + "ms"
-        );
+            timer.stop();
 
-        this.retrieve();
+            LogUtils.info(
+                    LogUtils.LogSource.TEST,
+                    "Upsert result: " + (result ? "SUCCESS" : "FAILURE") +
+                            " Performed in: " + timer.elapsed(TimeUnit.MILLISECONDS) + "ms"
+            );
+
+            this.retrieve(testObject);
+
+        }
 
     }
 
@@ -88,9 +120,9 @@ public class DatabaseTestHelper {
         
         Map<TestObject.TestEnum, String> testValues = new HashMap<>();
         
-        testValues.put(TestObject.TestEnum.TEST1, "test1");
-        testValues.put(TestObject.TestEnum.TEST2, "test2");
-        testValues.put(TestObject.TestEnum.TEST3, "test3");
+        testValues.put(TestObject.TestEnum.TEST1, UUID.randomUUID() + "");
+        testValues.put(TestObject.TestEnum.TEST2, UUID.randomUUID() + "");
+        testValues.put(TestObject.TestEnum.TEST3, UUID.randomUUID() + "");
         
         return testValues;
         
@@ -108,12 +140,14 @@ public class DatabaseTestHelper {
         );
     }
 
-    private void retrieve() {
-
-        Map<TestObject.TestEnum, String> testValues = this.getTestValues();
+    private void retrieve(TestObject obj) {
 
         // TEST1 stands for the identifier
-        TestObject filter = this.getFilter();
+        TestObject filter = new TestObject(
+                obj.getValues().get(
+                        TestObject.TestEnum.TEST1
+                )
+        );
 
         LogUtils.info(
                 LogUtils.LogSource.TEST,
@@ -122,11 +156,15 @@ public class DatabaseTestHelper {
                         .get(TestObject.TestEnum.TEST1)
         );
 
+        Stopwatch timer = Stopwatch.createStarted();
+
         TestObject result = db.findOne(filter); //.join();
+
+        timer.stop();
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(
-                testValues.get(TestObject.TestEnum.TEST2),
+                obj.getValues().get(TestObject.TestEnum.TEST2),
                 result.getValues().get(TestObject.TestEnum.TEST2)
         );
 
@@ -135,6 +173,7 @@ public class DatabaseTestHelper {
                 "Found object: " + result
                         .getValues()
                         .toString()
+                        + " in " + timer.elapsed(TimeUnit.MILLISECONDS) + "ms"
         );
     }
 

@@ -21,10 +21,9 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
     private final URIBuilder uriBuilder;
     private final Gson gson;
     private File sourceFile;
-    private T typeInstance;  // To store the instance of T
-
-    private List<T> cache;  // in-memory cache
-    private Map<Object, T> index;  // index for identifierValue
+    private T typeInstance;
+    private List<T> cache;
+    private Map<Object, T> index;
 
     public JSONDatabaseImpl(URIBuilder uriBuilder) {
         this.uriBuilder = uriBuilder;
@@ -35,22 +34,15 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
 
     @Override
     public boolean connect(T pojoClass) {
-        String filePath = uriBuilder.getUri();
-        this.sourceFile = new File(filePath);
-        this.typeInstance = pojoClass;  // Store the instance of T
+        this.sourceFile = new File(uriBuilder.getUri());
+        this.typeInstance = pojoClass;
 
-        LogUtils.debug(
-                LogUtils.LogSource.DATABASE,
-                "Connecting to " + uriBuilder.getUri()
-        );
+        LogUtils.debug(LogUtils.LogSource.DATABASE, "Connecting to " + uriBuilder.getUri());
 
         if (sourceFile.exists()) {
-            this.cache = readFromFile();
-            this.index = cache.stream()
-                    .collect(Collectors.toMap(SerializableMapConvertible::getUniqueIdentifierName, Function.identity()));
-            return true;
+            return loadDataFromFile();
         } else {
-            return createSourceFile(sourceFile);
+            return createSourceFile();
         }
     }
 
@@ -62,35 +54,37 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
     @Override
     public boolean disconnect() {
         this.sourceFile = null;
-        this.typeInstance = null;  // Clear the instance
+        this.typeInstance = null;
         return true;
     }
 
     @Override
     public boolean upsert(T pojoObject) {
-        T existing = index.get(pojoObject.getUniqueIdentifierName());
+
+        T existing = index.get(pojoObject.getUniqueIdentifierValue());
         if (existing != null) {
             cache.remove(existing);
         }
+
         cache.add(pojoObject);
-        index.put(pojoObject.getUniqueIdentifierName(), pojoObject);
-        return writeToFile(cache);
+        index.put(pojoObject.getUniqueIdentifierValue(), pojoObject);
+        return saveDataToFile();
     }
 
     @Override
     public boolean delete(T pojoObject) {
-        T existing = index.get(pojoObject.getUniqueIdentifierName());
+        T existing = index.get(pojoObject.getUniqueIdentifierValue());
         if (existing != null) {
             cache.remove(existing);
-            index.remove(pojoObject.getUniqueIdentifierName());
-            return writeToFile(cache);
+            index.remove(pojoObject.getUniqueIdentifierValue());
+            return saveDataToFile();
         }
         return false;
     }
 
     @Override
     public T findOne(T pojoObject) {
-        return index.get(pojoObject.getUniqueIdentifierName());
+        return index.get(pojoObject.getUniqueIdentifierValue());
     }
 
     @Override
@@ -102,51 +96,52 @@ public class JSONDatabaseImpl<T extends SerializableMapConvertible<T>> implement
 
     @Override
     public Document findDocument(Document document) {
-        return null; // todo not implemented
+        return null; // Not implemented
     }
 
     @Override
     public List<Document> findDocuments(Document document) {
-        return Collections.emptyList(); // todo not implemented
+        return Collections.emptyList(); // Not implemented
     }
 
-    private boolean createSourceFile(File file) {
+    private boolean createSourceFile() {
         try {
-            return file.createNewFile();
+            return sourceFile.createNewFile();
         } catch (IOException e) {
-            LogUtils.warn(
-                    LogUtils.LogSource.DATABASE,
-                    "Error during createSourceFile: " + e
-            );
+            LogUtils.warn(LogUtils.LogSource.DATABASE, "Error during createSourceFile: " + e);
             return false;
         }
     }
 
-    private List<T> readFromFile() {
+    private boolean loadDataFromFile() {
         try (Reader reader = new InputStreamReader(Files.newInputStream(sourceFile.toPath()), StandardCharsets.UTF_8)) {
-            Type listType = TypeToken.getParameterized(List.class, typeInstance.getClass()).getType();  // Use the instance class
+            Type listType = TypeToken.getParameterized(List.class, typeInstance.getClass()).getType();
             List<T> objects = gson.fromJson(reader, listType);
-            return objects != null ? objects : new ArrayList<>();
-        } catch (IOException e) {
-            LogUtils.warn(
-                    LogUtils.LogSource.DATABASE,
-                    "Error during readFromFile: " + e
-            );
-            return new ArrayList<>();
-        }
-    }
-
-    private boolean writeToFile(List<T> objects) {
-        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(sourceFile.toPath()), StandardCharsets.UTF_8)) {
-            gson.toJson(objects, writer);
+            if (objects != null) {
+                cache = objects;
+                index = cache.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        SerializableMapConvertible::getUniqueIdentifierValue,
+                                        Function.identity()
+                                )
+                        );
+            }
             return true;
         } catch (IOException e) {
-            LogUtils.warn(
-                    LogUtils.LogSource.DATABASE,
-                    "Error during writeToFile: " + e
-            );
+            LogUtils.warn(LogUtils.LogSource.DATABASE, "Error during loadDataFromFile: " + e);
             return false;
         }
     }
 
+    private boolean saveDataToFile() {
+
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(sourceFile.toPath()), StandardCharsets.UTF_8)) {
+            gson.toJson(cache, writer);
+            return true;
+        } catch (IOException e) {
+            LogUtils.warn(LogUtils.LogSource.DATABASE, "Error during saveDataToFile: " + e);
+            return false;
+        }
+    }
 }

@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 public class DatabaseTest {
 
+    private static final int FIXED_UPSERT_TEST_AMOUNT = 3;
+
     /**
      * Establishes a connection with each Database Implementation and then
      * perform a set of CRUD operations.
@@ -39,15 +41,22 @@ public class DatabaseTest {
 
             case MONGODB:
                 testHelper = new DatabaseTestHelper(
-                        URIUtil.getMongoTestURI()
+                        URIUtil.getMongoTestURI(),
+                        Database.MONGODB
                 );
                 break;
 
             case SQL:
                 testHelper = new DatabaseTestHelper(
-                        URIUtil.getSQLTestURI()
+                        URIUtil.getSQLTestURI(),
+                        Database.SQL
                 );
                 break;
+            case JSON:
+                testHelper = new DatabaseTestHelper(
+                        URIUtil.getJsonTestURI(),
+                        Database.JSON
+                );
             default:
                 LogUtils.warn(
                         LogUtils.LogSource.TEST,
@@ -74,7 +83,7 @@ public class DatabaseTest {
         Assertions.assertTrue(testHelper.isConnectionValid());
 
         testHelper.deleteIfExists();
-        testHelper.testUpsert();
+        testHelper.testUpsert(FIXED_UPSERT_TEST_AMOUNT);
         testHelper.tearDown();
 
     }
@@ -82,9 +91,10 @@ public class DatabaseTest {
     /**
      * Currently handled database types
      */
-    private enum Database {
+    public enum Database {
         MONGODB,
-        SQL
+        SQL,
+        JSON
     }
 
 }
