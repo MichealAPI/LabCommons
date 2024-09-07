@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-public final class LabCommons {
+public final class LabCommons extends JavaPlugin {
 
     public static String PLUGIN_NAME = "LabCommons"; // default value if not initialized
 
@@ -25,12 +25,10 @@ public final class LabCommons {
 
     private ChatMessagingHandler chatMessagingHandler;
 
-    public void initialize(JavaPlugin instance) {
-        PLUGIN_NAME = instance
-                .getDescription()
-                .getName();
+    @Override
+    public void onEnable() {
 
-        this.chatMessagingHandler = new ChatMessagingListener(instance);
+        this.chatMessagingHandler = new ChatMessagingListener(this);
 
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             PLACEHOLDER_API_ENABLED = true;
@@ -38,7 +36,8 @@ public final class LabCommons {
 
     }
 
-    public void disable() {
+    @Override
+    public void onDisable() {
         // close all open customGui inventories
 
         for(Player player : Bukkit.getOnlinePlayers()) {
