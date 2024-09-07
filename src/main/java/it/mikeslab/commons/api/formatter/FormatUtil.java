@@ -1,19 +1,25 @@
 package it.mikeslab.commons.api.formatter;
 
 import com.google.common.base.Strings;
+import it.mikeslab.commons.LabCommons;
 import it.mikeslab.commons.api.component.ComponentsUtil;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @UtilityClass
 public class FormatUtil {
 
-    public void printStartupInfos(JavaPlugin instance, BukkitAudiences audiences, String colorCode) {
+    public void printStartupInfos(JavaPlugin instance, String colorCode) {
+
+        BukkitAudiences audiences = LabCommons
+                .getInstance()
+                .getAudiences();
 
         String customColorTag = "<#" + colorCode + ">";
 
@@ -50,11 +56,14 @@ public class FormatUtil {
 
     /**
      * Send the running infos to the player
-     * @param audience The audience
      * @param instance The plugin instance
      * @param colorCode The color code
      */
-    public void sendRunningInfos(Audience audience, JavaPlugin instance, String colorCode) {
+    public void sendRunningInfos(CommandSender sender, JavaPlugin instance, String colorCode) {
+
+        BukkitAudiences audiences = LabCommons
+                .getInstance()
+                .getAudiences();
 
         PluginDescriptionFile pluginMeta = instance.getDescription();
 
@@ -63,7 +72,7 @@ public class FormatUtil {
                 .replace("[", "")
                 .replace("]", "");
 
-        audience.sendMessage(
+        audiences.sender(sender).sendMessage(
                 ComponentsUtil.getComponent(
                         "<#{colorCode}>This server is currently running <gold><plugin> v<version> <#{colorCode}>made by <gold><author>".replace("{colorCode}", colorCode),
                         Placeholder.unparsed("plugin", pluginMeta.getName()),

@@ -15,8 +15,10 @@ public abstract class MessageHelper {
 
     final BukkitAudiences audiences;
 
-    public MessageHelper(final BukkitAudiences audiences) {
-        this.audiences = audiences;
+    public MessageHelper() {
+        this.audiences = LabCommons
+                .getInstance()
+                .getAudiences();
     }
 
     /**

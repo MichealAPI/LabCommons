@@ -4,8 +4,10 @@ import it.mikeslab.commons.api.chat.ChatMessagingHandler;
 import it.mikeslab.commons.api.chat.ChatMessagingListener;
 import it.mikeslab.commons.api.config.ConfigurableEnum;
 import it.mikeslab.commons.api.config.impl.ConfigurableImpl;
+import it.mikeslab.commons.api.formatter.FormatUtil;
 import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.Getter;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,6 +19,9 @@ import java.util.Map;
 @Getter
 public final class LabCommons extends JavaPlugin {
 
+    @Getter
+    private static LabCommons instance;
+
     public static String PLUGIN_NAME = "LabCommons"; // default value if not initialized
 
     public static boolean PLACEHOLDER_API_ENABLED = false;
@@ -24,6 +29,8 @@ public final class LabCommons extends JavaPlugin {
     private static final Map<String, ConfigurableImpl> CONFIGURABLE_MAP = new HashMap<>();
 
     private ChatMessagingHandler chatMessagingHandler;
+
+    private BukkitAudiences audiences;
 
     @Override
     public void onEnable() {
@@ -33,6 +40,15 @@ public final class LabCommons extends JavaPlugin {
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             PLACEHOLDER_API_ENABLED = true;
         }
+
+        this.audiences = BukkitAudiences.create(this);
+
+        FormatUtil.printStartupInfos(
+                this,
+                "FFA500"
+        );
+
+        instance = this;
 
     }
 

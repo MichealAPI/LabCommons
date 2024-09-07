@@ -1,5 +1,5 @@
 name: LabCommons
 version: 1.0
-api-version: '1.14'
+api-version: '1.16'
 main: it.mikeslab.commons.LabCommons
-description: "This is not supposed to be a plug-in but a library. If you see this, you are doing something wrong, this plugin.yml is for test purposes."
+description: "Library Plug-in made bypl MikesLab"

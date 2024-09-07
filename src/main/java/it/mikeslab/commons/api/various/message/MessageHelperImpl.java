@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 
 public class MessageHelperImpl extends MessageHelper {
 
-    public MessageHelperImpl(BukkitAudiences audiences) {
-        super(audiences);
+    public MessageHelperImpl() {
+        super();
     }
 
     @Override
