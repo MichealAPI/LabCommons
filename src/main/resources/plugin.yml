@@ -1,5 +1,7 @@
 name: LabCommons
-version: 1.0
+version: '${project.version}'
 api-version: '1.16'
 main: it.mikeslab.commons.LabCommons
-description: "Library Plug-in made bypl MikesLab"
+description: "Library Plug-in for MikesLab's plug-ins."
+website: https://mikeslab.it
+author: MikesLab

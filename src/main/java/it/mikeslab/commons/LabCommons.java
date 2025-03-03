@@ -43,13 +43,12 @@ public final class LabCommons extends JavaPlugin {
 
         this.audiences = BukkitAudiences.create(this);
 
+        instance = this;
+
         FormatUtil.printStartupInfos(
                 this,
                 "FFA500"
         );
-
-        instance = this;
-
     }
 
     @Override
