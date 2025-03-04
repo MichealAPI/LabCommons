@@ -8,15 +8,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 
-@RequiredArgsConstructor
 public class ConfigurableImpl implements Configurable {
 
-    private final File dataFolder;
     private YamlConfiguration configuration;
-
+    private final File dataFolder;
 
     @Getter
     private File file;
+
+    public ConfigurableImpl(File dataFolder, File targetFile) {
+        this.dataFolder = dataFolder;
+        this.file = targetFile;
+    }
 
     @Override
     public ConfigurableImpl loadConfiguration(File file) {

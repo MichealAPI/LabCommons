@@ -195,8 +195,8 @@ public interface Configurable {
     /**
      * Create a new instance of the ConfigurableImpl class
      */
-    static ConfigurableImpl newInstance(File dataFolder) {
-        return new ConfigurableImpl(dataFolder);
+    static ConfigurableImpl newInstance(File dataFolder, File targetFile) {
+        return new ConfigurableImpl(dataFolder, targetFile);
     }
 
 }
