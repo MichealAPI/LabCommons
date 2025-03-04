@@ -3,6 +3,7 @@ package it.mikeslab.commons.api.inventory.helper;
 import it.mikeslab.commons.api.inventory.CustomInventory;
 import lombok.Getter;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +35,20 @@ public class InventoryMap {
 
     public void clear() {
         inventoryMap.clear();
+    }
+
+    public void putAll(UUID target, Map<String, CustomInventory> inventoryMap) {
+        inventoryMap.forEach((key, value) -> this.inventoryMap.put(new InventoryKey(target, key), value));
+    }
+
+    public ConcurrentMap<String, CustomInventory> getCachedInventories(UUID playerUUID) {
+        ConcurrentMap<String, CustomInventory> cachedInventories = new ConcurrentHashMap<>();
+        inventoryMap.forEach((key, value) -> {
+            if (key.playerUUID.equals(playerUUID)) {
+                cachedInventories.put(key.inventoryName, value);
+            }
+        });
+        return cachedInventories;
     }
 
     @Getter
