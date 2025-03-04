@@ -4,15 +4,20 @@ import it.mikeslab.commons.api.inventory.CustomInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A map that stores the setup inventories for each player
  * Necessary to keep track of the inventories that are open
  */
-public abstract class InventoryMap implements Map<UUID, Map<String, CustomInventory>> {
+public abstract class InventoryMap implements ConcurrentMap<UUID, Map<String, CustomInventory>> {
 
-    private final Map<UUID, Map<String, CustomInventory>> map = new HashMap<>();
+    private final ConcurrentMap<UUID, Map<String, CustomInventory>> map = new ConcurrentHashMap<>();
 
     public InventoryMap() {
         super();
