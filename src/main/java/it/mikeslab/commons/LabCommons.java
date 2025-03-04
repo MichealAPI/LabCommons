@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,11 +87,12 @@ public final class LabCommons extends JavaPlugin {
 
     /**
      * Register a ConfigurableImpl instance
+     * @param dataFolder the data folder
      * @param enumClass the class that implements ConfigurableEnum
      * @return the ConfigurableImpl instance
      */
-    public static ConfigurableImpl registerConfigurable(Class<? extends ConfigurableEnum> enumClass) {
-        ConfigurableImpl configurable = new ConfigurableImpl();
+    public static ConfigurableImpl registerConfigurable(File dataFolder, Class<? extends ConfigurableEnum> enumClass) {
+        ConfigurableImpl configurable = new ConfigurableImpl(dataFolder);
 
         CONFIGURABLE_MAP.put(enumClass.getSimpleName(), configurable);
 

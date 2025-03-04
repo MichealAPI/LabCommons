@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.List;
@@ -194,8 +195,8 @@ public interface Configurable {
     /**
      * Create a new instance of the ConfigurableImpl class
      */
-    static ConfigurableImpl newInstance() {
-        return new ConfigurableImpl();
+    static ConfigurableImpl newInstance(File dataFolder) {
+        return new ConfigurableImpl(dataFolder);
     }
 
 }
