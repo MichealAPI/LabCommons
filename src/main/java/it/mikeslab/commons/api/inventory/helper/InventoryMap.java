@@ -28,6 +28,14 @@ public class InventoryMap {
         return inventoryMap.keySet();
     }
 
+    public void destroy(UUID playerUUID) {
+        inventoryMap.keySet().removeIf(key -> key.playerUUID.equals(playerUUID));
+    }
+
+    public void clear() {
+        inventoryMap.clear();
+    }
+
     @Getter
     public static class InventoryKey {
         private final UUID playerUUID;
