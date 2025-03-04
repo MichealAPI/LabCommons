@@ -11,7 +11,9 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * This interface is used to create and manage custom inventories.

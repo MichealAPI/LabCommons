@@ -1,91 +1,55 @@
 package it.mikeslab.commons.api.inventory.helper;
 
 import it.mikeslab.commons.api.inventory.CustomInventory;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import lombok.Getter;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-/**
- * A map that stores the setup inventories for each player
- * Necessary to keep track of the inventories that are open
- */
-public abstract class InventoryMap implements ConcurrentMap<UUID, Map<String, CustomInventory>> {
+public class InventoryMap {
+    private final ConcurrentMap<InventoryKey, CustomInventory> inventoryMap = new ConcurrentHashMap<>();
 
-    private final ConcurrentMap<UUID, Map<String, CustomInventory>> map = new ConcurrentHashMap<>();
-
-    public InventoryMap() {
-        super();
+    public void setInventory(UUID playerUUID, String inventoryName, CustomInventory inventory) {
+        inventoryMap.put(new InventoryKey(playerUUID, inventoryName), inventory);
     }
 
-    @Override
-    public int size() {
-        return map.size();
+    public CustomInventory getInventory(UUID playerUUID, String inventoryName) {
+        return inventoryMap.get(new InventoryKey(playerUUID, inventoryName));
     }
 
-    @Override
-    public boolean isEmpty() {
-        return map.isEmpty();
+    public boolean containsKey(UUID playerUUID) {
+        return inventoryMap.keySet().stream().anyMatch(key -> key.playerUUID.equals(playerUUID));
     }
 
-    @Override
-    public boolean containsKey(Object key) {
-        return map.containsKey(key);
+    public Set<InventoryKey> getInventoryKeys() {
+        return inventoryMap.keySet();
     }
 
-    @Override
-    public boolean containsValue(Object value) {
-        return map.containsValue(value);
+    @Getter
+    public static class InventoryKey {
+        private final UUID playerUUID;
+        private final String inventoryName;
+
+        public InventoryKey(UUID playerUUID, String inventoryName) {
+            this.playerUUID = playerUUID;
+            this.inventoryName = inventoryName;
+        }
+
+        // Override equals and hashCode
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            InventoryKey that = (InventoryKey) o;
+            return playerUUID.equals(that.playerUUID) && inventoryName.equals(that.inventoryName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(playerUUID, inventoryName);
+        }
     }
-
-    @Override
-    public Map<String, CustomInventory> get(Object key) {
-        return map.get(key);
-    }
-
-    @Nullable
-    @Override
-    public Map<String, CustomInventory> put(UUID key, Map<String, CustomInventory> value) {
-        return map.put(key, value);
-    }
-
-    @Override
-    public Map<String, CustomInventory> remove(Object key) {
-        return map.remove(key);
-    }
-
-    @Override
-    public void putAll(@NotNull Map<? extends UUID, ? extends Map<String, CustomInventory>> m) {
-        map.putAll(m);
-    }
-
-    @Override
-    public void clear() {
-        map.clear();
-    }
-
-    @NotNull
-    @Override
-    public Set<UUID> keySet() {
-        return map.keySet();
-    }
-
-    @NotNull
-    @Override
-    public Collection<Map<String, CustomInventory>> values() {
-        return map.values();
-    }
-
-    @NotNull
-    @Override
-    public Set<Entry<UUID, Map<String, CustomInventory>>> entrySet() {
-        return map.entrySet();
-    }
-
-
 }

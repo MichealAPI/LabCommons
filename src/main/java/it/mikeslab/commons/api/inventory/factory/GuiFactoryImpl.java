@@ -179,19 +179,17 @@ public class GuiFactoryImpl implements GuiFactory {
 
     @Override
     public CustomInventory getCustomInventory(UUID referencePlayerUUID, Inventory inventory) {
+        if (inventoryMap == null) return null;
 
-        if(inventoryMap == null) return null;
+        for (InventoryMap.InventoryKey key : inventoryMap.getInventoryKeys()) {
+            if (key.getPlayerUUID().equals(referencePlayerUUID)) {
+                CustomInventory customInventory = inventoryMap.getInventory(key.getPlayerUUID(), key.getInventoryName());
+                boolean isCustomInventoryNull = customInventory == null;
+                boolean isInventoryNull = isCustomInventoryNull || customInventory.getInventory() == null;
 
-        if(!inventoryMap.containsKey(referencePlayerUUID)) return null;
-
-        Map<String, CustomInventory> customInventoryMap = inventoryMap.get(referencePlayerUUID);
-
-        for(CustomInventory customInventory : customInventoryMap.values()) {
-
-            if(customInventory == null || customInventory.getInventory() == null) continue;
-
-            if(customInventory.getInventory().equals(inventory)) {
-                return customInventory;
+                if (!isInventoryNull && customInventory.getInventory().equals(inventory)) {
+                    return customInventory;
+                }
             }
         }
 
