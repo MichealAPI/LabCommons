@@ -11,23 +11,23 @@ import java.io.File;
 public class ConfigurableImpl implements Configurable {
 
     private YamlConfiguration configuration;
+
+    @Getter
     private final File dataFolder;
 
     @Getter
-    private File file;
+    private final String configName;
 
-    public ConfigurableImpl(File dataFolder, File targetFile) {
+    public ConfigurableImpl(File dataFolder, String configName) {
         this.dataFolder = dataFolder;
-        this.file = targetFile;
+        this.configName = configName;
+
+        this.loadConfiguration();
     }
 
     @Override
-    public ConfigurableImpl loadConfiguration(File file) {
-        this.file = file;
-        this.configuration = YamlConfiguration.loadConfiguration(new File(
-                this.dataFolder,
-                file.getName()
-        ));
+    public ConfigurableImpl loadConfiguration() {
+        this.configuration = YamlConfiguration.loadConfiguration(this.buildFile());
         return this;
     }
 
@@ -35,8 +35,13 @@ public class ConfigurableImpl implements Configurable {
 
         if (this.configuration == null) {
 
-            // Returns inner-plugin configuration if not loaded
-            return YamlConfiguration.loadConfiguration(this.file);
+            ConfigurableImpl inst = this.loadConfiguration();
+
+            if (inst.configuration == null) {
+                throw new IllegalStateException("Configuration is null");
+            }
+
+            return inst.configuration;
 
         }
 

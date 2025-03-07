@@ -88,11 +88,12 @@ public final class LabCommons extends JavaPlugin {
     /**
      * Register a ConfigurableImpl instance
      * @param dataFolder the data folder
+     * @param configName the name of the configuration file
      * @param enumClass the class that implements ConfigurableEnum
      * @return the ConfigurableImpl instance
      */
-    public static ConfigurableImpl registerConfigurable(File dataFolder, File targetFile, Class<? extends ConfigurableEnum> enumClass) {
-        ConfigurableImpl configurable = new ConfigurableImpl(dataFolder, targetFile);
+    public static ConfigurableImpl registerConfigurable(File dataFolder, String configName, Class<? extends ConfigurableEnum> enumClass) {
+        ConfigurableImpl configurable = new ConfigurableImpl(dataFolder, configName);
 
         CONFIGURABLE_MAP.put(enumClass.getSimpleName(), configurable);
 

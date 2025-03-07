@@ -17,10 +17,10 @@ import java.util.function.Function;
 public interface Configurable {
 
     /**
-     * Get the YAML configuration file
-     * @param file the configuration file
+     * Get the YAML configuration file from the given
+     * dataFolder and configName data
      */
-    ConfigurableImpl loadConfiguration(File file);
+    ConfigurableImpl loadConfiguration();
 
     /**
      * Get the YAML configuration file
@@ -172,18 +172,20 @@ public interface Configurable {
     /**
      * Get the file of the configuration
      */
-    File getFile();
+    String getConfigName();
+
+    File getDataFolder();
 
     /**
      * Reload the configuration
      */
     default Configurable reload() {
-        return this.loadConfiguration(getFile());
+        return this.loadConfiguration();
     }
 
     default void save() {
         try {
-            getConfiguration().save(getFile());
+            getConfiguration().save(this.buildFile());
         } catch (Exception e) {
             LogUtils.warn(
                     LogUtils.LogSource.CONFIG,
@@ -192,11 +194,15 @@ public interface Configurable {
         }
     }
 
+    default File buildFile() {
+        return new File(this.getDataFolder(), this.getConfigName());
+    }
+
     /**
      * Create a new instance of the ConfigurableImpl class
      */
-    static ConfigurableImpl newInstance(File dataFolder, File targetFile) {
-        return new ConfigurableImpl(dataFolder, targetFile);
+    static ConfigurableImpl newInstance(File dataFolder, String configName) {
+        return new ConfigurableImpl(dataFolder, configName);
     }
 
 }
