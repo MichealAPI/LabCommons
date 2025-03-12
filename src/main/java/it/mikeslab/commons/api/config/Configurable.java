@@ -28,6 +28,13 @@ public interface Configurable {
     YamlConfiguration getConfiguration();
 
     /**
+     * Get the File of the configuration
+     */
+    default File getFile() {
+        return this.buildFile();
+    }
+
+    /**
      * Get a string from the configuration
      */
     default String getString(ConfigurableEnum configurableEnum) {

@@ -41,6 +41,10 @@ public class InventoryMap {
         inventoryMap.forEach((key, value) -> this.inventoryMap.put(new InventoryKey(target, key), value));
     }
 
+    public void put(UUID target, String inventoryName, CustomInventory inventory) {
+        inventoryMap.put(new InventoryKey(target, inventoryName), inventory);
+    }
+
     public ConcurrentMap<String, CustomInventory> getCachedInventories(UUID playerUUID) {
         ConcurrentMap<String, CustomInventory> cachedInventories = new ConcurrentHashMap<>();
         inventoryMap.forEach((key, value) -> {
