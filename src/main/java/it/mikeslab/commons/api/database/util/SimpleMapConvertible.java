@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
-@ApiStatus.Experimental
+@ApiStatus.AvailableSince("2.4.1.5")
 public abstract class SimpleMapConvertible<T, U> implements SerializableMapConvertible<U> {
 
     private static Set<String> IDENTIFIERS = new HashSet<>();
@@ -37,7 +37,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
 
     public SimpleMapConvertible(T uniqueId, String uniqueIdentifierName) {
         this.uniqueId = uniqueId;
-        this.values = null;
+        this.values = new HashMap<>();
 
         this.uniqueIdentifierName = uniqueIdentifierName;
     }
@@ -71,7 +71,9 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
         if (values != null && !values.isEmpty()) {
             LogUtils.debug(
                     LogUtils.LogSource.DATABASE, // todo add a custom name
-                    "Populating a map based on a BankAccount POJO instance which contains: " + values.toString()
+                    String.format("Populating a map based on a %s POJO instance which contains: " + values,
+                            this.getClass().getSimpleName()
+                    )
             );
             map.putAll(values);
         }
