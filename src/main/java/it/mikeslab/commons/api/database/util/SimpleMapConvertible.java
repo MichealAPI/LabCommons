@@ -5,6 +5,7 @@ import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
@@ -16,15 +17,16 @@ import java.util.Set;
 @ApiStatus.Experimental
 public abstract class SimpleMapConvertible<T, U> implements SerializableMapConvertible<U> {
 
-    private final T uniqueId;
+    private static Set<String> IDENTIFIERS = new HashSet<>();
+
+    @Setter
+    private T uniqueId;
 
     @Getter
     private String uniqueIdentifierName;
 
     @Getter(AccessLevel.PUBLIC)
     private Map<String, Object> values;
-
-    private Set<String> identifiers = new HashSet<>();
 
     public SimpleMapConvertible() {
         this.uniqueId = null;
@@ -84,7 +86,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
     protected  <V> V getValue(String key) {
 
         // if it has not been added, skip heavier retrieval
-        if (!this.identifiers.contains(key)) {
+        if (!IDENTIFIERS.contains(key)) {
             return null;
         }
 
@@ -97,12 +99,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
             this.values = new HashMap<>();
         }
 
-        this.identifiers.add(key);
+        IDENTIFIERS.add(key);
         this.values.put(key, value);
     }
-
-    public Set<String> identifiers() {
-        return this.identifiers;
-    }
-
 }
