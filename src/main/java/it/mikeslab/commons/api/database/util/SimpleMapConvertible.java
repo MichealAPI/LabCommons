@@ -21,8 +21,8 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
     @Getter
     private String uniqueIdentifierName;
 
-    @Getter(AccessLevel.PROTECTED)
-    protected Map<String, Object> values;
+    @Getter(AccessLevel.PUBLIC)
+    private Map<String, Object> values;
 
     private Set<String> identifiers = new HashSet<>();
 
