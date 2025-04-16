@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -83,6 +84,11 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
 
     public String getUniqueIdentifierValue() {
         return this.uniqueId.toString();
+    }
+
+    @Nullable
+    public Set<String> identifiers() {
+        return IDENTIFIERS;
     }
 
     protected  <V> V getValue(String key) {
