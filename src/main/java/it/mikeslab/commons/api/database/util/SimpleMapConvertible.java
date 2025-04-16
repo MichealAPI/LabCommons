@@ -13,19 +13,26 @@ import java.util.*;
 @ApiStatus.AvailableSince("2.4.1.5")
 public abstract class SimpleMapConvertible<T, U> implements SerializableMapConvertible<U> {
 
+    private static Set<String> KNOWN_IDENTIFIERS = null; // Instance field for identifiers
+
     @Setter
     private T uniqueId;
 
     private SimpleIdentifiers uniqueIdentifier = null;
 
-    private Set<String> knownIdentifiers = null; // Instance field for identifiers
 
     private final Map<String, Object> data = new HashMap<>();
 
     protected SimpleMapConvertible(@NotNull Class<? extends SimpleIdentifiers> identifiersClass, @NotNull SimpleIdentifiers uniqueIdentifier) {
         // Initialize final fields
         this.uniqueIdentifier = uniqueIdentifier;
-        this.knownIdentifiers = Collections.unmodifiableSet(SimpleIdentifiers.identifiers(identifiersClass)); // Initialize instance identifiers safely
+        KNOWN_IDENTIFIERS = Collections.unmodifiableSet(SimpleIdentifiers.identifiers(identifiersClass)); // Initialize instance identifiers safely
+
+        LogUtils.debug(
+                LogUtils.LogSource.DATABASE,
+                String.format("SimpleMapConvertible initialized with uniqueIdentifier: %s and identifiers: %s",
+                        this.uniqueIdentifier, KNOWN_IDENTIFIERS)
+        );
 
         // uniqueId starts as null, must be set later
         this.uniqueId = null;
@@ -124,7 +131,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
 
     @Nullable
     public Set<String> getIdentifiers() {
-        return this.knownIdentifiers;
+        return KNOWN_IDENTIFIERS;
     }
 
     /**
@@ -139,7 +146,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
     @Nullable
     protected <V> V getValue(String key) {
 
-        if (!this.knownIdentifiers.contains(key)) {
+        if (!KNOWN_IDENTIFIERS.contains(key)) {
             LogUtils.warn(LogUtils.LogSource.DATABASE, String.format("Key '%s' is not a known identifier for %s", key, this.getClass().getSimpleName()));
              return null;
         }
@@ -173,7 +180,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
      */
     protected void setValue(String key, @Nullable Object value) {
 
-        if (!this.knownIdentifiers.contains(key)) {
+        if (!KNOWN_IDENTIFIERS.contains(key)) {
              LogUtils.warn(LogUtils.LogSource.DATABASE, String.format("Setting value for non-declared identifier key '%s' in %s", key, this.getClass().getSimpleName()));
         }
 
