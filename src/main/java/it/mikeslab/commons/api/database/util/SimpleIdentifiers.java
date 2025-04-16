@@ -8,8 +8,6 @@ public interface SimpleIdentifiers {
 
     String getKey();
 
-    Class<?> getType();
-
     static Set<String> identifiers(Class<? extends SimpleIdentifiers> clazz) {
         return Arrays.stream(clazz.getEnumConstants())
                 .map(SimpleIdentifiers::getKey)

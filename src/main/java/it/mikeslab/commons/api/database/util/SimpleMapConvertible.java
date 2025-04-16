@@ -2,17 +2,11 @@ package it.mikeslab.commons.api.database.util;
 
 import it.mikeslab.commons.api.database.SerializableMapConvertible;
 import it.mikeslab.commons.api.logger.LogUtils;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @ApiStatus.AvailableSince("2.4.1.5")
@@ -107,7 +101,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
         IDENTIFIERS = SimpleIdentifiers.identifiers(clazz);
     }
 
-    protected  <V> V getValue(String key) {
+    protected <V> V getValue(String key) {
 
         // if it has not been added, skip heavier retrieval
         if (!IDENTIFIERS.contains(key)) {
@@ -126,4 +120,28 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
         IDENTIFIERS.add(key);
         this.values.put(key, value);
     }
+
+    /*
+     * Set the value of a specific identifier
+     * @param inst the instance of the identifier
+     * @param value the value to set
+     *
+     * Usage of enum to avoid the need of a string and force
+     * an overall better design in all usages
+     */
+    public void setValue(SimpleIdentifiers inst, Object value) {
+        this.setValue(inst.getKey(), value);
+    }
+
+    /*
+     * Get the value of a specific identifier
+     * @param inst the instance of the identifier
+     *
+     * Usage of enum to avoid the need of a string and force
+     * an overall better design in all usages
+     */
+    public <V> V getValue(SimpleIdentifiers inst) {
+        return this.getValue(inst.getKey());
+    }
+
 }
