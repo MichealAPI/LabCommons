@@ -60,7 +60,7 @@ public class TestObject implements SerializableMapConvertible<TestObject> {
     }
 
     @Override
-    public Set<String> identifiers() {
+    public Set<String> getIdentifiers() {
 
         TestEnum[] testEnums = TestEnum.values();
 

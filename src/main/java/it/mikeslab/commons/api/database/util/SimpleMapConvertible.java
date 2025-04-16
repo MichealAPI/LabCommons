@@ -87,8 +87,24 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
     }
 
     @Nullable
-    public Set<String> identifiers() {
+    public Set<String> getIdentifiers() {
         return IDENTIFIERS;
+    }
+
+    /**
+     * Set the identifiers for this class
+     * @param identifiers the identifiers to set
+     */
+    public void setIdentifiers(Set<String> identifiers) {
+        IDENTIFIERS = identifiers;
+    }
+
+    /**
+     * Set the identifiers for this class
+     * @param clazz the class which contains the identifiers in a simple way
+     */
+    public void setIdentifiers(Class<? extends SimpleIdentifiers> clazz) {
+        IDENTIFIERS = SimpleIdentifiers.identifiers(clazz);
     }
 
     protected  <V> V getValue(String key) {
@@ -101,7 +117,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
         return (V) this.getValues().get(key);
     }
 
-    protected void addValue(String key, Object value) {
+    protected void setValue(String key, Object value) {
 
         if (this.values == null) {
             this.values = new HashMap<>();

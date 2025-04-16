@@ -31,6 +31,6 @@ public interface SerializableMapConvertible<T> {
     /**
      * @return Returns the values identifiers
      */
-    Set<String> identifiers();
+    Set<String> getIdentifiers();
 
 }
