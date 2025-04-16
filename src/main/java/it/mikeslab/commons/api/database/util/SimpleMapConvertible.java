@@ -16,19 +16,26 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
     @Setter
     private T uniqueId;
 
-    private final String uniqueIdentifierName;
+    private SimpleIdentifiers uniqueIdentifier = null;
 
-    private final Set<String> knownIdentifiers; // Instance field for identifiers
+    private Set<String> knownIdentifiers = null; // Instance field for identifiers
 
     private final Map<String, Object> data = new HashMap<>();
 
     protected SimpleMapConvertible(@NotNull Class<? extends SimpleIdentifiers> identifiersClass, @NotNull SimpleIdentifiers uniqueIdentifier) {
         // Initialize final fields
-        this.uniqueIdentifierName = uniqueIdentifier.getKey();
+        this.uniqueIdentifier = uniqueIdentifier;
         this.knownIdentifiers = Collections.unmodifiableSet(SimpleIdentifiers.identifiers(identifiersClass)); // Initialize instance identifiers safely
 
         // uniqueId starts as null, must be set later
         this.uniqueId = null;
+    }
+
+    protected SimpleMapConvertible(T uniqueId) {
+
+        // uniqueId starts as null, must be set later
+        this.uniqueId = uniqueId;
+
     }
 
     @Override
@@ -40,7 +47,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
             Map<String, Object> tempMap = new HashMap<>(map);
 
             // Retrieve and set uniqueId from map if structure allows
-            Object idFromMap = tempMap.get(this.uniqueIdentifierName);
+            Object idFromMap = tempMap.get(this.getUniqueIdentifierName());
             if (idFromMap != null) {
                 try {
 
@@ -51,7 +58,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
             }
 
             // Remove identifier before storing the rest
-            tempMap.remove(this.uniqueIdentifierName);
+            tempMap.remove(this.getUniqueIdentifierName());
             this.data.putAll(tempMap);
 
             LogUtils.debug(
@@ -71,15 +78,15 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
         Map<String, Object> map = new HashMap<>();
 
         // Handle potential null uniqueId
-        String uniqueIdValue = getUniqueIdentifierValueAsString(); // Use helper
+        String uniqueIdValue = this.getUniqueIdentifierValue(); // Use helper
         if (uniqueIdValue == null) {
             LogUtils.warn(
                     LogUtils.LogSource.DATABASE,
                     String.format("Unique identifier '%s' is null for object %s. Skipping.",
-                            this.uniqueIdentifierName, this.getClass().getSimpleName())
+                            this.getUniqueIdentifierKey(), this.getClass().getSimpleName())
             );
         } else {
-            map.put(this.uniqueIdentifierName, uniqueIdValue); // Store String representation
+            map.put(this.getUniqueIdentifierKey(), uniqueIdValue); // Store String representation
         }
 
 
@@ -100,8 +107,18 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
      * @return String representation or null if uniqueId is null.
      */
     @Nullable
-    public String getUniqueIdentifierValueAsString() {
+    @Override
+    public String getUniqueIdentifierValue() {
         return this.uniqueId != null ? this.uniqueId.toString() : null;
+    }
+
+    /**
+     * Gets the unique identifier name.
+     * @return The name of the unique identifier.
+     */
+    @Nullable
+    private String getUniqueIdentifierKey() {
+        return this.uniqueIdentifier != null ? this.uniqueIdentifier.getKey() : null;
     }
 
     @Nullable
