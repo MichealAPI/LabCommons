@@ -14,24 +14,24 @@ import java.util.*;
 public abstract class SimpleMapConvertible<T, U> implements SerializableMapConvertible<U> {
 
     private static Set<String> KNOWN_IDENTIFIERS = null; // Instance field for identifiers
+    private static SimpleIdentifiers UNIQUE_IDENTIFIER = null;
 
     @Setter
     private T uniqueId;
 
-    private SimpleIdentifiers uniqueIdentifier = null;
 
 
     private final Map<String, Object> data = new HashMap<>();
 
     protected SimpleMapConvertible(@NotNull Class<? extends SimpleIdentifiers> identifiersClass, @NotNull SimpleIdentifiers uniqueIdentifier) {
         // Initialize final fields
-        this.uniqueIdentifier = uniqueIdentifier;
+        UNIQUE_IDENTIFIER = uniqueIdentifier;
         KNOWN_IDENTIFIERS = Collections.unmodifiableSet(SimpleIdentifiers.identifiers(identifiersClass)); // Initialize instance identifiers safely
 
         LogUtils.debug(
                 LogUtils.LogSource.DATABASE,
                 String.format("SimpleMapConvertible initialized with uniqueIdentifier: %s and identifiers: %s",
-                        this.uniqueIdentifier, KNOWN_IDENTIFIERS)
+                        UNIQUE_IDENTIFIER, KNOWN_IDENTIFIERS)
         );
 
         // uniqueId starts as null, must be set later
@@ -126,7 +126,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
     @Nullable
     @Override
     public String getUniqueIdentifierName() {
-        return this.uniqueIdentifier != null ? this.uniqueIdentifier.getKey() : null;
+        return UNIQUE_IDENTIFIER != null ? UNIQUE_IDENTIFIER.getKey() : null;
     }
 
     @Nullable
