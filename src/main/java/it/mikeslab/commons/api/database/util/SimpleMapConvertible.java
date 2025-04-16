@@ -38,7 +38,7 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
         this.uniqueId = null;
     }
 
-    protected SimpleMapConvertible(T uniqueId) {
+    public SimpleMapConvertible(T uniqueId) {
 
         // uniqueId starts as null, must be set later
         this.uniqueId = uniqueId;
