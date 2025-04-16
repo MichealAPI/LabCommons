@@ -83,10 +83,10 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
             LogUtils.warn(
                     LogUtils.LogSource.DATABASE,
                     String.format("Unique identifier '%s' is null for object %s. Skipping.",
-                            this.getUniqueIdentifierKey(), this.getClass().getSimpleName())
+                            this.getUniqueIdentifierName(), this.getClass().getSimpleName())
             );
         } else {
-            map.put(this.getUniqueIdentifierKey(), uniqueIdValue); // Store String representation
+            map.put(this.getUniqueIdentifierName(), uniqueIdValue); // Store String representation
         }
 
 
@@ -117,7 +117,8 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
      * @return The name of the unique identifier.
      */
     @Nullable
-    private String getUniqueIdentifierKey() {
+    @Override
+    public String getUniqueIdentifierName() {
         return this.uniqueIdentifier != null ? this.uniqueIdentifier.getKey() : null;
     }
 
