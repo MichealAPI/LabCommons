@@ -203,7 +203,7 @@ public class GuiElement {
         );
 
         // Use ItemCreator to generate and return the final ItemStack
-        return new ItemCreator().create(clone);
+        return ItemCreator.create(clone);
     }
 
     /**
@@ -220,7 +220,7 @@ public class GuiElement {
         //    clone = this.executeReplacements(replacements);
         //}
 
-        return new ItemCreator().create(clone);
+        return ItemCreator.create(clone);
     }
 
 
