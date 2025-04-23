@@ -21,9 +21,11 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
 
     private final Map<String, Object> data = new HashMap<>();
 
+    protected SimpleMapConvertible() {}
+
     protected SimpleMapConvertible(T uniqueId, @NotNull Class<? extends SimpleIdentifiers> identifiersClass, @NotNull SimpleIdentifiers uniqueIdentifier) {
 
-        // uniqueId starts as null, must be set later
+        // uniqueId starts as null and must be set later
         this.uniqueId = uniqueId;
 
         if (KNOWN_IDENTIFIERS == null || UNIQUE_IDENTIFIER == null) {
