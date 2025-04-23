@@ -17,13 +17,25 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
     private static SimpleIdentifiers UNIQUE_IDENTIFIER = null;
 
     @Setter
-    private T uniqueId;
-
-
+    private T uniqueId = null; // Unique ID, can be null initially
 
     private final Map<String, Object> data = new HashMap<>();
 
-    protected SimpleMapConvertible(@NotNull Class<? extends SimpleIdentifiers> identifiersClass, @NotNull SimpleIdentifiers uniqueIdentifier) {
+    protected SimpleMapConvertible(T uniqueId, @NotNull Class<? extends SimpleIdentifiers> identifiersClass, @NotNull SimpleIdentifiers uniqueIdentifier) {
+
+        // uniqueId starts as null, must be set later
+        this.uniqueId = uniqueId;
+
+        if (KNOWN_IDENTIFIERS == null || UNIQUE_IDENTIFIER == null) {
+            this.initializeIdentifiers(
+                    identifiersClass,
+                    uniqueIdentifier
+            );
+        }
+    }
+
+    private void initializeIdentifiers(@NotNull Class<? extends SimpleIdentifiers> identifiersClass, @NotNull SimpleIdentifiers uniqueIdentifier) {
+
         // Initialize final fields
         UNIQUE_IDENTIFIER = uniqueIdentifier;
         KNOWN_IDENTIFIERS = Collections.unmodifiableSet(SimpleIdentifiers.identifiers(identifiersClass)); // Initialize instance identifiers safely
@@ -33,16 +45,6 @@ public abstract class SimpleMapConvertible<T, U> implements SerializableMapConve
                 String.format("SimpleMapConvertible initialized with uniqueIdentifier: %s and identifiers: %s",
                         UNIQUE_IDENTIFIER, KNOWN_IDENTIFIERS)
         );
-
-        // uniqueId starts as null, must be set later
-        this.uniqueId = null;
-    }
-
-    protected SimpleMapConvertible(T uniqueId) {
-
-        // uniqueId starts as null, must be set later
-        this.uniqueId = uniqueId;
-
     }
 
     @Override
