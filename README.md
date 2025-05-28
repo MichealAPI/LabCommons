@@ -1,15 +1,16 @@
 <div align="left" style="position: relative;">
 <img src="/logo.png" align="right" style="margin: -20px 0 0 20px;" alt="logo">
-<br>
 
-<p align="left">
-	<img src="https://img.shields.io/github/license/MichealAPI/LabCommons?style=default&logo=opensourceinitiative&logoColor=white&color=00c5ff" alt="license">
-	<img src="https://img.shields.io/github/last-commit/MichealAPI/LabCommons?style=default&logo=git&logoColor=white&color=00c5ff" alt="last-commit">
-	<img src="https://img.shields.io/github/languages/top/MichealAPI/LabCommons?style=default&color=00c5ff" alt="repo-top-language">
-	<img src="https://img.shields.io/github/languages/count/MichealAPI/LabCommons?style=default&color=00c5ff" alt="repo-language-count">
-</p>
+
 </div>
 <br clear="right">
+
+<p align="center" style="margin-top: 50px;">
+	<img src="https://img.shields.io/github/license/MichealAPI/LabCommons?style=default&logo=opensourceinitiative&logoColor=white&color=c6424e" alt="license">
+	<img src="https://img.shields.io/github/last-commit/MichealAPI/LabCommons?style=default&logo=git&logoColor=white&color=c6424e" alt="last-commit">
+	<img src="https://img.shields.io/github/languages/top/MichealAPI/LabCommons?style=default&color=c6424e" alt="repo-top-language">
+	<img src="https://img.shields.io/github/languages/count/MichealAPI/LabCommons?style=default&color=c6424e" alt="repo-language-count">
+</p>
 
 ## 🔗 Table of Contents
 
