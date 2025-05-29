@@ -9,6 +9,7 @@ import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import it.mikeslab.commons.api.inventory.util.action.internal.ConsumerFilter;
 import it.mikeslab.commons.api.logger.LogUtils;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -27,6 +28,7 @@ public class GuiListener implements Listener {
 
     private final GuiFactory guiFactory;
 
+    @Getter
     private final HashMap<UUID, String> openInventories = new HashMap<>();
 
     public GuiListener(GuiFactory guiFactory, JavaPlugin plugin) {
