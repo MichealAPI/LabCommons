@@ -115,9 +115,12 @@ public class GuiConfigImpl implements GuiConfig {
                 ConfigField.SIZE.getField()
         );
 
+        String identifier = section.getName();
+
         this.guiDetails = new GuiDetails(
                 layout,
-                guiType
+                guiType,
+                identifier
         );
 
         this.guiDetails.setInventoryName(guiTitle);

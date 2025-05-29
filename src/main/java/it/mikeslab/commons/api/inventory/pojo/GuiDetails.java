@@ -27,6 +27,8 @@ public class GuiDetails {
     private int inventorySize; // calculated or fixed, in case of a chest
     private Map<String, Supplier<String>> placeholders;
 
+    private String identifier;
+
     private Map<String, Consumer<GuiInteractEvent>> clickActions;
 
     private Map<String, Supplier<String>> injectedConditionPlaceholders;
@@ -37,7 +39,7 @@ public class GuiDetails {
     @ApiStatus.Experimental
     private String text; // valid only for anvil menus
 
-    public GuiDetails(String[] inventoryLayout, GuiType guiType) {
+    public GuiDetails(String[] inventoryLayout, GuiType guiType, String identifier) {
 
         // default size
         inventorySize = inventoryLayout.length * guiType.getRowLength();
@@ -59,6 +61,7 @@ public class GuiDetails {
 
         this.injectedConditionPlaceholders = new HashMap<>();
 
+        this.identifier = identifier;
     }
 
 
@@ -75,7 +78,7 @@ public class GuiDetails {
 
     public GuiDetails clone() {
 
-        GuiDetails clone = new GuiDetails(inventoryLayout, guiType);
+        GuiDetails clone = new GuiDetails(inventoryLayout, guiType, identifier);
 
         clone.setHolder(holder);
         clone.setInventoryName(inventoryName);

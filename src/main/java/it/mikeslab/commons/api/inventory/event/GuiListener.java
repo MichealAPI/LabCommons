@@ -19,13 +19,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 public class GuiListener implements Listener {
 
     private final GuiFactory guiFactory;
-    private final JavaPlugin instance;
+
+    private final HashMap<String, String> openInventories = new HashMap<>();
+
+    public GuiListener(GuiFactory guiFactory, JavaPlugin plugin) {
+        this.guiFactory = guiFactory;
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
@@ -84,6 +90,11 @@ public class GuiListener implements Listener {
                     player,
                     customGui,
                     ActionHandler.ActionEvent.OPEN
+            );
+
+            this.openInventories.put(
+                    player.getUniqueId().toString(),
+                    customGui.getGuiDetails().getInventoryName()
             );
 
     }
