@@ -8,6 +8,7 @@ import it.mikeslab.commons.api.inventory.helper.ActionHelper;
 import it.mikeslab.commons.api.inventory.pojo.GuiElement;
 import it.mikeslab.commons.api.inventory.util.action.ActionHandler;
 import it.mikeslab.commons.api.inventory.util.action.internal.ConsumerFilter;
+import it.mikeslab.commons.api.logger.LogUtils;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,7 +27,7 @@ public class GuiListener implements Listener {
 
     private final GuiFactory guiFactory;
 
-    private final HashMap<String, String> openInventories = new HashMap<>();
+    private final HashMap<UUID, String> openInventories = new HashMap<>();
 
     public GuiListener(GuiFactory guiFactory, JavaPlugin plugin) {
         this.guiFactory = guiFactory;
@@ -93,10 +94,9 @@ public class GuiListener implements Listener {
             );
 
             this.openInventories.put(
-                    player.getUniqueId().toString(),
-                    customGui.getGuiDetails().getInventoryName()
+                    player.getUniqueId(),
+                    customGui.getGuiDetails().getIdentifier()
             );
-
     }
 
     @EventHandler
@@ -121,6 +121,19 @@ public class GuiListener implements Listener {
                 customGui,
                 ActionHandler.ActionEvent.CLOSE
         );
+
+        this.openInventories.computeIfPresent(player.getUniqueId(), (uuid, identifier) -> {
+            if(identifier.equals(customGui.getGuiDetails().getIdentifier())) {
+                return null; // Remove the entry if it matches
+            }
+
+            LogUtils.debug(LogUtils.LogSource.API, String.format("Tried to close a GUI that was not the current one. Expected: %s, Actual: %s",
+                    identifier,
+                    customGui.getGuiDetails().getIdentifier()
+            ));
+
+            return identifier; // Keep the entry if it doesn't match
+        });
 
     }
 
